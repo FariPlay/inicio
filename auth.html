@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iniciar sesión — Rexpres Play</title>
+<meta name="theme-color" content="#07040A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2307040A'/%3E%3Cpolygon points='14,12 34,12 50,52 30,52' fill='%23FF7A1A'/%3E%3Cpolygon points='50,12 30,12 14,52 34,52' fill='%233A5CFF'/%3E%3C/svg%3E" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg-0:#07040A; --bg-1:#120B18; --bg-2:#1B1024;
+  --blue:#3A5CFF; --blue-2:#5B7CFF;
+  --orange:#FF7A1A; --orange-2:#FFB238; --red:#FF3B3B;
+  --ink:#FFFFFF; --ink-dim:#C9C6DA; --muted:#8B87A6;
+  --font:Arial,Helvetica,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg-0);color:var(--ink);font-family:var(--font);min-height:100vh;min-height:100dvh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;position:relative;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    radial-gradient(50% 40% at 85% 0%, rgba(255,59,59,.16), transparent 60%),
+    radial-gradient(45% 40% at 8% 8%, rgba(58,92,255,.2), transparent 60%),
+    linear-gradient(rgba(255,122,26,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,122,26,.035) 1px,transparent 1px);
+  background-size:auto,auto,38px 38px,38px 38px;}
+a{color:inherit;text-decoration:none;}
+.brand{display:flex;align-items:center;gap:.5rem;margin-bottom:28px;position:relative;z-index:1;}
+.bmark{width:28px;height:24px;position:relative;flex:none;}
+.bslab{position:absolute;width:60%;height:46%;clip-path:polygon(0 0,70% 0,100% 100%,30% 100%);}
+.bslab.a{top:0;left:0;background:var(--blue-2);}
+.bslab.b{bottom:0;right:0;background:var(--orange);}
+.brand-logo{height:32px;width:auto;}
+.bword{font-weight:900;font-size:1.1rem;text-transform:uppercase;}
+.bword i{color:var(--orange-2);font-style:normal;}
+
+.card{position:relative;z-index:1;width:100%;max-width:380px;background:linear-gradient(160deg,var(--bg-2),var(--bg-1));
+  border:1px solid rgba(255,255,255,.08);border-top:2px solid var(--orange);border-radius:8px;padding:26px 24px;}
+.tabs{display:flex;gap:6px;margin-bottom:20px;background:var(--bg-0);border-radius:6px;padding:4px;}
+.tab{flex:1;text-align:center;padding:10px;border-radius:5px;font-size:.78rem;font-weight:900;text-transform:uppercase;
+  letter-spacing:.5px;cursor:pointer;color:var(--muted);transition:background .2s,color .2s;}
+.tab.active{background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;}
+
+.field{margin-bottom:14px;}
+.field-label{display:block;font-size:.66rem;font-weight:900;color:var(--muted);text-transform:uppercase;
+  letter-spacing:1.5px;margin-bottom:8px;}
+.field-input{width:100%;background:var(--bg-0);border:1px solid rgba(255,255,255,.1);border-radius:5px;
+  padding:13px 14px;color:var(--ink);font-size:.95rem;font-family:var(--font);outline:none;transition:border-color .2s;}
+.field-input:focus{border-color:var(--orange);}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:var(--font);
+  font-weight:900;text-transform:uppercase;letter-spacing:.5px;padding:14px;border-radius:6px;border:none;
+  cursor:pointer;font-size:.85rem;transition:transform .2s,box-shadow .2s;}
+.btn--fire{background:linear-gradient(135deg,var(--red),var(--orange) 55%,var(--orange-2));color:#1A0500;
+  box-shadow:0 0 0 1px rgba(255,122,26,.4),0 14px 30px -10px rgba(255,59,59,.6);margin-top:6px;}
+.btn--fire:hover{transform:translateY(-2px);}
+.btn--fire:disabled{opacity:.6;cursor:wait;transform:none;}
+.btn--google{background:#fff;color:#1a1a1a;margin-top:14px;}
+.btn--google svg{width:18px;height:18px;}
+
+.divider{display:flex;align-items:center;gap:10px;margin:18px 0 0;color:var(--muted);font-size:.72rem;
+  text-transform:uppercase;letter-spacing:1px;}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.1);}
+
+.msg{font-size:.78rem;padding:10px 12px;border-radius:6px;margin-bottom:14px;display:none;line-height:1.5;}
+.msg.show{display:block;}
+.msg.err{background:rgba(255,59,59,.1);border:1px solid rgba(255,59,59,.3);color:#ff8080;}
+.msg.ok{background:rgba(62,207,110,.1);border:1px solid rgba(62,207,110,.3);color:#6ee7a0;}
+
+.back-link{margin-top:20px;font-size:.8rem;color:var(--muted);position:relative;z-index:1;}
+.back-link:hover{color:var(--orange-2);}
+</style>
+</head>
+<body>
+
+<a href="index.html" class="brand">
+  <img src="logo.png" alt="Rexpres Play" class="brand-logo" onerror="this.style.display='none'">
+</a>
+
+<div class="card">
+  <div class="tabs">
+    <div class="tab active" id="tabLogin">Iniciar sesión</div>
+    <div class="tab" id="tabSignup">Crear cuenta</div>
+  </div>
+
+  <p class="msg" id="msg"></p>
+
+  <form id="authForm">
+    <div class="field">
+      <label class="field-label">Correo electrónico</label>
+      <input type="email" id="email" class="field-input" placeholder="tucorreo@ejemplo.com" required>
+    </div>
+    <div class="field">
+      <label class="field-label">Contraseña</label>
+      <input type="password" id="password" class="field-input" placeholder="Mínimo 6 caracteres" minlength="6" required>
+    </div>
+    <button type="submit" class="btn btn--fire" id="submitBtn">Iniciar sesión</button>
+  </form>
+
+  <div class="divider">o continúa con</div>
+  <button type="button" class="btn btn--google" id="googleBtn">
+    <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.07 5.07 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.99.66-2.25 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.85A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.09A6.6 6.6 0 0 1 5.5 12c0-.73.12-1.43.34-2.09V7.06H2.18A11 11 0 0 0 1 12c0 1.77.43 3.45 1.18 4.94l3.66-2.85z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1a11 11 0 0 0-9.82 6.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    Continuar con Google
+  </button>
+</div>
+
+<a href="index.html" class="back-link">← Volver a Rexpres Play</a>
+
+<script>
+/* =====================================================================
+   CONFIGURACIÓN DE SUPABASE — pega aquí tus datos reales
+   (Settings → API en tu proyecto de Supabase)
+===================================================================== */
+const SUPABASE_URL = "https://zdefkvvodijmrlhxvlrr.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_C0ur5kEiRQ0TYDpgtiaF8Q_w2lCVCQA";
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const params = new URLSearchParams(location.search);
+const redirectTo = params.get("redirect") || "index.html";
+
+// Si ya hay sesión activa, no tiene sentido mostrar el login de nuevo
+sb.auth.getSession().then(({ data }) => {
+  if (data.session) location.href = redirectTo;
+});
+
+let mode = "login"; // "login" | "signup"
+const tabLogin = document.getElementById("tabLogin");
+const tabSignup = document.getElementById("tabSignup");
+const submitBtn = document.getElementById("submitBtn");
+const msg = document.getElementById("msg");
+
+function setMode(m){
+  mode = m;
+  tabLogin.classList.toggle("active", m === "login");
+  tabSignup.classList.toggle("active", m === "signup");
+  submitBtn.textContent = m === "login" ? "Iniciar sesión" : "Crear cuenta";
+  msg.className = "msg";
+}
+tabLogin.addEventListener("click", () => setMode("login"));
+tabSignup.addEventListener("click", () => setMode("signup"));
+
+function showMsg(text, type){
+  msg.textContent = text;
+  msg.className = "msg show " + type;
+}
+
+document.getElementById("authForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = mode === "login" ? "Entrando…" : "Creando cuenta…";
+
+  const { error } = mode === "login"
+    ? await sb.auth.signInWithPassword({ email, password })
+    : await sb.auth.signUp({ email, password });
+
+  submitBtn.disabled = false;
+  submitBtn.textContent = mode === "login" ? "Iniciar sesión" : "Crear cuenta";
+
+  if (error) {
+    showMsg(error.message, "err");
+    return;
+  }
+
+  if (mode === "signup") {
+    showMsg("Cuenta creada. Revisa tu correo para confirmar (si tu proyecto lo requiere) e inicia sesión.", "ok");
+    setMode("login");
+  } else {
+    location.href = redirectTo;
+  }
+});
+
+document.getElementById("googleBtn").addEventListener("click", async () => {
+  await sb.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: location.origin + location.pathname.replace("auth.html", redirectTo) }
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis pedidos — Rexpres Play</title>
+<meta name="theme-color" content="#07040A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2307040A'/%3E%3Cpolygon points='14,12 34,12 50,52 30,52' fill='%23FF7A1A'/%3E%3Cpolygon points='50,12 30,12 14,52 34,52' fill='%233A5CFF'/%3E%3C/svg%3E" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg-0:#07040A; --bg-1:#120B18; --bg-2:#1B1024;
+  --blue-2:#5B7CFF; --orange:#FF7A1A; --orange-2:#FFB238;
+  --ink:#FFFFFF; --ink-dim:#C9C6DA; --muted:#8B87A6; --green:#3ECF6E;
+  --font:Arial,Helvetica,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg-0);color:var(--ink);font-family:var(--font);min-height:100vh;min-height:100dvh;position:relative;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,122,26,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,122,26,.035) 1px,transparent 1px);
+  background-size:38px 38px;}
+a{color:inherit;text-decoration:none;}
+.hdr{background:rgba(7,4,10,.92);backdrop-filter:blur(16px);position:sticky;top:0;z-index:100;height:58px;
+  padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,122,26,.18);}
+.brand-logo{height:26px;width:auto;}
+.wrap{max-width:640px;margin:0 auto;padding:28px 16px 60px;position:relative;z-index:1;}
+h1{font-size:1.3rem;font-weight:900;text-transform:uppercase;margin-bottom:6px;}
+.sub{font-size:.82rem;color:var(--muted);margin-bottom:24px;}
+.order{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
+  border-left:3px solid var(--orange);border-radius:6px;padding:16px 18px;margin-bottom:12px;}
+.order-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.order-pkg{font-size:1rem;font-weight:900;}
+.order-total{font-family:var(--font);font-weight:900;color:var(--orange-2);font-size:1.05rem;}
+.order-meta{font-size:.76rem;color:var(--muted);margin-top:6px;line-height:1.6;}
+.badge{display:inline-block;font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;
+  padding:3px 9px;border-radius:20px;margin-top:8px;}
+.badge.pendiente{background:rgba(255,178,56,.12);color:var(--orange-2);border:1px solid rgba(255,178,56,.3);}
+.badge.confirmado{background:rgba(62,207,110,.12);color:var(--green);border:1px solid rgba(62,207,110,.3);}
+.empty{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty a{color:var(--orange-2);font-weight:800;}
+.loading{text-align:center;padding:40px;color:var(--muted);font-size:.85rem;}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <a href="index.html"><img src="logo.png" alt="Rexpres Play" class="brand-logo" onerror="this.style.display='none'"></a>
+  <a href="#" id="logoutBtn" style="font-size:.8rem;color:var(--muted);">Cerrar sesión</a>
+</header>
+
+<div class="wrap">
+  <h1>Mis pedidos</h1>
+  <p class="sub" id="userEmail"></p>
+  <div id="ordersList"><p class="loading">Cargando tus pedidos…</p></div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://zdefkvvodijmrlhxvlrr.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_C0ur5kEiRQ0TYDpgtiaF8Q_w2lCVCQA";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = "auth.html?redirect=mis-pedidos.html"; return; }
+
+  document.getElementById("userEmail").textContent = session.user.email;
+
+  const { data: pedidos, error } = await sb
+    .from("pedidos")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  const list = document.getElementById("ordersList");
+
+  if (error) {
+    list.innerHTML = '<p class="empty">No pudimos cargar tus pedidos. Intenta de nuevo más tarde.</p>';
+    return;
+  }
+
+  if (!pedidos || pedidos.length === 0) {
+    list.innerHTML = '<p class="empty">Todavía no tienes pedidos.<br><a href="index.html#paquetes">Ver paquetes disponibles →</a></p>';
+    return;
+  }
+
+  list.innerHTML = pedidos.map(p => {
+    const fecha = new Date(p.created_at).toLocaleString("es-EC", { dateStyle: "medium", timeStyle: "short" });
+    return `
+      <div class="order">
+        <div class="order-top">
+          <div>
+            <div class="order-pkg">${p.paquete}${p.bono > 0 ? ' <small>(+' + p.bono + ' bono)</small>' : ''}</div>
+            <div class="order-meta">${fecha} · ID jugador: ${p.player_id} · ${p.metodo_pago || ''}${p.banco ? ' · ' + p.banco : ''}</div>
+          </div>
+          <div class="order-total">$${Number(p.total).toFixed(2)}</div>
+        </div>
+        <span class="badge ${p.estado === 'confirmado' ? 'confirmado' : 'pendiente'}">${p.estado || 'pendiente'}</span>
+      </div>`;
+  }).join('');
+})();
+
+document.getElementById("logoutBtn").addEventListener("click", async (e) => {
+  e.preventDefault();
+  await sb.auth.signOut();
+  location.href = "index.html";
+});
+</script>
+</body>
+</html>

@@ -237,8 +237,11 @@ footer{background:var(--bg-0);border-top:1px solid rgba(255,255,255,.06);padding
 .success-btn{display:inline-block;background:linear-gradient(135deg,var(--red),var(--orange));color:#1A0500;
   font-weight:900;padding:12px 26px;border-radius:6px;font-size:.82rem;text-transform:uppercase;letter-spacing:.5px;}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
+<div id="authGate" style="position:fixed;inset:0;background:#07040A;z-index:999;display:flex;align-items:center;justify-content:center;color:#8B87A6;font-family:Arial,Helvetica,sans-serif;font-size:.85rem;">Verificando tu sesión…</div>
 
 <div class="toast" id="toast"></div>
 
@@ -409,6 +412,26 @@ footer{background:var(--bg-0);border-top:1px solid rgba(255,255,255,.06);padding
 "use strict";
 var SUPPORT_NUMBER = "593992225484";
 var ORDER_NUMBER = "593982063160";
+
+/* =====================================================================
+   SUPABASE — cuentas de usuario e historial de pedidos
+===================================================================== */
+var SUPABASE_URL = "https://zdefkvvodijmrlhxvlrr.supabase.co";
+var SUPABASE_ANON_KEY = "sb_publishable_C0ur5kEiRQ0TYDpgtiaF8Q_w2lCVCQA";
+var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+var currentUser = null;
+
+(async function requireAuth(){
+  var res = await sb.auth.getSession();
+  if(!res.data.session){
+    var actual = location.pathname.split("/").pop() + location.search;
+    location.href = "auth.html?redirect=" + encodeURIComponent(actual);
+    return;
+  }
+  currentUser = res.data.session.user;
+  var gate = document.getElementById("authGate");
+  if(gate) gate.style.display = "none";
+})();
 
 /* =====================================================================
    CUPONES — edítalos aquí. Clave = código en mayúsculas, valor = % descuento.
@@ -648,6 +671,23 @@ document.getElementById("btnOk").addEventListener("click", async function(){
       ? "• 📎 Comprobante: " + comprobanteUrl + "\n"
       : "• 📎 Comprobante: se descargó a tu celular, adjúntalo aquí 👇\n";
   }
+
+  btn.textContent = "Guardando pedido…";
+  try{
+    await sb.from("pedidos").insert({
+      user_id: currentUser.id,
+      paquete: amt,
+      bono: bonus,
+      precio: price,
+      metodo_pago: metodoLabel,
+      banco: necesitaBanco ? bancoSel : null,
+      codigo_cupon: codigoUsado,
+      descuento: descuento,
+      total: tot,
+      player_id: id,
+      comprobante_url: comprobanteUrl || null
+    });
+  }catch(e){ /* si falla el guardado, el pedido igual se envía por WhatsApp */ }
 
   btn.textContent = "Abriendo WhatsApp…";
   window.open("https://wa.me/" + ORDER_NUMBER + "?text=" + encodeURIComponent(msg), "_blank", "noopener");
