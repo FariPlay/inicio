@@ -70,6 +70,26 @@ a{color:inherit;text-decoration:none;}
 
 .back-link{margin-top:20px;font-size:.8rem;color:var(--muted);position:relative;z-index:1;}
 .back-link:hover{color:var(--orange-2);}
+
+/* -------- pantallas de estado (callback / confirmación) -------- */
+.state-screen{position:fixed;inset:0;z-index:200;background:var(--bg-0);display:none;
+  align-items:center;justify-content:center;flex-direction:column;padding:24px;text-align:center;}
+.state-screen.show{display:flex;}
+.state-card{position:relative;z-index:1;width:100%;max-width:380px;background:linear-gradient(160deg,var(--bg-2),var(--bg-1));
+  border:1px solid rgba(255,255,255,.08);border-top:2px solid var(--orange);border-radius:8px;padding:36px 26px;}
+.state-icon{width:56px;height:56px;margin:0 auto 18px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,178,56,.12);border:1px solid rgba(255,178,56,.3);}
+.state-icon svg{width:28px;height:28px;}
+.state-title{font-size:1.05rem;font-weight:900;text-transform:uppercase;margin-bottom:10px;letter-spacing:.3px;}
+.state-text{font-size:.85rem;color:var(--ink-dim);line-height:1.6;margin-bottom:6px;}
+.state-email{font-weight:900;color:var(--orange-2);}
+.spinner{width:34px;height:34px;border-radius:50%;border:3px solid rgba(255,255,255,.12);border-top-color:var(--orange);
+  animation:spin .8s linear infinite;margin:0 auto 18px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.state-actions{margin-top:22px;display:flex;flex-direction:column;gap:10px;}
+.link-btn{background:none;border:none;color:var(--blue-2);font-family:var(--font);font-size:.8rem;font-weight:800;
+  cursor:pointer;text-decoration:underline;}
+.link-btn:disabled{opacity:.5;cursor:default;text-decoration:none;}
 </style>
 </head>
 <body>
@@ -78,7 +98,33 @@ a{color:inherit;text-decoration:none;}
   <img src="logo.png" alt="Rexpres Play" class="brand-logo" onerror="this.style.display='none'">
 </a>
 
-<div class="card">
+<!-- Pantalla: procesando enlace de Google / confirmación de correo -->
+<div class="state-screen" id="callbackScreen">
+  <div class="state-card">
+    <div class="spinner"></div>
+    <div class="state-title">Iniciando sesión…</div>
+    <p class="state-text">Un momento, estamos verificando tu acceso.</p>
+  </div>
+</div>
+
+<!-- Pantalla: cuenta creada, revisa tu correo -->
+<div class="state-screen" id="signupSuccessScreen">
+  <div class="state-card">
+    <div class="state-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#FFB238" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="m22 6-10 7L2 6"/></svg>
+    </div>
+    <div class="state-title">¡Cuenta creada!</div>
+    <p class="state-text">Te enviamos un correo de confirmación a</p>
+    <p class="state-email" id="signupEmailShown"></p>
+    <p class="state-text" style="margin-top:14px;">Abre ese correo y toca el enlace para activar tu cuenta. Si no lo ves, revisa spam o promociones.</p>
+    <div class="state-actions">
+      <button class="btn btn--fire" id="backToLoginBtn" type="button">Ir a iniciar sesión</button>
+      <button class="link-btn" id="resendBtn" type="button">Reenviar correo</button>
+    </div>
+  </div>
+</div>
+
+<div class="card" id="authCard">
   <div class="tabs">
     <div class="tab active" id="tabLogin">Iniciar sesión</div>
     <div class="tab" id="tabSignup">Crear cuenta</div>
@@ -87,6 +133,10 @@ a{color:inherit;text-decoration:none;}
   <p class="msg" id="msg"></p>
 
   <form id="authForm">
+    <div class="field" id="nameField" style="display:none;">
+      <label class="field-label">Nombre completo</label>
+      <input type="text" id="fullName" class="field-input" placeholder="Tu nombre y apellido">
+    </div>
     <div class="field">
       <label class="field-label">Correo electrónico</label>
       <input type="email" id="email" class="field-input" placeholder="tucorreo@ejemplo.com" required>
@@ -120,9 +170,33 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const params = new URLSearchParams(location.search);
 const redirectTo = params.get("redirect") || "index.html";
 
-// Si ya hay sesión activa, no tiene sentido mostrar el login de nuevo
+const authCard = document.getElementById("authCard");
+const callbackScreen = document.getElementById("callbackScreen");
+
+/* Si venimos de un enlace de confirmación de correo o de Google OAuth,
+   la URL trae #access_token=... (o ?code=...). En vez de mostrar esa URL
+   fea, tapamos todo con una pantalla de "Iniciando sesión..." */
+const cameFromAuthLink = location.hash.includes("access_token") || params.has("code");
+if (cameFromAuthLink) {
+  authCard.style.display = "none";
+  callbackScreen.classList.add("show");
+}
+
+// Si ya hay sesión activa (o se acaba de crear desde el enlace), redirige limpio
 sb.auth.getSession().then(({ data }) => {
-  if (data.session) location.href = redirectTo;
+  if (data.session) {
+    location.replace(redirectTo);
+  } else if (cameFromAuthLink) {
+    // El enlace no trajo una sesión válida (expiró o ya se usó)
+    callbackScreen.classList.remove("show");
+    authCard.style.display = "block";
+    showMsg("Ese enlace ya no es válido o expiró. Inicia sesión de nuevo.", "err");
+  }
+});
+
+// Por si el SDK tarda en procesar el hash, también escuchamos el evento
+sb.auth.onAuthStateChange((event, session) => {
+  if (session && cameFromAuthLink) location.replace(redirectTo);
 });
 
 let mode = "login"; // "login" | "signup"
@@ -136,6 +210,8 @@ function setMode(m){
   tabLogin.classList.toggle("active", m === "login");
   tabSignup.classList.toggle("active", m === "signup");
   submitBtn.textContent = m === "login" ? "Iniciar sesión" : "Crear cuenta";
+  document.getElementById("nameField").style.display = m === "signup" ? "block" : "none";
+  document.getElementById("fullName").required = m === "signup";
   msg.className = "msg";
 }
 tabLogin.addEventListener("click", () => setMode("login"));
@@ -150,13 +226,14 @@ document.getElementById("authForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
+  const fullName = document.getElementById("fullName").value.trim();
 
   submitBtn.disabled = true;
   submitBtn.textContent = mode === "login" ? "Entrando…" : "Creando cuenta…";
 
   const { error } = mode === "login"
     ? await sb.auth.signInWithPassword({ email, password })
-    : await sb.auth.signUp({ email, password });
+    : await sb.auth.signUp({ email, password, options: { data: { full_name: fullName } } });
 
   submitBtn.disabled = false;
   submitBtn.textContent = mode === "login" ? "Iniciar sesión" : "Crear cuenta";
@@ -167,11 +244,28 @@ document.getElementById("authForm").addEventListener("submit", async (e) => {
   }
 
   if (mode === "signup") {
-    showMsg("Cuenta creada. Revisa tu correo para confirmar (si tu proyecto lo requiere) e inicia sesión.", "ok");
-    setMode("login");
+    document.getElementById("signupEmailShown").textContent = email;
+    authCard.style.display = "none";
+    document.getElementById("signupSuccessScreen").classList.add("show");
   } else {
     location.href = redirectTo;
   }
+});
+
+document.getElementById("backToLoginBtn").addEventListener("click", () => {
+  document.getElementById("signupSuccessScreen").classList.remove("show");
+  authCard.style.display = "block";
+  setMode("login");
+});
+
+document.getElementById("resendBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("resendBtn");
+  const email = document.getElementById("signupEmailShown").textContent;
+  btn.disabled = true;
+  btn.textContent = "Enviando…";
+  const { error } = await sb.auth.resend({ type: "signup", email });
+  btn.textContent = error ? "No se pudo reenviar, intenta más tarde" : "Correo reenviado ✓";
+  setTimeout(() => { btn.disabled = false; btn.textContent = "Reenviar correo"; }, 4000);
 });
 
 document.getElementById("googleBtn").addEventListener("click", async () => {
