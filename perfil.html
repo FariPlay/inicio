@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi perfil — Rexpres Play</title>
+<meta name="theme-color" content="#07040A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2307040A'/%3E%3Cpolygon points='14,12 34,12 50,52 30,52' fill='%23FF7A1A'/%3E%3Cpolygon points='50,12 30,12 14,52 34,52' fill='%233A5CFF'/%3E%3C/svg%3E" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg-0:#07040A; --bg-1:#120B18; --bg-2:#1B1024;
+  --orange:#FF7A1A; --orange-2:#FFB238; --red:#FF3B3B;
+  --ink:#FFFFFF; --ink-dim:#C9C6DA; --muted:#8B87A6;
+  --font:Arial,Helvetica,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg-0);color:var(--ink);font-family:var(--font);min-height:100vh;min-height:100dvh;
+  position:relative;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,122,26,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,122,26,.035) 1px,transparent 1px);
+  background-size:38px 38px;}
+a{color:inherit;text-decoration:none;}
+.hdr{background:rgba(6,4,10,.97);backdrop-filter:blur(14px);position:sticky;top:0;z-index:100;height:58px;
+  padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,122,26,.2);}
+.brand-logo{height:26px;width:auto;}
+.back{font-size:.8rem;font-weight:800;color:var(--ink-dim);}
+.back:hover{color:var(--orange-2);}
+
+.wrap{max-width:420px;margin:0 auto;padding:48px 20px 60px;position:relative;z-index:1;}
+.profile-card{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
+  border-top:2px solid var(--orange);border-radius:14px;padding:34px 26px;text-align:center;
+  box-shadow:0 24px 50px -20px rgba(0,0,0,.7);}
+.profile-avatar{width:76px;height:76px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;
+  font-size:1.9rem;font-weight:900;color:#1A0500;background:linear-gradient(135deg,var(--orange-2),var(--orange));
+  box-shadow:0 0 0 4px rgba(255,122,26,.2);}
+.profile-name{font-size:1.2rem;font-weight:900;}
+.profile-email{font-size:.84rem;color:var(--muted);margin-top:4px;word-break:break-all;}
+
+.profile-fields{margin-top:26px;text-align:left;display:flex;flex-direction:column;gap:0;}
+.profile-field{display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:13px 2px;border-bottom:1px solid rgba(255,255,255,.07);}
+.profile-field:last-child{border-bottom:none;}
+.profile-field-label{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+.profile-field-value{font-size:.88rem;font-weight:800;color:var(--ink);text-align:right;}
+
+.logout-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:28px;
+  background:rgba(255,59,59,.1);border:1px solid rgba(255,59,59,.35);color:#ff8080;font-family:var(--font);
+  font-weight:900;text-transform:uppercase;letter-spacing:.4px;font-size:.82rem;padding:13px;border-radius:8px;cursor:pointer;
+  transition:background .2s;}
+.logout-btn:hover{background:rgba(255,59,59,.18);}
+.logout-btn svg{width:16px;height:16px;}
+
+.loading{text-align:center;padding:60px 20px;color:var(--muted);font-size:.85rem;}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <a href="index.html"><img src="logo.png" alt="Rexpres Play" class="brand-logo" onerror="this.style.display='none'"></a>
+  <a href="index.html" class="back">← Volver a la tienda</a>
+</header>
+
+<div class="wrap">
+  <div class="profile-card" id="profileCard" style="display:none;">
+    <div class="profile-avatar" id="profileAvatar">·</div>
+    <div class="profile-name" id="profileName">—</div>
+    <div class="profile-email" id="profileEmail">—</div>
+
+    <div class="profile-fields">
+      <div class="profile-field">
+        <span class="profile-field-label">N° de cliente</span>
+        <span class="profile-field-value" id="profileClientId">—</span>
+      </div>
+      <div class="profile-field">
+        <span class="profile-field-label">Cliente desde</span>
+        <span class="profile-field-value" id="profileSince">—</span>
+      </div>
+    </div>
+
+    <button type="button" class="logout-btn" id="logoutBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      Cerrar sesión
+    </button>
+  </div>
+
+  <p class="loading" id="loadingMsg">Cargando tu perfil…</p>
+</div>
+
+<script>
+const SUPABASE_URL = "https://zdefkvvodijmrlhxvlrr.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_C0ur5kEiRQ0TYDpgtiaF8Q_w2lCVCQA";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = "auth.html?redirect=perfil.html"; return; }
+
+  const user = session.user;
+  const email = user.email || "";
+  const fullName = (user.user_metadata && user.user_metadata.full_name) || "";
+  const displayName = fullName || email.split("@")[0];
+  const initial = (fullName || email || "?").trim().charAt(0).toUpperCase();
+  const clientId = "RP-" + user.id.slice(0, 6).toUpperCase();
+  const since = new Date(user.created_at).toLocaleDateString("es-EC", { year: "numeric", month: "long", day: "numeric" });
+
+  document.getElementById("profileAvatar").textContent = initial;
+  document.getElementById("profileName").textContent = displayName;
+  document.getElementById("profileEmail").textContent = email;
+  document.getElementById("profileClientId").textContent = clientId;
+  document.getElementById("profileSince").textContent = since;
+
+  document.getElementById("loadingMsg").style.display = "none";
+  document.getElementById("profileCard").style.display = "block";
+})();
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await sb.auth.signOut();
+  location.href = "index.html";
+});
+</script>
+</body>
+</html>

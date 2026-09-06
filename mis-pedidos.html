@@ -3,95 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mi cuenta — Rexpres Play</title>
+<title>Mis pedidos — Rexpres Play</title>
 <meta name="theme-color" content="#07040A">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2307040A'/%3E%3Cpolygon points='14,12 34,12 50,52 30,52' fill='%23FF7A1A'/%3E%3Cpolygon points='50,12 30,12 14,52 34,52' fill='%233A5CFF'/%3E%3C/svg%3E" type="image/svg+xml">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --bg-0:#07040A; --bg-1:#120B18; --bg-2:#1B1024;
-  --blue:#3A5CFF; --blue-2:#5B7CFF; --orange:#FF7A1A; --orange-2:#FFB238;
+  --blue-2:#5B7CFF; --orange:#FF7A1A; --orange-2:#FFB238;
   --ink:#FFFFFF; --ink-dim:#C9C6DA; --muted:#8B87A6; --green:#3ECF6E;
   --font:Arial,Helvetica,sans-serif;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
 body{background:var(--bg-0);color:var(--ink);font-family:var(--font);min-height:100vh;min-height:100dvh;
-  position:relative;overflow-x:hidden;padding-bottom:76px;}
+  position:relative;overflow-x:hidden;}
 body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   background-image:linear-gradient(rgba(255,122,26,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,122,26,.035) 1px,transparent 1px);
   background-size:38px 38px;}
 a{color:inherit;text-decoration:none;}
-
-/* -------- header superior -------- */
-.hdr{background:rgba(7,4,10,.92);backdrop-filter:blur(16px);position:sticky;top:0;z-index:100;height:58px;
-  padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,122,26,.18);}
+.hdr{background:rgba(6,4,10,.97);backdrop-filter:blur(14px);position:sticky;top:0;z-index:100;height:58px;
+  padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,122,26,.2);}
 .brand-logo{height:26px;width:auto;}
-.hdr-icons{display:flex;align-items:center;gap:14px;}
-.icon-btn{position:relative;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:var(--ink-dim);flex:none;}
-.icon-btn svg{width:16px;height:16px;}
-.icon-btn .dot{position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:50%;background:var(--orange);
-  border:2px solid var(--bg-0);}
+.back{font-size:.8rem;font-weight:800;color:var(--ink-dim);}
+.back:hover{color:var(--orange-2);}
 
-/* -------- banda de perfil (estilo hero) -------- */
-.profile-band{position:relative;padding:26px 16px 70px;background:
-  radial-gradient(60% 70% at 85% -10%, rgba(58,92,255,.35), transparent 60%),
-  radial-gradient(55% 60% at 5% 0%, rgba(255,122,26,.28), transparent 60%),
-  linear-gradient(160deg,var(--bg-2),#0d0712 80%);
-  border-bottom:1px solid rgba(255,255,255,.06);overflow:hidden;}
-.profile-band-inner{max-width:640px;margin:0 auto;position:relative;z-index:1;
-  display:flex;align-items:center;gap:16px;}
-.profile-avatar{width:56px;height:56px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
-  font-size:1.4rem;font-weight:900;color:#1A0500;background:linear-gradient(135deg,var(--orange-2),var(--orange));
-  box-shadow:0 0 0 3px rgba(255,122,26,.25);}
-.profile-hello{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:800;}
-.profile-name{font-size:1.15rem;font-weight:900;line-height:1.25;}
-.profile-chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
-.profile-chip{display:flex;align-items:center;gap:5px;font-size:.68rem;font-weight:800;color:var(--ink-dim);
-  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:5px 11px 5px 9px;}
-.profile-chip svg{width:12px;height:12px;flex:none;color:var(--orange-2);}
-.profile-chip b{color:var(--orange-2);font-weight:900;}
+.wrap{max-width:640px;margin:0 auto;padding:26px 16px 60px;position:relative;z-index:1;}
+h1{font-size:1.25rem;font-weight:900;text-transform:uppercase;margin-bottom:18px;}
 
-/* -------- tarjeta blanca flotante de stats -------- */
-.wrap{max-width:640px;margin:0 auto;padding:0 16px 40px;position:relative;z-index:1;}
-.stats-card{margin-top:-52px;background:linear-gradient(160deg,var(--bg-2),var(--bg-1));
-  border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px;
-  box-shadow:0 24px 50px -20px rgba(0,0,0,.7);position:relative;z-index:2;}
-.stats-cta{display:block;text-align:center;background:linear-gradient(135deg,var(--orange-2),var(--orange));
-  color:#1A0500;font-weight:900;text-transform:uppercase;letter-spacing:.4px;font-size:.85rem;
-  border-radius:8px;padding:13px;margin-bottom:16px;box-shadow:0 10px 24px -8px rgba(255,122,26,.5);}
-.stats-row{display:flex;}
-.stat{flex:1;text-align:center;padding:0 6px;}
-.stat + .stat{border-left:1px solid rgba(255,255,255,.08);}
-.stat-label{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:800;margin-bottom:5px;}
-.stat-value{font-size:1.15rem;font-weight:900;}
-.stat-value.orange{color:var(--orange-2);}
-.stat-value.green{color:var(--green);}
-.stat-value.blue{color:var(--blue-2);}
+/* -------- filtros -------- */
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+.filter-field{flex:1;min-width:130px;display:flex;flex-direction:column;gap:5px;}
+.filter-field label{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);}
+.filter-field input{background:var(--bg-1);border:1px solid rgba(255,255,255,.12);border-radius:8px;
+  padding:10px 12px;color:var(--ink);font-family:var(--font);font-size:.82rem;outline:none;transition:border-color .2s;}
+.filter-field input:focus{border-color:var(--orange);}
+.filter-clear{align-self:flex-end;background:none;border:1px solid rgba(255,255,255,.15);color:var(--ink-dim);
+  border-radius:8px;padding:10px 14px;font-family:var(--font);font-size:.76rem;font-weight:800;cursor:pointer;}
+.filter-clear:hover{border-color:var(--orange);color:var(--orange-2);}
 
-/* -------- último pedido destacado -------- */
-.last-order{display:none;align-items:center;gap:12px;background:rgba(58,92,255,.08);
-  border:1px solid rgba(91,124,255,.25);border-radius:10px;padding:13px 15px;margin-top:22px;}
-.last-order.show{display:flex;}
-.last-order-icon{width:36px;height:36px;border-radius:50%;flex:none;background:rgba(91,124,255,.18);
-  display:flex;align-items:center;justify-content:center;color:var(--blue-2);}
-.last-order-icon svg{width:17px;height:17px;}
-.last-order-text{flex:1;font-size:.78rem;color:var(--ink-dim);line-height:1.5;}
-.last-order-text b{color:var(--ink);}
-
-/* -------- buscador -------- */
-.search-box{position:relative;margin-top:22px;}
+.search-box{position:relative;margin-bottom:22px;}
 .search-box input{width:100%;background:var(--bg-1);border:1px solid rgba(255,255,255,.1);border-radius:24px;
   padding:12px 42px 12px 18px;color:var(--ink);font-family:var(--font);font-size:.85rem;outline:none;transition:border-color .2s;}
 .search-box input:focus{border-color:var(--orange);}
 .search-box svg{position:absolute;right:16px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);}
 
 .section-title{font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.7px;
-  color:var(--muted);margin:26px 0 14px 2px;display:flex;justify-content:space-between;align-items:center;}
+  color:var(--muted);margin-bottom:14px;}
 .section-title span.count{color:var(--orange-2);}
 
-/* -------- lista de pedidos -------- */
+/* -------- lista -------- */
 .order{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
   border-left:3px solid var(--orange);border-radius:10px;padding:16px 18px;margin-bottom:12px;}
 .order-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
@@ -106,90 +66,28 @@ a{color:inherit;text-decoration:none;}
 .empty{text-align:center;padding:50px 20px;color:var(--muted);}
 .empty a{color:var(--orange-2);font-weight:800;}
 .loading{text-align:center;padding:40px;color:var(--muted);font-size:.85rem;}
-
-/* -------- barra inferior fija -------- */
-.bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:150;background:rgba(11,7,16,.95);backdrop-filter:blur(16px);
-  border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:center;padding:8px 10px calc(8px + env(safe-area-inset-bottom));}
-.bottom-nav-inner{display:flex;align-items:center;justify-content:space-around;gap:4px;max-width:460px;width:100%;}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:.62rem;
-  font-weight:800;flex:1;padding:5px 2px;border-radius:8px;}
-.nav-item svg{width:20px;height:20px;}
-.nav-item.active{color:var(--orange-2);}
-.nav-item.center{margin-top:-22px;}
-.nav-item.center .nav-badge{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--orange-2),var(--orange));
-  display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px -6px rgba(255,122,26,.6);
-  border:3px solid var(--bg-0);margin-bottom:2px;}
-.nav-item.center .nav-badge svg{width:20px;height:20px;color:#1A0500;}
-.nav-item.center{color:var(--ink-dim);}
-
-@media (max-width:480px){
-  .profile-avatar{width:48px;height:48px;font-size:1.2rem;}
-  .profile-name{font-size:1.02rem;}
-  .stats-card{padding:16px;}
-  .stat-value{font-size:1rem;}
-}
 </style>
 </head>
 <body>
 
 <header class="hdr">
   <a href="index.html"><img src="logo.png" alt="Rexpres Play" class="brand-logo" onerror="this.style.display='none'"></a>
-  <div class="hdr-icons">
-    <a class="icon-btn" href="https://wa.me/593992225484" target="_blank" rel="noopener" aria-label="Soporte por WhatsApp">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-    </a>
-    <a class="icon-btn" href="#" id="logoutBtn" aria-label="Cerrar sesión">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-    </a>
-  </div>
+  <a href="index.html" class="back">← Volver a la tienda</a>
 </header>
 
-<div class="profile-band">
-  <div class="profile-band-inner">
-    <div class="profile-avatar" id="profileAvatar">·</div>
-    <div>
-      <div class="profile-hello">Hola de nuevo</div>
-      <div class="profile-name" id="profileName">Cargando…</div>
-      <div class="profile-chip-row">
-        <span class="profile-chip">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
-          <b id="profileClientId">—</b>
-        </span>
-        <span class="profile-chip">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-          Desde <b id="profileSince">—</b>
-        </span>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="wrap">
-  <div class="stats-card">
-    <a href="index.html#paquetes" class="stats-cta">💎 Comprar diamantes</a>
-    <div class="stats-row">
-      <div class="stat">
-        <div class="stat-label">Invertido</div>
-        <div class="stat-value orange" id="statTotal">$0.00</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Pedidos</div>
-        <div class="stat-value" id="statCount">0</div>
-      </div>
-      <div class="stat">
-        <div class="stat-label">Entregados</div>
-        <div class="stat-value green" id="statDelivered">0</div>
-      </div>
-    </div>
+  <h1>Mis pedidos</h1>
 
-    <div class="last-order" id="lastOrder">
-      <div class="last-order-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-      </div>
-      <div class="last-order-text">
-        Tu pedido más reciente: <b id="lastOrderText">—</b>
-      </div>
+  <div class="filters">
+    <div class="filter-field">
+      <label for="dateFrom">Desde</label>
+      <input type="date" id="dateFrom">
     </div>
+    <div class="filter-field">
+      <label for="dateTo">Hasta</label>
+      <input type="date" id="dateTo">
+    </div>
+    <button type="button" class="filter-clear" id="filterClear">Limpiar</button>
   </div>
 
   <div class="search-box">
@@ -197,35 +95,9 @@ a{color:inherit;text-decoration:none;}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
   </div>
 
-  <p class="section-title">Tus pedidos <span class="count" id="ordersCount"></span></p>
+  <p class="section-title">Resultados <span class="count" id="ordersCount"></span></p>
   <div id="ordersList"><p class="loading">Cargando tus pedidos…</p></div>
 </div>
-
-<nav class="bottom-nav">
-  <div class="bottom-nav-inner">
-    <a class="nav-item" href="index.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>
-      Inicio
-    </a>
-    <a class="nav-item" href="index.html#paquetes">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
-      Comprar
-    </a>
-    <a class="nav-item center" href="index.html" aria-label="Rexpres Play">
-      <span class="nav-badge">
-        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="7,3 14,3 20,21 13,21"/></svg>
-      </span>
-    </a>
-    <a class="nav-item active" href="mis-pedidos.html">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M14 2v5h5"/></svg>
-      Pedidos
-    </a>
-    <a class="nav-item" href="https://wa.me/593992225484" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-      Soporte
-    </a>
-  </div>
-</nav>
 
 <script>
 const SUPABASE_URL = "https://zdefkvvodijmrlhxvlrr.supabase.co";
@@ -239,7 +111,7 @@ function pintarPedidos(pedidos){
   document.getElementById("ordersCount").textContent = pedidos.length ? "(" + pedidos.length + ")" : "";
 
   if (!pedidos.length) {
-    list.innerHTML = '<p class="empty">No encontramos pedidos con eso.</p>';
+    list.innerHTML = '<p class="empty">No encontramos pedidos con esos filtros.</p>';
     return;
   }
 
@@ -260,32 +132,46 @@ function pintarPedidos(pedidos){
   }).join('');
 }
 
-document.getElementById("searchInput").addEventListener("input", (e) => {
-  const q = e.target.value.trim().toLowerCase();
-  if (!q) { pintarPedidos(TODOS_LOS_PEDIDOS); return; }
-  const filtrados = TODOS_LOS_PEDIDOS.filter(p =>
-    (p.paquete || "").toLowerCase().includes(q) ||
-    String(p.player_id || "").toLowerCase().includes(q)
-  );
+function aplicarFiltros(){
+  const q = document.getElementById("searchInput").value.trim().toLowerCase();
+  const desde = document.getElementById("dateFrom").value;
+  const hasta = document.getElementById("dateTo").value;
+
+  let filtrados = TODOS_LOS_PEDIDOS;
+
+  if (q) {
+    filtrados = filtrados.filter(p =>
+      (p.paquete || "").toLowerCase().includes(q) ||
+      String(p.player_id || "").toLowerCase().includes(q)
+    );
+  }
+
+  if (desde) {
+    const desdeDate = new Date(desde + "T00:00:00");
+    filtrados = filtrados.filter(p => new Date(p.created_at) >= desdeDate);
+  }
+
+  if (hasta) {
+    const hastaDate = new Date(hasta + "T23:59:59");
+    filtrados = filtrados.filter(p => new Date(p.created_at) <= hastaDate);
+  }
+
   pintarPedidos(filtrados);
+}
+
+document.getElementById("searchInput").addEventListener("input", aplicarFiltros);
+document.getElementById("dateFrom").addEventListener("change", aplicarFiltros);
+document.getElementById("dateTo").addEventListener("change", aplicarFiltros);
+document.getElementById("filterClear").addEventListener("click", () => {
+  document.getElementById("searchInput").value = "";
+  document.getElementById("dateFrom").value = "";
+  document.getElementById("dateTo").value = "";
+  pintarPedidos(TODOS_LOS_PEDIDOS);
 });
 
 (async () => {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { location.href = "auth.html?redirect=mis-pedidos.html"; return; }
-
-  const user = session.user;
-  const email = user.email || "";
-  const fullName = (user.user_metadata && user.user_metadata.full_name) || "";
-  const displayName = fullName || email.split("@")[0];
-  const initial = (fullName || email || "?").trim().charAt(0).toUpperCase();
-  const clientId = "RP-" + user.id.slice(0, 6).toUpperCase();
-  const since = new Date(user.created_at).toLocaleDateString("es-EC", { year: "numeric", month: "short" });
-
-  document.getElementById("profileAvatar").textContent = initial;
-  document.getElementById("profileName").textContent = displayName;
-  document.getElementById("profileClientId").textContent = clientId;
-  document.getElementById("profileSince").textContent = since;
 
   const { data: pedidos, error } = await sb
     .from("pedidos")
@@ -301,34 +187,14 @@ document.getElementById("searchInput").addEventListener("input", (e) => {
 
   TODOS_LOS_PEDIDOS = pedidos || [];
 
-  // -------- stats --------
-  const totalGastado = TODOS_LOS_PEDIDOS.reduce((s, p) => s + Number(p.total || 0), 0);
-  const entregados = TODOS_LOS_PEDIDOS.filter(p => p.estado === "entregado").length;
-  document.getElementById("statTotal").textContent = "$" + totalGastado.toFixed(2);
-  document.getElementById("statCount").textContent = TODOS_LOS_PEDIDOS.length;
-  document.getElementById("statDelivered").textContent = entregados;
-
-  // -------- último pedido --------
-  if (TODOS_LOS_PEDIDOS.length) {
-    const ultimo = TODOS_LOS_PEDIDOS[0];
-    document.getElementById("lastOrderText").textContent =
-      ultimo.paquete + " · " + (ultimo.estado || "pendiente");
-    document.getElementById("lastOrder").classList.add("show");
-  }
-
   if (!TODOS_LOS_PEDIDOS.length) {
     list.innerHTML = '<p class="empty">Todavía no tienes pedidos.<br><a href="index.html#paquetes">Ver paquetes disponibles →</a></p>';
+    document.getElementById("ordersCount").textContent = "";
     return;
   }
 
   pintarPedidos(TODOS_LOS_PEDIDOS);
 })();
-
-document.getElementById("logoutBtn").addEventListener("click", async (e) => {
-  e.preventDefault();
-  await sb.auth.signOut();
-  location.href = "index.html";
-});
 </script>
 </body>
 </html>

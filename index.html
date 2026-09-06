@@ -69,8 +69,8 @@ p{margin:0;}
   box-shadow:0 8px 18px -8px rgba(255,122,26,.6);}
 .acct-quick-icon{width:22px;height:22px;flex:none;display:flex;align-items:center;justify-content:center;}
 .acct-quick-icon svg{width:20px;height:20px;}
-.acct-quick-label{font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
-@media (max-width:520px){.acct-quick-label{display:none;}.acct-quick{padding:.45rem;}}
+.acct-quick-label{font-size:.78rem;font-weight:900;letter-spacing:.01em;white-space:nowrap;}
+@media (max-width:520px){.acct-quick{padding:.45rem .6rem;}.acct-quick-label{font-size:.72rem;}}
 
 /* -------- hamburguesa (siempre visible, abre el menú con todo) -------- */
 .navtog{display:flex;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;
@@ -306,11 +306,6 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
     <p class="nav-section-title">Mi cuenta</p>
     <a href="auth.html" class="nav-link">Iniciar sesión</a>
   </div>
-
-  <div class="nav-section">
-    <p class="nav-section-title">Ayuda</p>
-    <a href="https://wa.me/593992225484" target="_blank" rel="noopener" class="nav-link">Soporte por WhatsApp</a>
-  </div>
 </nav>
 
 <main id="top">
@@ -545,7 +540,7 @@ var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   // acceso rápido en el header
   var acctQuick = document.getElementById("acctQuick");
   var acctQuickLabel = document.getElementById("acctQuickLabel");
-  if(acctQuick){ acctQuick.href = "mis-pedidos.html"; }
+  if(acctQuick){ acctQuick.href = "perfil.html"; }
   if(acctQuickLabel){ acctQuickLabel.textContent = "Mi perfil"; }
 
   // sección "Mi cuenta" dentro del menú de todas las funciones
@@ -554,6 +549,7 @@ var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     navAccountSection.innerHTML =
       '<p class="nav-section-title">Mi cuenta</p>' +
       '<p class="nav-account-email">' + email + '</p>' +
+      '<a href="perfil.html" class="nav-link">Mi perfil</a>' +
       '<a href="mis-pedidos.html" class="nav-link">Mis pedidos</a>' +
       (esAdmin ? '<a href="admin.html" class="nav-link">Panel admin</a>' : '') +
       '<button type="button" class="nav-link nav-link--danger" id="navSalirBtn">Cerrar sesión</button>';
