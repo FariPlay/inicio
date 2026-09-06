@@ -45,11 +45,12 @@ p{margin:0;}
 .btn--blue:hover{transform:translateY(-2px);}
 
 /* ---------- HEADER ---------- */
-.site-header{position:fixed;inset:0 0 auto 0;z-index:200;padding:1rem 0;transition:background .3s,padding .3s;}
-.site-header.on{background:rgba(5,7,15,.86);backdrop-filter:blur(12px);padding:.65rem 0;border-bottom:1px solid rgba(248,249,255,.06);}
+.site-header{position:fixed;inset:0 0 auto 0;z-index:200;
+  background:rgba(6,4,10,.97);backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,122,26,.2);padding:.85rem 0;}
 .h-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem;}
 .brand{display:flex;align-items:center;gap:.55rem;}
-.brand-logo{height:34px;width:auto;flex:none;}
+.brand-logo{height:32px;width:auto;flex:none;}
 .bmark{width:30px;height:26px;position:relative;flex:none;}
 .bslab{position:absolute;width:60%;height:46%;clip-path:polygon(0 0,70% 0,100% 100%,30% 100%);}
 .bslab.a{top:0;left:0;background:var(--blue-2);}
@@ -58,42 +59,41 @@ p{margin:0;}
 .bword b{color:var(--ink);}
 .bword i{color:var(--orange-2);font-style:normal;}
 .flag-ec{width:24px;height:16px;border-radius:2px;overflow:hidden;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.18);margin-left:2px;}
-.nav{display:flex;gap:2rem;}
-.nav a{font-size:.85rem;font-weight:700;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.03em;}
-.nav a:hover{color:var(--orange-2);}
-.h-actions{display:flex;align-items:center;gap:1rem;}
-.acct-link{font-size:.82rem;font-weight:700;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
-.acct-link:hover{color:var(--orange-2);}
+.h-actions{display:flex;align-items:center;gap:.6rem;}
 
-/* -------- menú de cuenta (avatar + dropdown) -------- */
-.acct-box{position:relative;}
-.avatar-btn{display:flex;align-items:center;gap:.55rem;background:none;border:none;cursor:pointer;
-  padding:.25rem .5rem .25rem .25rem;border-radius:999px;transition:background .2s;}
-.avatar-btn:hover{background:rgba(248,249,255,.08);}
-.avatar-circle{width:32px;height:32px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
-  font-weight:900;font-size:.8rem;color:#1A0500;background:linear-gradient(135deg,var(--orange-2),var(--orange));
-  box-shadow:0 0 0 2px rgba(255,122,26,.25);}
-.avatar-name{font-size:.8rem;font-weight:800;color:var(--ink-dim);max-width:130px;overflow:hidden;
-  text-overflow:ellipsis;white-space:nowrap;}
-.avatar-caret{width:10px;height:6px;flex:none;color:var(--ink-faint);transition:transform .2s;}
-.acct-box.open .avatar-caret{transform:rotate(180deg);}
-.acct-menu{position:absolute;top:calc(100% + 12px);right:0;min-width:210px;
-  background:linear-gradient(160deg,var(--bg-2,#1B1024),var(--bg-1,#120B18));
-  border:1px solid rgba(248,249,255,.1);border-top:2px solid var(--orange);border-radius:10px;padding:8px;
-  box-shadow:0 24px 48px -14px rgba(0,0,0,.7);opacity:0;visibility:hidden;transform:translateY(-8px);
-  transition:opacity .18s var(--ease),transform .18s var(--ease),visibility .18s;z-index:260;}
-.acct-box.open .acct-menu{opacity:1;visibility:visible;transform:translateY(0);}
-.acct-menu-email{font-size:.72rem;color:var(--ink-faint);padding:6px 10px 10px;
-  border-bottom:1px solid rgba(248,249,255,.08);margin-bottom:6px;word-break:break-all;}
-.acct-menu a,.acct-menu button{display:flex;align-items:center;gap:9px;width:100%;background:none;border:none;
-  color:var(--ink-dim);font-family:inherit;font-size:.85rem;font-weight:700;text-align:left;
-  padding:9px 10px;border-radius:6px;cursor:pointer;}
-.acct-menu a:hover,.acct-menu button:hover{background:rgba(248,249,255,.07);color:var(--ink);}
-.acct-menu svg{width:16px;height:16px;flex:none;}
-.acct-menu .danger:hover{color:#ff8080;background:rgba(255,59,59,.1);}
-@media (max-width:860px){.avatar-name{display:none;}.avatar-btn{padding:.25rem;}}
-.navtog{display:none;background:none;border:none;width:34px;height:34px;flex-direction:column;justify-content:center;gap:5px;cursor:pointer;}
-.navtog span{height:2px;background:var(--ink);border-radius:2px;}
+/* -------- acceso rápido a cuenta -------- */
+.acct-quick{display:flex;align-items:center;gap:.45rem;padding:.45rem .75rem;border-radius:999px;
+  color:var(--orange-2);background:rgba(255,122,26,.12);border:1.5px solid rgba(255,122,26,.55);
+  transition:background .2s,color .2s,transform .2s,box-shadow .2s;}
+.acct-quick:hover{background:rgba(255,122,26,.22);color:var(--ink);transform:translateY(-1px);
+  box-shadow:0 8px 18px -8px rgba(255,122,26,.6);}
+.acct-quick-icon{width:22px;height:22px;flex:none;display:flex;align-items:center;justify-content:center;}
+.acct-quick-icon svg{width:20px;height:20px;}
+.acct-quick-label{font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;}
+@media (max-width:520px){.acct-quick-label{display:none;}.acct-quick{padding:.45rem;}}
+
+/* -------- hamburguesa (siempre visible, abre el menú con todo) -------- */
+.navtog{display:flex;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;
+  width:38px;height:38px;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;}
+.navtog span{width:18px;height:2.5px;background:#FF6347;border-radius:2px;}
+
+/* -------- panel del menú (todas las funciones) -------- */
+.nav{position:fixed;inset:0 0 auto 0;width:100%;background:var(--bg-1);
+  padding:5.5rem 1.6rem 2.4rem;transform:translateY(-100%);transition:transform .32s var(--ease);
+  border-bottom:2px solid var(--orange);max-height:100vh;overflow-y:auto;z-index:199;}
+.nav.open{transform:translateY(0);}
+.nav-close{position:absolute;top:1rem;right:1.2rem;width:38px;height:38px;background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);border-radius:8px;color:var(--ink);font-size:1.3rem;line-height:1;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.nav-section{max-width:640px;margin:0 auto 1.6rem;}
+.nav-section-title{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--muted);margin-bottom:.8rem;}
+.nav-link{display:block;width:100%;text-align:left;background:none;border:none;font-family:inherit;
+  font-size:1.02rem;font-weight:800;color:var(--ink-dim);padding:.65rem 0;cursor:pointer;
+  border-bottom:1px solid rgba(255,255,255,.06);}
+.nav-link:hover{color:var(--orange-2);}
+.nav-link--danger:hover{color:#ff8080;}
+.nav-account-email{font-size:.78rem;color:var(--ink-faint);padding-bottom:.6rem;word-break:break-all;}
 
 /* ---------- HERO ---------- */
 .hero{position:relative;padding:9rem 0 4.5rem;overflow:hidden;}
@@ -260,18 +260,6 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
 .wa-channel__btn{background:linear-gradient(135deg,#25D366,#1DA851);color:#04170c;box-shadow:0 0 0 1px rgba(37,211,102,.4),0 14px 30px -10px rgba(37,211,102,.7);white-space:nowrap;}
 .wa-channel__btn:hover{transform:translateY(-2px);}
 @media (max-width:640px){.wa-channel__inner{text-align:center;flex-direction:column;}}
-@media (max-width:860px){
-  .nav{position:fixed;inset:0 0 auto 0;width:100%;background:var(--bg-1);flex-direction:column;align-items:flex-start;
-    padding:5.5rem 1.6rem 2.2rem;transform:translateY(-100%);transition:transform .32s var(--ease);gap:1.3rem;
-    border-bottom:2px solid var(--orange);max-height:100vh;overflow-y:auto;z-index:199;}
-  .nav.open{transform:translateY(0);}
-  .nav a{font-size:1.05rem;padding:.3rem 0;width:100%;}
-  .nav-close{position:absolute;top:1rem;right:1.2rem;width:38px;height:38px;background:rgba(255,255,255,.08);
-    border:1px solid rgba(255,255,255,.18);border-radius:8px;color:var(--ink);font-size:1.3rem;line-height:1;
-    display:flex;align-items:center;justify-content:center;cursor:pointer;}
-  .navtog{display:flex;}
-  .h-actions .btn{display:none;}
-}
 
 </style>
 
@@ -291,21 +279,39 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
         <circle cx="15" cy="10" r="3.4" fill="#FFD100" stroke="#034EA2" stroke-width=".6"/>
       </svg>
     </a>
-    <nav class="nav" id="nav">
-      <button class="nav-close" id="navClose" aria-label="Cerrar menú">✕</button>
-      <a href="#paquetes">Paquetes</a>
-      <a href="#como">Cómo funciona</a>
-      <a href="#preguntas">Preguntas</a>
-    </nav>
     <div class="h-actions">
-      <div class="acct-box" id="acctBox">
-        <a href="auth.html" id="authLink" class="acct-link">Iniciar sesión</a>
-      </div>
-      <a href="#paquetes" class="btn btn--fire" style="padding:.6rem 1.2rem;font-size:.85rem;">Comprar</a>
+      <a href="auth.html" id="acctQuick" class="acct-quick" aria-label="Mi cuenta">
+        <span class="acct-quick-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
+        </span>
+        <span class="acct-quick-label" id="acctQuickLabel">Mi perfil</span>
+      </a>
       <button class="navtog" id="navtog" aria-label="Menú" aria-expanded="false"><span></span><span></span><span></span></button>
     </div>
   </div>
 </header>
+
+<nav class="nav" id="nav">
+  <button class="nav-close" id="navClose" aria-label="Cerrar menú">✕</button>
+
+  <div class="nav-section">
+    <p class="nav-section-title">Explorar</p>
+    <a href="#top" class="nav-link">Inicio</a>
+    <a href="#paquetes" class="nav-link">Paquetes</a>
+    <a href="#como" class="nav-link">Cómo funciona</a>
+    <a href="#preguntas" class="nav-link">Preguntas</a>
+  </div>
+
+  <div class="nav-section" id="navAccountSection">
+    <p class="nav-section-title">Mi cuenta</p>
+    <a href="auth.html" class="nav-link">Iniciar sesión</a>
+  </div>
+
+  <div class="nav-section">
+    <p class="nav-section-title">Ayuda</p>
+    <a href="https://wa.me/593992225484" target="_blank" rel="noopener" class="nav-link">Soporte por WhatsApp</a>
+  </div>
+</nav>
 
 <main id="top">
 
@@ -526,45 +532,37 @@ var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 (async function pintarSesion(){
   var res = await sb.auth.getSession();
-  var acctBox = document.getElementById("acctBox");
-  if(!acctBox) return;
   var session = res.data.session;
-  if(!session) return; // se queda el link de "Iniciar sesión" por defecto
+  if(!session) return; // se quedan "Ingresar" / "Iniciar sesión" por defecto
 
   var user = session.user;
   var email = user.email || "";
   var fullName = (user.user_metadata && user.user_metadata.full_name) || "";
-  var displayName = fullName || email.split("@")[0];
-  var initial = (fullName || email || "?").trim().charAt(0).toUpperCase();
 
-  acctBox.innerHTML =
-    '<button type="button" class="avatar-btn" id="avatarBtn" aria-haspopup="true" aria-expanded="false">' +
-      '<span class="avatar-circle">' + initial + '</span>' +
-      '<span class="avatar-name">' + displayName + '</span>' +
-      '<svg class="avatar-caret" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-    '</button>' +
-    '<div class="acct-menu" id="acctMenu">' +
-      '<div class="acct-menu-email">' + email + '</div>' +
-      '<a href="mis-pedidos.html">' +
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M14 2v5h5"/></svg>' +
-        'Mis pedidos</a>' +
-      '<button type="button" class="danger" id="salirBtn">' +
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>' +
-        'Cerrar sesión</button>' +
-    '</div>';
+  var ADMIN_EMAIL = "hfarinango2707@gmail.com";
+  var esAdmin = email === ADMIN_EMAIL;
 
-  var avatarBtn = document.getElementById("avatarBtn");
-  avatarBtn.addEventListener("click", function(e){
-    e.stopPropagation();
-    var isOpen = acctBox.classList.toggle("open");
-    avatarBtn.setAttribute("aria-expanded", isOpen);
-  });
-  document.addEventListener("click", function(){ acctBox.classList.remove("open"); });
+  // acceso rápido en el header
+  var acctQuick = document.getElementById("acctQuick");
+  var acctQuickLabel = document.getElementById("acctQuickLabel");
+  if(acctQuick){ acctQuick.href = "mis-pedidos.html"; }
+  if(acctQuickLabel){ acctQuickLabel.textContent = "Mi perfil"; }
 
-  document.getElementById("salirBtn").addEventListener("click", async function(){
-    await sb.auth.signOut();
-    location.reload();
-  });
+  // sección "Mi cuenta" dentro del menú de todas las funciones
+  var navAccountSection = document.getElementById("navAccountSection");
+  if(navAccountSection){
+    navAccountSection.innerHTML =
+      '<p class="nav-section-title">Mi cuenta</p>' +
+      '<p class="nav-account-email">' + email + '</p>' +
+      '<a href="mis-pedidos.html" class="nav-link">Mis pedidos</a>' +
+      (esAdmin ? '<a href="admin.html" class="nav-link">Panel admin</a>' : '') +
+      '<button type="button" class="nav-link nav-link--danger" id="navSalirBtn">Cerrar sesión</button>';
+
+    document.getElementById("navSalirBtn").addEventListener("click", async function(){
+      await sb.auth.signOut();
+      location.reload();
+    });
+  }
 })();
 var WHATSAPP_NUMBER = "593992225484";
 
@@ -593,18 +591,13 @@ var WHATSAPP_NUMBER = "593992225484";
 /* ---------- año footer ---------- */
 var yr = document.getElementById("yr"); if(yr) yr.textContent = new Date().getFullYear();
 
-/* ---------- header scroll ---------- */
-var hdr = document.getElementById("hdr");
-function onScroll(){ hdr.classList.toggle("on", window.scrollY > 20); }
-document.addEventListener("scroll", onScroll, {passive:true}); onScroll();
-
 /* ---------- mobile nav ---------- */
 var navtog = document.getElementById("navtog"), nav = document.getElementById("nav");
 navtog.addEventListener("click", function(){
   var open = nav.classList.toggle("open");
   navtog.setAttribute("aria-expanded", open ? "true" : "false");
 });
-nav.querySelectorAll("a").forEach(function(a){ a.addEventListener("click", function(){ nav.classList.remove("open"); }); });
+nav.addEventListener("click", function(e){ if(e.target.closest("a")) nav.classList.remove("open"); });
 var navClose = document.getElementById("navClose");
 if(navClose) navClose.addEventListener("click", function(){ nav.classList.remove("open"); navtog.setAttribute("aria-expanded","false"); });
 
