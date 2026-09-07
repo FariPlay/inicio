@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recargar saldo — Rexpres Play</title>
+<meta name="theme-color" content="#07040A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2307040A'/%3E%3Cpolygon points='14,12 34,12 50,52 30,52' fill='%23FF7A1A'/%3E%3Cpolygon points='50,12 30,12 14,52 34,52' fill='%233A5CFF'/%3E%3C/svg%3E" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg-0:#07040A; --bg-1:#120B18; --bg-2:#1B1024;
+  --blue:#3A5CFF; --blue-2:#5B7CFF; --orange:#FF7A1A; --orange-2:#FFB238;
+  --ink:#FFFFFF; --ink-dim:#C9C6DA; --muted:#8B87A6; --green:#3ECF6E; --red:#FF3B3B;
+  --font:Arial,Helvetica,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg-0);color:var(--ink);font-family:var(--font);min-height:100vh;min-height:100dvh;
+  position:relative;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,122,26,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,122,26,.035) 1px,transparent 1px);
+  background-size:38px 38px;}
+a{color:inherit;text-decoration:none;}
+.hdr{background:rgba(6,4,10,.97);backdrop-filter:blur(14px);position:sticky;top:0;z-index:100;height:58px;
+  padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,122,26,.2);}
+.brand-logo{height:26px;width:auto;}
+.back{font-size:.8rem;font-weight:800;color:var(--ink-dim);}
+.back:hover{color:var(--orange-2);}
+
+.wrap{max-width:520px;margin:0 auto;padding:26px 16px 60px;position:relative;z-index:1;}
+h1{font-size:1.25rem;font-weight:900;text-transform:uppercase;margin-bottom:6px;}
+.sub{font-size:.82rem;color:var(--muted);margin-bottom:22px;}
+
+/* -------- tarjeta de saldo actual -------- */
+.balance-card{background:linear-gradient(135deg,#1B1024,#0d0712);border:1px solid rgba(255,255,255,.08);
+  border-top:2px solid var(--orange);border-radius:12px;padding:20px;margin-bottom:26px;text-align:center;}
+.balance-label{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);}
+.balance-value{font-size:2rem;font-weight:900;color:var(--orange-2);margin-top:4px;}
+
+/* -------- pasos (mismo estilo que checkout) -------- */
+.step-box{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;padding:18px;margin-bottom:16px;}
+.step-title{font-size:.92rem;font-weight:900;margin-bottom:14px;}
+.amount-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.amount-chip{background:var(--bg-0);border:2px solid rgba(255,255,255,.1);border-radius:8px;padding:12px 6px;
+  text-align:center;font-weight:900;font-size:.9rem;color:var(--ink-dim);cursor:pointer;}
+.amount-chip.selected{border-color:var(--orange);background:rgba(255,122,26,.1);color:var(--orange-2);}
+.field-label{display:block;font-size:.66rem;font-weight:900;color:var(--muted);text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:8px;}
+.field-input{width:100%;background:var(--bg-0);border:1px solid rgba(255,255,255,.12);border-radius:6px;
+  padding:12px 14px;color:var(--ink);font-family:var(--font);font-size:.95rem;outline:none;}
+.field-input:focus{border-color:var(--orange);}
+
+.metodos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;}
+.metodo-btn{background:var(--bg-0);border:2px solid rgba(255,255,255,.1);border-radius:8px;padding:14px 10px;
+  text-align:center;cursor:pointer;color:var(--ink-dim);}
+.metodo-btn svg{width:22px;height:22px;margin-bottom:6px;}
+.metodo-btn.selected{border-color:var(--orange);background:rgba(255,122,26,.08);color:var(--ink);}
+.metodo-name{display:block;font-weight:900;font-size:.85rem;}
+
+.bancos-wrap{display:none;margin-top:16px;}
+.bancos-wrap.show{display:block;}
+.bancos-label{font-size:.66rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.bancos-grid{display:grid;gap:8px;margin-bottom:14px;}
+.banco-btn{background:var(--bg-0);border:2px solid rgba(255,255,255,.08);border-left:3px solid rgba(255,255,255,.14);
+  border-radius:6px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;}
+.banco-btn.selected{border-color:var(--orange);border-left-color:var(--orange);background:rgba(255,122,26,.08);}
+.banco-name{font-size:.85rem;font-weight:800;}
+.banco-check{width:16px;height:16px;border-radius:50%;border:2px solid var(--muted);display:flex;align-items:center;
+  justify-content:center;font-size:.62rem;color:transparent;}
+.banco-btn.selected .banco-check{border-color:var(--orange);background:var(--orange);color:#1A0500;}
+
+.cuenta-info{display:none;background:var(--bg-0);border:1px solid rgba(255,255,255,.1);border-radius:8px;
+  padding:14px;margin-bottom:14px;}
+.cuenta-info.show{display:block;}
+.ci-head{font-weight:900;font-size:.85rem;margin-bottom:8px;color:var(--orange-2);}
+.ci-row{display:flex;justify-content:space-between;font-size:.8rem;padding:4px 0;color:var(--ink-dim);}
+.ci-val{font-weight:800;color:var(--ink);}
+.ci-copy{width:100%;margin-top:10px;background:rgba(91,124,255,.12);border:1px solid rgba(91,124,255,.3);
+  color:var(--blue-2);border-radius:6px;padding:9px;font-family:var(--font);font-weight:800;font-size:.78rem;cursor:pointer;}
+.ci-copy.copied{background:rgba(62,207,110,.14);border-color:rgba(62,207,110,.4);color:var(--green);}
+
+.comprobante-wrap{display:none;margin-top:6px;}
+.comprobante-wrap.show{display:block;}
+.comprobante-box{border:2px dashed rgba(255,255,255,.16);border-radius:8px;padding:22px 14px;text-align:center;cursor:pointer;}
+.comprobante-box.has-file{border-style:solid;border-color:rgba(62,207,110,.5);background:rgba(62,207,110,.05);}
+.comprobante-txt{font-size:.82rem;font-weight:800;margin-top:6px;}
+.comprobante-hint{font-size:.68rem;color:var(--muted);margin-top:3px;}
+.comprobante-filename{font-size:.72rem;color:var(--green);margin-top:8px;font-weight:700;text-align:center;}
+
+.btn-ok{width:100%;background:linear-gradient(135deg,var(--red),var(--orange) 55%,var(--orange-2));color:#1A0500;
+  border:none;border-radius:8px;padding:15px;font-family:var(--font);font-weight:900;text-transform:uppercase;
+  letter-spacing:.4px;font-size:.9rem;cursor:pointer;margin-top:4px;}
+.btn-ok:disabled{opacity:.6;cursor:wait;}
+.msg-err{font-size:.78rem;color:#ff8080;margin-top:10px;display:none;}
+.msg-err.show{display:block;}
+
+/* -------- historial -------- */
+.section-title{font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.7px;
+  color:var(--muted);margin:28px 0 14px 2px;}
+.recarga-item{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
+  border-left:3px solid var(--blue-2);border-radius:8px;padding:13px 15px;margin-bottom:10px;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.recarga-monto{font-weight:900;font-size:1rem;color:var(--orange-2);}
+.recarga-meta{font-size:.72rem;color:var(--muted);margin-top:3px;}
+.badge{display:inline-block;font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;
+  padding:3px 8px;border-radius:20px;}
+.badge.pendiente{background:rgba(255,178,56,.12);color:var(--orange-2);border:1px solid rgba(255,178,56,.3);}
+.badge.confirmado{background:rgba(62,207,110,.12);color:var(--green);border:1px solid rgba(62,207,110,.3);}
+.badge.rechazado{background:rgba(255,59,59,.12);color:#ff8080;border:1px solid rgba(255,59,59,.3);}
+.empty{text-align:center;padding:30px 20px;color:var(--muted);font-size:.85rem;}
+
+/* -------- pantalla de éxito -------- */
+.success-ov{position:fixed;inset:0;background:rgba(5,3,8,.9);backdrop-filter:blur(6px);z-index:300;
+  display:none;align-items:center;justify-content:center;padding:24px;}
+.success-ov.open{display:flex;}
+.success-card{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.1);
+  border-top:2px solid var(--green);border-radius:12px;padding:32px 26px;max-width:360px;text-align:center;}
+.success-icon{font-size:2.4rem;margin-bottom:10px;}
+.success-title{font-weight:900;font-size:1.05rem;margin-bottom:8px;text-transform:uppercase;}
+.success-text{font-size:.85rem;color:var(--ink-dim);line-height:1.6;margin-bottom:18px;}
+.success-btn{display:block;width:100%;background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;
+  font-weight:900;text-transform:uppercase;font-size:.8rem;padding:12px;border-radius:8px;border:none;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <a href="index.html"><img src="logo.png" alt="Rexpres Play" class="brand-logo" onerror="this.style.display='none'"></a>
+  <a href="index.html" class="back">← Volver a la tienda</a>
+</header>
+
+<div class="wrap">
+  <h1>Recargar saldo</h1>
+  <p class="sub">Tu saldo se usa para pagar tus paquetes de diamantes al instante, sin esperar confirmación de pago.</p>
+
+  <div class="balance-card">
+    <div class="balance-label">Saldo disponible</div>
+    <div class="balance-value" id="balanceValue">$0.00</div>
+  </div>
+
+  <div class="step-box">
+    <div class="step-title">1. ¿Cuánto quieres recargar?</div>
+    <div class="amount-grid">
+      <div class="amount-chip" data-amt="5">$5</div>
+      <div class="amount-chip" data-amt="10">$10</div>
+      <div class="amount-chip" data-amt="20">$20</div>
+      <div class="amount-chip" data-amt="50">$50</div>
+      <div class="amount-chip" data-amt="100">$100</div>
+      <div class="amount-chip" data-amt="0" id="chipOtro">Otro</div>
+    </div>
+    <div id="ottroWrap" style="display:none;">
+      <label class="field-label">Monto personalizado</label>
+      <input type="number" id="montoInput" class="field-input" placeholder="Ej. 25.00" min="1" step="0.01">
+    </div>
+  </div>
+
+  <div class="step-box">
+    <div class="step-title">2. Método de pago</div>
+    <div class="metodos-grid">
+      <div class="metodo-btn" id="mTransferencia" data-metodo="Transferencia bancaria">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h18M5 10v9m4-9v9m6-9v9m4-9v9M3 19h18M12 3 3 8h18z"/></svg>
+        <span class="metodo-name">Transferencia</span>
+      </div>
+      <div class="metodo-btn" id="mDeposito" data-metodo="Depósito">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v14M5 9l7 7 7-7"/><path d="M4 21h16"/></svg>
+        <span class="metodo-name">Depósito</span>
+      </div>
+    </div>
+
+    <div class="bancos-wrap" id="bancosWrap">
+      <p class="bancos-label" style="margin-top:14px;">Selecciona el banco</p>
+      <div class="bancos-grid">
+        <div class="banco-btn" data-banco="Banco Pichincha" id="bPichincha"><span class="banco-name">Banco Pichincha</span><span class="banco-check">✓</span></div>
+        <div class="banco-btn" data-banco="Produbanco" id="bProdubanco"><span class="banco-name">Produbanco</span><span class="banco-check">✓</span></div>
+        <div class="banco-btn" data-banco="Banco Guayaquil" id="bGuayaquil"><span class="banco-name">Banco Guayaquil</span><span class="banco-check">✓</span></div>
+      </div>
+
+      <div class="cuenta-info" id="cuentaInfo">
+        <div class="ci-head" id="ciBancoNombre">Datos de la cuenta</div>
+        <div class="ci-row"><span>N° de cuenta</span><span class="ci-val" id="ciCuenta">—</span></div>
+        <div class="ci-row" id="ciTipoRow"><span>Tipo</span><span class="ci-val" id="ciTipo">—</span></div>
+        <div class="ci-row"><span>Titular</span><span class="ci-val" id="ciNombre">—</span></div>
+        <button type="button" class="ci-copy" id="ciCopyBtn">📋 Copiar número de cuenta</button>
+      </div>
+
+      <div class="comprobante-wrap" id="comprobanteWrap">
+        <p class="bancos-label">Adjuntar comprobante de pago</p>
+        <div class="comprobante-box" id="comprobanteBox">
+          <div style="font-size:1.6rem;">📎</div>
+          <div class="comprobante-txt">Toca para subir tu comprobante</div>
+          <div class="comprobante-hint">JPG, PNG o PDF · Máx. 5MB</div>
+          <input type="file" id="fComprobante" accept="image/*,.pdf" style="display:none;">
+        </div>
+        <p class="comprobante-filename" id="comprobanteFilename"></p>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-ok" id="btnOk">Enviar solicitud de recarga</button>
+  <p class="msg-err" id="msgErr"></p>
+
+  <p class="section-title">Historial de recargas</p>
+  <div id="recargasList"><p class="empty">Cargando…</p></div>
+</div>
+
+<div class="success-ov" id="successOv">
+  <div class="success-card">
+    <div class="success-icon">⏳</div>
+    <div class="success-title">Recarga en revisión</div>
+    <p class="success-text">Recibimos tu comprobante. En cuanto lo verifiquemos, tu saldo se actualizará automáticamente. Puedes ver el estado abajo en tu historial.</p>
+    <button class="success-btn" id="successClose">Entendido</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://zdefkvvodijmrlhxvlrr.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_C0ur5kEiRQ0TYDpgtiaF8Q_w2lCVCQA";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const CLOUDINARY_CLOUD_NAME = "wgp1dbjg";
+const CLOUDINARY_UPLOAD_PRESET = "rexpres";
+
+let currentUser = null;
+let montoSel = 0, metodoSel = "", bancoSel = "";
+let comprobanteFile = null;
+
+const bancosInfo = {
+  "Banco Pichincha": { cuenta:"2100215429", tipo:null, nombre:"Bemovil Ecuador S. A." },
+  "Produbanco":       { cuenta:"20005251786", tipo:"Ahorros", nombre:"Olga Pineida" },
+  "Banco Guayaquil":  { cuenta:"36999165", tipo:"Ahorros", nombre:"Holguer Farinango" }
+};
+
+async function calcularSaldo(userId){
+  const [{ data: recargasOk }, { data: pedidosSaldo }] = await Promise.all([
+    sb.from("recargas").select("monto").eq("user_id", userId).eq("estado", "confirmado"),
+    sb.from("pedidos").select("total").eq("user_id", userId).eq("metodo_pago", "Saldo Rexpres Play")
+  ]);
+  const recargado = (recargasOk || []).reduce((s, r) => s + Number(r.monto), 0);
+  const gastado = (pedidosSaldo || []).reduce((s, p) => s + Number(p.total), 0);
+  return recargado - gastado;
+}
+
+function pintarHistorial(recargas){
+  const list = document.getElementById("recargasList");
+  if (!recargas.length) { list.innerHTML = '<p class="empty">Todavía no tienes recargas.</p>'; return; }
+  list.innerHTML = recargas.map(r => {
+    const fecha = new Date(r.created_at).toLocaleString("es-EC", { dateStyle: "medium", timeStyle: "short" });
+    const estado = r.estado || "pendiente";
+    return `
+      <div class="recarga-item">
+        <div>
+          <div class="recarga-monto">+$${Number(r.monto).toFixed(2)}</div>
+          <div class="recarga-meta">${fecha} · ${r.metodo_pago}${r.banco ? ' · ' + r.banco : ''}</div>
+        </div>
+        <span class="badge ${estado}">${estado}</span>
+      </div>`;
+  }).join("");
+}
+
+(async function init(){
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = "auth.html?redirect=recargar.html"; return; }
+  currentUser = session.user;
+
+  const saldo = await calcularSaldo(currentUser.id);
+  document.getElementById("balanceValue").textContent = "$" + saldo.toFixed(2);
+
+  const { data: recargas } = await sb.from("recargas").select("*").eq("user_id", currentUser.id).order("created_at", { ascending: false });
+  pintarHistorial(recargas || []);
+})();
+
+/* ---------- monto ---------- */
+document.querySelectorAll(".amount-chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll(".amount-chip").forEach(c => c.classList.remove("selected"));
+    chip.classList.add("selected");
+    const otroWrap = document.getElementById("ottroWrap");
+    if (chip.id === "chipOtro") {
+      otroWrap.style.display = "block";
+      montoSel = 0;
+      document.getElementById("montoInput").focus();
+    } else {
+      otroWrap.style.display = "none";
+      montoSel = Number(chip.dataset.amt);
+    }
+  });
+});
+document.getElementById("montoInput").addEventListener("input", (e) => {
+  montoSel = parseFloat(e.target.value) || 0;
+});
+
+/* ---------- método de pago ---------- */
+const bancosWrap = document.getElementById("bancosWrap");
+document.querySelectorAll(".metodo-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    metodoSel = btn.dataset.metodo;
+    bancoSel = "";
+    document.querySelectorAll(".metodo-btn").forEach(b => b.classList.toggle("selected", b === btn));
+    document.getElementById("cuentaInfo").classList.remove("show");
+    document.getElementById("comprobanteWrap").classList.remove("show");
+    document.querySelectorAll(".banco-btn").forEach(b => b.classList.remove("selected"));
+    bancosWrap.classList.add("show");
+    document.getElementById("bPichincha").style.display = (metodoSel === "Transferencia bancaria") ? "flex" : "none";
+  });
+});
+
+document.querySelectorAll(".banco-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    bancoSel = btn.dataset.banco;
+    document.querySelectorAll(".banco-btn").forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
+    const info = bancosInfo[bancoSel];
+    document.getElementById("ciBancoNombre").textContent = bancoSel;
+    document.getElementById("ciCuenta").textContent = info.cuenta;
+    document.getElementById("ciNombre").textContent = info.nombre;
+    const tipoRow = document.getElementById("ciTipoRow");
+    if (info.tipo) { tipoRow.style.display = "flex"; document.getElementById("ciTipo").textContent = info.tipo; }
+    else tipoRow.style.display = "none";
+    document.getElementById("cuentaInfo").classList.add("show");
+    document.getElementById("comprobanteWrap").classList.add("show");
+  });
+});
+
+document.getElementById("ciCopyBtn").addEventListener("click", function(){
+  const num = document.getElementById("ciCuenta").textContent;
+  const btn = this;
+  function marcarCopiado(){
+    btn.textContent = "✓ Copiado"; btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "📋 Copiar número de cuenta"; btn.classList.remove("copied"); }, 1800);
+  }
+  if (navigator.clipboard) navigator.clipboard.writeText(num).then(marcarCopiado).catch(marcarCopiado);
+});
+
+/* ---------- comprobante ---------- */
+const comprobanteBox = document.getElementById("comprobanteBox");
+const fComprobante = document.getElementById("fComprobante");
+comprobanteBox.addEventListener("click", () => fComprobante.click());
+fComprobante.addEventListener("change", function(){
+  const file = this.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { alert("El archivo debe pesar máximo 5MB."); this.value = ""; return; }
+  comprobanteFile = file;
+  comprobanteBox.classList.add("has-file");
+  comprobanteBox.querySelector(".comprobante-txt").textContent = "Comprobante listo ✔";
+  comprobanteBox.querySelector(".comprobante-hint").textContent = "Toca para cambiar el archivo";
+  document.getElementById("comprobanteFilename").textContent = "📄 " + file.name;
+});
+
+async function subirComprobante(){
+  if (!comprobanteFile) return "";
+  try{
+    const fd = new FormData();
+    fd.append("file", comprobanteFile);
+    fd.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+    const resp = await fetch("https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/auto/upload", { method: "POST", body: fd });
+    const data = await resp.json();
+    if (data && data.secure_url) return data.secure_url;
+  }catch(e){}
+  return "";
+}
+
+/* ---------- enviar ---------- */
+document.getElementById("btnOk").addEventListener("click", async function(){
+  const errEl = document.getElementById("msgErr");
+  errEl.classList.remove("show");
+
+  if (!montoSel || montoSel <= 0) { errEl.textContent = "Ingresa o elige un monto válido."; errEl.classList.add("show"); return; }
+  if (!metodoSel) { errEl.textContent = "Selecciona un método de pago."; errEl.classList.add("show"); return; }
+  if (!bancoSel) { errEl.textContent = "Selecciona un banco."; errEl.classList.add("show"); return; }
+  if (!comprobanteFile) { errEl.textContent = "Adjunta el comprobante de pago."; errEl.classList.add("show"); comprobanteBox.scrollIntoView({behavior:"smooth",block:"center"}); return; }
+
+  const btn = this;
+  btn.disabled = true;
+  btn.textContent = "Subiendo comprobante…";
+  const comprobanteUrl = await subirComprobante();
+
+  btn.textContent = "Guardando…";
+  try{
+    await sb.from("recargas").insert({
+      user_id: currentUser.id,
+      monto: montoSel,
+      metodo_pago: metodoSel,
+      banco: bancoSel,
+      comprobante_url: comprobanteUrl || null
+    });
+    document.getElementById("successOv").classList.add("open");
+    const { data: recargas } = await sb.from("recargas").select("*").eq("user_id", currentUser.id).order("created_at", { ascending: false });
+    pintarHistorial(recargas || []);
+  }catch(e){
+    errEl.textContent = "No se pudo guardar tu recarga. Intenta de nuevo.";
+    errEl.classList.add("show");
+  }
+
+  btn.disabled = false;
+  btn.textContent = "Enviar solicitud de recarga";
+});
+
+document.getElementById("successClose").addEventListener("click", () => {
+  document.getElementById("successOv").classList.remove("open");
+});
+</script>
+</body>
+</html>

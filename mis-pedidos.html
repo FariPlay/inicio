@@ -176,6 +176,7 @@ document.getElementById("filterClear").addEventListener("click", () => {
   const { data: pedidos, error } = await sb
     .from("pedidos")
     .select("*")
+    .eq("user_id", session.user.id)
     .order("created_at", { ascending: false });
 
   const list = document.getElementById("ordersList");

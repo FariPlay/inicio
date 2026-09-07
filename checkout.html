@@ -112,7 +112,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
 .field-hint{font-size:.68rem;color:var(--muted);margin-top:6px;font-weight:600;}
 
 /* ---------- payment methods ---------- */
-.metodos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:4px;}
+.metodos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px;}
 .metodo-btn{position:relative;background:var(--bg-0);border:2px solid rgba(255,255,255,.08);border-radius:6px;padding:16px 8px;
   text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;
   transition:border-color .2s,background .2s,transform .2s;
@@ -313,6 +313,11 @@ footer{background:var(--bg-0);border-top:1px solid rgba(255,255,255,.06);padding
     </div>
     <div class="step-body">
       <div class="metodos-grid">
+        <div class="metodo-btn" id="mSaldo" data-metodo="saldo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          <span class="metodo-name">Saldo</span>
+          <span class="metodo-desc" id="saldoDisponibleTxt">Cargando…</span>
+        </div>
         <div class="metodo-btn" id="mTransferencia" data-metodo="transferencia">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h18M5 10v9m4-9v9m6-9v9m4-9v9M3 19h18M12 3 3 8h18z"/></svg>
           <span class="metodo-name">Transferencia</span>
@@ -322,6 +327,13 @@ footer{background:var(--bg-0);border-top:1px solid rgba(255,255,255,.06);padding
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v14M5 9l7 7 7-7"/><path d="M4 21h16"/></svg>
           <span class="metodo-name">Depósito</span>
           <span class="metodo-desc">Ventanilla o cajero</span>
+        </div>
+      </div>
+
+      <div class="saldo-wrap" id="saldoWrap" style="display:none;margin-top:14px;">
+        <div class="instruccion show" id="iSaldoOk" style="display:none;">💎&nbsp;&nbsp;<p>Se descontará <strong id="saldoADescontar">$0.00</strong> de tu saldo disponible. La recarga queda confirmada al instante.</p></div>
+        <div class="instruccion show" id="iSaldoInsuficiente" style="display:none;background:rgba(255,59,59,.08);border-color:rgba(255,59,59,.3);">
+          ⚠️&nbsp;&nbsp;<p>Tu saldo no alcanza para este paquete. <a href="recargar.html" style="color:var(--orange-2);font-weight:800;">Recarga saldo aquí →</a></p>
         </div>
       </div>
 
@@ -421,16 +433,17 @@ var SUPABASE_ANON_KEY = "sb_publishable_C0ur5kEiRQ0TYDpgtiaF8Q_w2lCVCQA";
 var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 var currentUser = null;
 
-(async function requireAuth(){
+var authPromise = (async function requireAuth(){
   var res = await sb.auth.getSession();
   if(!res.data.session){
     var actual = location.pathname.split("/").pop() + location.search;
     location.href = "auth.html?redirect=" + encodeURIComponent(actual);
-    return;
+    return null;
   }
   currentUser = res.data.session.user;
   var gate = document.getElementById("authGate");
   if(gate) gate.style.display = "none";
+  return currentUser;
 })();
 
 /* =====================================================================
@@ -467,6 +480,29 @@ function actualizarResumen(){
 }
 actualizarResumen();
 
+/* ---------- saldo disponible ---------- */
+var saldoDisponible = 0;
+async function calcularSaldo(userId){
+  var rRecargas = await sb.from("recargas").select("monto").eq("user_id", userId).eq("estado", "confirmado");
+  var rPedidos = await sb.from("pedidos").select("total").eq("user_id", userId).eq("metodo_pago", "Saldo Rexpres Play");
+  var recargado = (rRecargas.data || []).reduce(function(s,r){ return s + Number(r.monto); }, 0);
+  var gastado = (rPedidos.data || []).reduce(function(s,p){ return s + Number(p.total); }, 0);
+  return recargado - gastado;
+}
+
+authPromise.then(async function(user){
+  if(!user) return;
+  saldoDisponible = await calcularSaldo(user.id);
+  var tot = Math.max(price - descuento, 0);
+  var txt = document.getElementById("saldoDisponibleTxt");
+  if(saldoDisponible >= tot && tot > 0){
+    txt.textContent = "$" + saldoDisponible.toFixed(2) + " disponible";
+  }else{
+    txt.textContent = "$" + saldoDisponible.toFixed(2) + " · insuficiente";
+    document.getElementById("mSaldo").style.opacity = ".55";
+  }
+});
+
 /* ---------- métodos de pago ---------- */
 var bancosInfo = {
   "Banco Pichincha": { cuenta:"2100215429", tipo:null, nombre:"Bemovil Ecuador S. A." },
@@ -489,6 +525,22 @@ metodoBtns.forEach(function(btn){
     document.querySelectorAll(".banco-btn").forEach(function(b){ b.classList.remove("selected"); });
     document.getElementById("iTransferencia").classList.remove("show");
     document.getElementById("iDeposito").classList.remove("show");
+    bancosWrap.classList.remove("show");
+    document.getElementById("saldoWrap").style.display = "none";
+    document.getElementById("iSaldoOk").style.display = "none";
+    document.getElementById("iSaldoInsuficiente").style.display = "none";
+
+    if(metodoSel === "saldo"){
+      var tot = Math.max(price - descuento, 0);
+      document.getElementById("saldoWrap").style.display = "block";
+      document.getElementById("saldoADescontar").textContent = "$" + tot.toFixed(2);
+      if(saldoDisponible >= tot && tot > 0){
+        document.getElementById("iSaldoOk").style.display = "flex";
+      }else{
+        document.getElementById("iSaldoInsuficiente").style.display = "flex";
+      }
+      return;
+    }
 
     bancosWrap.classList.add("show");
     document.getElementById("i" + (metodoSel === "transferencia" ? "Transferencia" : "Deposito")).classList.add("show");
@@ -642,7 +694,14 @@ document.getElementById("btnOk").addEventListener("click", async function(){
   if(!/^\d{6,15}$/.test(id)){ document.getElementById("fId").focus(); alert("El ID debe tener solo números, entre 6 y 15 dígitos."); return; }
   if(!metodoSel){ alert("Selecciona un método de pago."); return; }
 
+  var tot = Math.max(price - descuento, 0);
+  var pagaConSaldo = (metodoSel === "saldo");
   var necesitaBanco = (metodoSel === "transferencia" || metodoSel === "deposito");
+
+  if(pagaConSaldo && saldoDisponible < tot){
+    alert("Tu saldo no alcanza para este paquete. Recárgalo primero.");
+    return;
+  }
   if(necesitaBanco){
     if(!bancoSel){ alert("Selecciona un banco."); return; }
     if(!comprobanteBase64){ alert("Adjunta el comprobante de pago."); document.getElementById("comprobanteBox").scrollIntoView({behavior:"smooth",block:"center"}); return; }
@@ -650,13 +709,17 @@ document.getElementById("btnOk").addEventListener("click", async function(){
 
   var btn = this;
   btn.disabled = true;
-  btn.textContent = "Subiendo comprobante…";
 
-  var comprobanteUrl = await subirComprobante();
-  if(!comprobanteUrl && comprobanteFile) descargarComprobante();
+  var comprobanteUrl = "";
+  if(necesitaBanco){
+    btn.textContent = "Subiendo comprobante…";
+    comprobanteUrl = await subirComprobante();
+    if(!comprobanteUrl && comprobanteFile) descargarComprobante();
+  }
 
-  var tot = Math.max(price - descuento, 0);
-  var metodoLabel = {transferencia:"Transferencia bancaria", deposito:"Depósito"}[metodoSel];
+  var metodoLabel = pagaConSaldo
+    ? "Saldo Rexpres Play"
+    : {transferencia:"Transferencia bancaria", deposito:"Depósito"}[metodoSel];
 
   var msg = "¡Hola Rexpres Play! 🚀\n\n*Pedido de diamantes Free Fire:*\n";
   msg += "• Paquete: " + amt + (bonus > 0 ? " (+"+bonus+" bono)" : "") + "\n";
@@ -666,6 +729,7 @@ document.getElementById("btnOk").addEventListener("click", async function(){
   msg += "• Subtotal: $" + price.toFixed(2) + "\n";
   if(descuento > 0) msg += "• Código: " + codigoUsado + " (-$" + descuento.toFixed(2) + ")\n";
   msg += "• *Total: $" + tot.toFixed(2) + "*\n";
+  if(pagaConSaldo) msg += "• 💎 Pagado con saldo Rexpres Play (ya confirmado)\n";
   if(necesitaBanco){
     msg += comprobanteUrl
       ? "• 📎 Comprobante: " + comprobanteUrl + "\n"
@@ -685,7 +749,8 @@ document.getElementById("btnOk").addEventListener("click", async function(){
       descuento: descuento,
       total: tot,
       player_id: id,
-      comprobante_url: comprobanteUrl || null
+      comprobante_url: comprobanteUrl || null,
+      estado: pagaConSaldo ? "confirmado" : "pendiente"
     });
   }catch(e){ /* si falla el guardado, el pedido igual se envía por WhatsApp */ }
 

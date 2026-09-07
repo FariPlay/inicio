@@ -95,6 +95,18 @@ p{margin:0;}
 .nav-link--danger:hover{color:#ff8080;}
 .nav-account-email{font-size:.78rem;color:var(--ink-faint);padding-bottom:.6rem;word-break:break-all;}
 
+/* -------- banda de saldo (solo con sesión iniciada) -------- */
+.wallet-band{position:sticky;top:70px;z-index:150;background:linear-gradient(135deg,#1B1024,#0d0712);
+  border-bottom:1px solid rgba(255,122,26,.25);padding:.7rem 0;}
+.wallet-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.wallet-left{display:flex;align-items:baseline;gap:8px;}
+.wallet-label{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+.wallet-value{font-size:1.15rem;font-weight:900;color:var(--orange-2);}
+.wallet-btn{background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;font-weight:900;
+  font-size:.78rem;text-transform:uppercase;letter-spacing:.3px;padding:.55rem 1rem;border-radius:20px;
+  white-space:nowrap;box-shadow:0 8px 18px -8px rgba(255,122,26,.6);}
+@media (max-width:480px){.wallet-band{top:64px;}.wallet-value{font-size:1rem;}.wallet-btn{padding:.5rem .85rem;font-size:.72rem;}}
+
 /* ---------- HERO ---------- */
 .hero{position:relative;padding:9rem 0 4.5rem;overflow:hidden;}
 .hero::before{content:"";position:absolute;inset:0;
@@ -272,12 +284,6 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
     <a href="#top" class="brand">
       <img src="logo.png" alt="Rexpres Play" class="brand-logo"
            onerror="this.style.display='none'">
-      <svg class="flag-ec" viewBox="0 0 30 20" role="img" aria-label="Ecuador">
-        <rect width="30" height="20" fill="#FFD100"/>
-        <rect y="10" width="30" height="10" fill="#034EA2"/>
-        <rect y="15" width="30" height="5" fill="#EF3340"/>
-        <circle cx="15" cy="10" r="3.4" fill="#FFD100" stroke="#034EA2" stroke-width=".6"/>
-      </svg>
     </a>
     <div class="h-actions">
       <a href="auth.html" id="acctQuick" class="acct-quick" aria-label="Mi cuenta">
@@ -307,6 +313,16 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
     <a href="auth.html" class="nav-link">Iniciar sesión</a>
   </div>
 </nav>
+
+<div class="wallet-band" id="walletBand" style="display:none;">
+  <div class="wrap wallet-inner">
+    <div class="wallet-left">
+      <span class="wallet-label">Tu saldo</span>
+      <span class="wallet-value" id="walletValue">$0.00</span>
+    </div>
+    <a href="recargar.html" class="wallet-btn">💎 Recargar saldo</a>
+  </div>
+</div>
 
 <main id="top">
 
@@ -558,6 +574,19 @@ var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       await sb.auth.signOut();
       location.reload();
     });
+  }
+
+  // banda de saldo (estilo Bemovil)
+  var walletBand = document.getElementById("walletBand");
+  if(walletBand){
+    walletBand.style.display = "block";
+    try{
+      var rRecargas = await sb.from("recargas").select("monto").eq("user_id", user.id).eq("estado", "confirmado");
+      var rPedidos = await sb.from("pedidos").select("total").eq("user_id", user.id).eq("metodo_pago", "Saldo Rexpres Play");
+      var recargado = (rRecargas.data || []).reduce(function(s,r){ return s + Number(r.monto); }, 0);
+      var gastado = (rPedidos.data || []).reduce(function(s,p){ return s + Number(p.total); }, 0);
+      document.getElementById("walletValue").textContent = "$" + (recargado - gastado).toFixed(2);
+    }catch(e){ document.getElementById("walletValue").textContent = "$0.00"; }
   }
 })();
 var WHATSAPP_NUMBER = "593992225484";
