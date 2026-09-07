@@ -244,12 +244,12 @@ h1{font-size:1.25rem;font-weight:900;text-transform:uppercase;margin-bottom:6px;
     </div>
 
     <div class="comprobante-wrap show" style="margin-top:18px;">
-      <p class="bancos-label">Adjuntar foto del comprobante (opcional, ayuda a validar más rápido)</p>
+      <p class="bancos-label">Adjuntar foto del comprobante *</p>
       <div class="comprobante-box" id="comprobanteBox">
         <div style="font-size:1.6rem;">📎</div>
         <div class="comprobante-txt">Toca para subir tu comprobante</div>
-        <div class="comprobante-hint">JPG, PNG o PDF · Máx. 5MB</div>
-        <input type="file" id="fComprobante" accept="image/*,.pdf" style="display:none;">
+        <div class="comprobante-hint">JPG o PNG desde tu galería · Máx. 5MB</div>
+        <input type="file" id="fComprobante" accept="image/*" style="display:none;">
       </div>
       <p class="comprobante-filename" id="comprobanteFilename"></p>
     </div>
@@ -381,7 +381,7 @@ document.getElementById("ciCopyBtn").addEventListener("click", function(){
   if (navigator.clipboard) navigator.clipboard.writeText(num).then(marcarCopiado).catch(marcarCopiado);
 });
 
-/* ---------- comprobante (foto opcional) ---------- */
+/* ---------- comprobante (foto obligatoria) ---------- */
 const comprobanteBox = document.getElementById("comprobanteBox");
 const fComprobante = document.getElementById("fComprobante");
 comprobanteBox.addEventListener("click", () => fComprobante.click());
@@ -427,15 +427,13 @@ document.getElementById("btnOk").addEventListener("click", async function(){
   if (!monto || monto <= 0) { errEl.textContent = "Ingresa el valor de la compra."; errEl.classList.add("show"); return; }
   if (!fecha) { errEl.textContent = "Ingresa la fecha de la compra."; errEl.classList.add("show"); return; }
   if (!numeroComprobante) { errEl.textContent = "Ingresa el número de comprobante."; errEl.classList.add("show"); return; }
+  if (!comprobanteFile) { errEl.textContent = "Adjunta la foto del comprobante."; errEl.classList.add("show"); comprobanteBox.scrollIntoView({behavior:"smooth",block:"center"}); return; }
 
   const btn = this;
   btn.disabled = true;
 
-  let comprobanteUrl = "";
-  if (comprobanteFile) {
-    btn.textContent = "Subiendo comprobante…";
-    comprobanteUrl = await subirComprobante();
-  }
+  btn.textContent = "Subiendo comprobante…";
+  const comprobanteUrl = await subirComprobante();
 
   btn.textContent = "Guardando…";
   try{
