@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Recargar saldo — Rexpres Play</title>
+<title>Recargar saldo — FariPlay</title>
 <meta name="theme-color" content="#07040A">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2307040A'/%3E%3Cpolygon points='14,12 34,12 50,52 30,52' fill='%23FF7A1A'/%3E%3Cpolygon points='50,12 30,12 14,52 34,52' fill='%233A5CFF'/%3E%3C/svg%3E" type="image/svg+xml">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -121,14 +121,71 @@ h1{font-size:1.25rem;font-weight:900;text-transform:uppercase;margin-bottom:6px;
 .success-text{font-size:.85rem;color:var(--ink-dim);line-height:1.6;margin-bottom:18px;}
 .success-btn{display:block;width:100%;background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;
   font-weight:900;text-transform:uppercase;font-size:.8rem;padding:12px;border-radius:8px;border:none;cursor:pointer;}
+
+/* -------- menú ☰ compartido (todas las funciones) -------- */
+.hdr-actions{display:flex;align-items:center;gap:.6rem;}
+.hdr-greet{font-size:.78rem;font-weight:900;color:var(--orange-2);white-space:nowrap;}
+.navtog{display:flex;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;
+  width:36px;height:36px;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;flex:none;}
+.navtog span{width:16px;height:2.5px;background:#FF6347;border-radius:2px;}
+.nav{position:fixed;inset:0 0 auto 0;width:100%;background:var(--bg-1);
+  padding:5.5rem 1.6rem 2.4rem;transform:translateY(-100%);transition:transform .32s ease;
+  border-bottom:2px solid var(--orange);max-height:100vh;overflow-y:auto;z-index:299;}
+.nav.open{transform:translateY(0);}
+.nav-close{position:absolute;top:1rem;right:1.2rem;width:38px;height:38px;background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);border-radius:8px;color:var(--ink);font-size:1.3rem;line-height:1;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.nav-section{max-width:520px;margin:0 auto 1.6rem;}
+.nav-section-title{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--muted);margin-bottom:.8rem;}
+.nav-link{display:block;width:100%;text-align:left;background:none;border:none;font-family:inherit;
+  font-size:1.02rem;font-weight:800;color:var(--ink-dim);padding:.65rem 0;cursor:pointer;
+  border-bottom:1px solid rgba(255,255,255,.06);}
+.nav-link:hover{color:var(--orange-2);}
+.nav-link--danger:hover{color:#ff8080;}
+.nav-account-email{font-size:.78rem;color:var(--muted);padding-bottom:.6rem;word-break:break-all;}
+
+/* -------- toggle switch -------- */
+.toggle-row{display:flex;align-items:center;gap:12px;font-size:.82rem;color:var(--ink-dim);margin-top:4px;}
+.toggle-switch{position:relative;display:inline-block;width:44px;height:24px;flex:none;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,.15);border-radius:24px;transition:.2s;}
+.toggle-slider::before{content:"";position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;}
+.toggle-switch input:checked + .toggle-slider{background:var(--orange);}
+.toggle-switch input:checked + .toggle-slider::before{transform:translateX(20px);}
+
+/* -------- caja de info -------- */
+.info-box{display:flex;gap:10px;background:rgba(91,124,255,.08);border:1px solid rgba(91,124,255,.25);
+  border-radius:8px;padding:14px;margin:16px 0;font-size:.78rem;color:var(--ink-dim);line-height:1.5;}
 </style>
 </head>
 <body>
 
 <header class="hdr">
-  <a href="index.html"><img src="logo.png" alt="Rexpres Play" class="brand-logo" onerror="this.style.display='none'"></a>
-  <a href="index.html" class="back">← Volver a la tienda</a>
+  <a href="index.html"><img src="logo.png" alt="FariPlay" class="brand-logo" onerror="this.style.display='none'"></a>
+  <div class="hdr-actions">
+    <span class="hdr-greet" id="hdrGreet"></span>
+    <button class="navtog" id="navtog" aria-label="Menú" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
 </header>
+
+<nav class="nav" id="nav">
+  <button class="nav-close" id="navClose" aria-label="Cerrar menú">✕</button>
+  <div class="nav-section">
+    <p class="nav-section-title">Explorar</p>
+    <a href="index.html" class="nav-link">Inicio</a>
+    <a href="index.html#paquetes" class="nav-link">Paquetes</a>
+  </div>
+  <div class="nav-section">
+    <p class="nav-section-title">Mi cuenta</p>
+    <p class="nav-account-email" id="navAccountEmail"></p>
+    <a href="perfil.html" class="nav-link">Mi perfil</a>
+    <a href="mis-pedidos.html" class="nav-link">Mis pedidos</a>
+    <a href="recargar.html" class="nav-link">Recargar saldo</a>
+    <a href="admin.html" class="nav-link" id="navAdminLink" style="display:none;">Panel admin</a>
+    <button type="button" class="nav-link nav-link--danger" id="navSalirBtn">Cerrar sesión</button>
+  </div>
+</nav>
 
 <div class="wrap">
   <h1>Recargar saldo</h1>
@@ -140,64 +197,69 @@ h1{font-size:1.25rem;font-weight:900;text-transform:uppercase;margin-bottom:6px;
   </div>
 
   <div class="step-box">
-    <div class="step-title">1. ¿Cuánto quieres recargar?</div>
-    <div class="amount-grid">
-      <div class="amount-chip" data-amt="5">$5</div>
-      <div class="amount-chip" data-amt="10">$10</div>
-      <div class="amount-chip" data-amt="20">$20</div>
-      <div class="amount-chip" data-amt="50">$50</div>
-      <div class="amount-chip" data-amt="100">$100</div>
-      <div class="amount-chip" data-amt="0" id="chipOtro">Otro</div>
+    <div class="step-title">Reportar tu recarga</div>
+
+    <label class="field-label">Banco</label>
+    <select id="bancoSelect" class="field-input" style="margin-bottom:16px;">
+      <option value="">Selecciona un banco…</option>
+      <option value="Banco Pichincha">Banco Pichincha</option>
+      <option value="Produbanco">Produbanco</option>
+      <option value="Banco Guayaquil">Banco Guayaquil</option>
+    </select>
+
+    <div class="cuenta-info" id="cuentaInfo">
+      <div class="ci-head" id="ciBancoNombre">Datos de la cuenta</div>
+      <div class="ci-row"><span>N° de cuenta</span><span class="ci-val" id="ciCuenta">—</span></div>
+      <div class="ci-row" id="ciTipoRow"><span>Tipo</span><span class="ci-val" id="ciTipo">—</span></div>
+      <div class="ci-row"><span>Titular</span><span class="ci-val" id="ciNombre">—</span></div>
+      <button type="button" class="ci-copy" id="ciCopyBtn">📋 Copiar número de cuenta</button>
     </div>
-    <div id="ottroWrap" style="display:none;">
-      <label class="field-label">Monto personalizado</label>
-      <input type="number" id="montoInput" class="field-input" placeholder="Ej. 25.00" min="1" step="0.01">
+
+    <label class="field-label">Valor de la compra</label>
+    <input type="number" id="montoInput" class="field-input" placeholder="$0.00" min="1" step="0.01" style="margin-bottom:16px;">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+      <div>
+        <label class="field-label">Fecha compra</label>
+        <input type="date" id="fechaInput" class="field-input">
+      </div>
+      <div>
+        <label class="field-label">Hora compra</label>
+        <input type="time" id="horaInput" class="field-input">
+      </div>
+    </div>
+
+    <label class="field-label">Número de comprobante</label>
+    <input type="text" id="numeroComprobanteInput" class="field-input" placeholder="Ej. 000123456" style="margin-bottom:16px;">
+
+    <label class="field-label">Observación (opcional)</label>
+    <textarea id="observacionInput" class="field-input" rows="3" style="margin-bottom:16px;resize:vertical;"></textarea>
+
+    <div class="toggle-row">
+      <label class="toggle-switch">
+        <input type="checkbox" id="esTransferenciaToggle">
+        <span class="toggle-slider"></span>
+      </label>
+      <span>¿Es transferencia? (si no, se registra como depósito)</span>
+    </div>
+
+    <div class="comprobante-wrap show" style="margin-top:18px;">
+      <p class="bancos-label">Adjuntar foto del comprobante (opcional, ayuda a validar más rápido)</p>
+      <div class="comprobante-box" id="comprobanteBox">
+        <div style="font-size:1.6rem;">📎</div>
+        <div class="comprobante-txt">Toca para subir tu comprobante</div>
+        <div class="comprobante-hint">JPG, PNG o PDF · Máx. 5MB</div>
+        <input type="file" id="fComprobante" accept="image/*,.pdf" style="display:none;">
+      </div>
+      <p class="comprobante-filename" id="comprobanteFilename"></p>
     </div>
   </div>
 
-  <div class="step-box">
-    <div class="step-title">2. Método de pago</div>
-    <div class="metodos-grid">
-      <div class="metodo-btn" id="mTransferencia" data-metodo="Transferencia bancaria">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h18M5 10v9m4-9v9m6-9v9m4-9v9M3 19h18M12 3 3 8h18z"/></svg>
-        <span class="metodo-name">Transferencia</span>
-      </div>
-      <div class="metodo-btn" id="mDeposito" data-metodo="Depósito">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v14M5 9l7 7 7-7"/><path d="M4 21h16"/></svg>
-        <span class="metodo-name">Depósito</span>
-      </div>
-    </div>
-
-    <div class="bancos-wrap" id="bancosWrap">
-      <p class="bancos-label" style="margin-top:14px;">Selecciona el banco</p>
-      <div class="bancos-grid">
-        <div class="banco-btn" data-banco="Banco Pichincha" id="bPichincha"><span class="banco-name">Banco Pichincha</span><span class="banco-check">✓</span></div>
-        <div class="banco-btn" data-banco="Produbanco" id="bProdubanco"><span class="banco-name">Produbanco</span><span class="banco-check">✓</span></div>
-        <div class="banco-btn" data-banco="Banco Guayaquil" id="bGuayaquil"><span class="banco-name">Banco Guayaquil</span><span class="banco-check">✓</span></div>
-      </div>
-
-      <div class="cuenta-info" id="cuentaInfo">
-        <div class="ci-head" id="ciBancoNombre">Datos de la cuenta</div>
-        <div class="ci-row"><span>N° de cuenta</span><span class="ci-val" id="ciCuenta">—</span></div>
-        <div class="ci-row" id="ciTipoRow"><span>Tipo</span><span class="ci-val" id="ciTipo">—</span></div>
-        <div class="ci-row"><span>Titular</span><span class="ci-val" id="ciNombre">—</span></div>
-        <button type="button" class="ci-copy" id="ciCopyBtn">📋 Copiar número de cuenta</button>
-      </div>
-
-      <div class="comprobante-wrap" id="comprobanteWrap">
-        <p class="bancos-label">Adjuntar comprobante de pago</p>
-        <div class="comprobante-box" id="comprobanteBox">
-          <div style="font-size:1.6rem;">📎</div>
-          <div class="comprobante-txt">Toca para subir tu comprobante</div>
-          <div class="comprobante-hint">JPG, PNG o PDF · Máx. 5MB</div>
-          <input type="file" id="fComprobante" accept="image/*,.pdf" style="display:none;">
-        </div>
-        <p class="comprobante-filename" id="comprobanteFilename"></p>
-      </div>
-    </div>
+  <div class="info-box">
+    Revisamos las recargas todos los días. En cuanto la aprobemos, tu saldo se actualiza solo — puedes ver el estado abajo en tu historial.
   </div>
 
-  <button class="btn-ok" id="btnOk">Enviar solicitud de recarga</button>
+  <button class="btn-ok" id="btnOk">Reportar recarga</button>
   <p class="msg-err" id="msgErr"></p>
 
   <p class="section-title">Historial de recargas</p>
@@ -221,7 +283,6 @@ const CLOUDINARY_CLOUD_NAME = "wgp1dbjg";
 const CLOUDINARY_UPLOAD_PRESET = "rexpres";
 
 let currentUser = null;
-let montoSel = 0, metodoSel = "", bancoSel = "";
 let comprobanteFile = null;
 
 const bancosInfo = {
@@ -229,11 +290,12 @@ const bancosInfo = {
   "Produbanco":       { cuenta:"20005251786", tipo:"Ahorros", nombre:"Olga Pineida" },
   "Banco Guayaquil":  { cuenta:"36999165", tipo:"Ahorros", nombre:"Holguer Farinango" }
 };
+const ADMIN_EMAIL = "hfarinango2707@gmail.com";
 
 async function calcularSaldo(userId){
   const [{ data: recargasOk }, { data: pedidosSaldo }] = await Promise.all([
     sb.from("recargas").select("monto").eq("user_id", userId).eq("estado", "confirmado"),
-    sb.from("pedidos").select("total").eq("user_id", userId).eq("metodo_pago", "Saldo Rexpres Play")
+    sb.from("pedidos").select("total").eq("user_id", userId).eq("metodo_pago", "Saldo FariPlay")
   ]);
   const recargado = (recargasOk || []).reduce((s, r) => s + Number(r.monto), 0);
   const gastado = (pedidosSaldo || []).reduce((s, p) => s + Number(p.total), 0);
@@ -262,6 +324,22 @@ function pintarHistorial(recargas){
   if (!session) { location.href = "auth.html?redirect=recargar.html"; return; }
   currentUser = session.user;
 
+  const email = currentUser.email || "";
+  const fullName = (currentUser.user_metadata && currentUser.user_metadata.full_name) || "";
+  const primerNombre = (fullName || email.split("@")[0]).trim().split(" ")[0];
+  document.getElementById("hdrGreet").textContent = "Hola, " + primerNombre;
+  document.getElementById("navAccountEmail").textContent = email;
+  if (email === ADMIN_EMAIL) document.getElementById("navAdminLink").style.display = "block";
+  document.getElementById("navSalirBtn").addEventListener("click", async () => {
+    await sb.auth.signOut();
+    location.href = "index.html";
+  });
+
+  // fecha y hora actuales por defecto
+  const ahora = new Date();
+  document.getElementById("fechaInput").value = ahora.toISOString().slice(0, 10);
+  document.getElementById("horaInput").value = ahora.toTimeString().slice(0, 5);
+
   const saldo = await calcularSaldo(currentUser.id);
   document.getElementById("balanceValue").textContent = "$" + saldo.toFixed(2);
 
@@ -269,56 +347,28 @@ function pintarHistorial(recargas){
   pintarHistorial(recargas || []);
 })();
 
-/* ---------- monto ---------- */
-document.querySelectorAll(".amount-chip").forEach(chip => {
-  chip.addEventListener("click", () => {
-    document.querySelectorAll(".amount-chip").forEach(c => c.classList.remove("selected"));
-    chip.classList.add("selected");
-    const otroWrap = document.getElementById("ottroWrap");
-    if (chip.id === "chipOtro") {
-      otroWrap.style.display = "block";
-      montoSel = 0;
-      document.getElementById("montoInput").focus();
-    } else {
-      otroWrap.style.display = "none";
-      montoSel = Number(chip.dataset.amt);
-    }
-  });
+const navEl = document.getElementById("nav");
+const navtogBtn = document.getElementById("navtog");
+navtogBtn.addEventListener("click", () => {
+  const open = navEl.classList.toggle("open");
+  navtogBtn.setAttribute("aria-expanded", open);
 });
-document.getElementById("montoInput").addEventListener("input", (e) => {
-  montoSel = parseFloat(e.target.value) || 0;
-});
+document.getElementById("navClose").addEventListener("click", () => navEl.classList.remove("open"));
+navEl.addEventListener("click", (e) => { if (e.target.closest("a")) navEl.classList.remove("open"); });
 
-/* ---------- método de pago ---------- */
-const bancosWrap = document.getElementById("bancosWrap");
-document.querySelectorAll(".metodo-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    metodoSel = btn.dataset.metodo;
-    bancoSel = "";
-    document.querySelectorAll(".metodo-btn").forEach(b => b.classList.toggle("selected", b === btn));
-    document.getElementById("cuentaInfo").classList.remove("show");
-    document.getElementById("comprobanteWrap").classList.remove("show");
-    document.querySelectorAll(".banco-btn").forEach(b => b.classList.remove("selected"));
-    bancosWrap.classList.add("show");
-    document.getElementById("bPichincha").style.display = (metodoSel === "Transferencia bancaria") ? "flex" : "none";
-  });
-});
-
-document.querySelectorAll(".banco-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    bancoSel = btn.dataset.banco;
-    document.querySelectorAll(".banco-btn").forEach(b => b.classList.remove("selected"));
-    btn.classList.add("selected");
-    const info = bancosInfo[bancoSel];
-    document.getElementById("ciBancoNombre").textContent = bancoSel;
-    document.getElementById("ciCuenta").textContent = info.cuenta;
-    document.getElementById("ciNombre").textContent = info.nombre;
-    const tipoRow = document.getElementById("ciTipoRow");
-    if (info.tipo) { tipoRow.style.display = "flex"; document.getElementById("ciTipo").textContent = info.tipo; }
-    else tipoRow.style.display = "none";
-    document.getElementById("cuentaInfo").classList.add("show");
-    document.getElementById("comprobanteWrap").classList.add("show");
-  });
+/* ---------- banco ---------- */
+document.getElementById("bancoSelect").addEventListener("change", function(){
+  const bancoSel = this.value;
+  const cuentaInfo = document.getElementById("cuentaInfo");
+  if (!bancoSel) { cuentaInfo.classList.remove("show"); return; }
+  const info = bancosInfo[bancoSel];
+  document.getElementById("ciBancoNombre").textContent = bancoSel;
+  document.getElementById("ciCuenta").textContent = info.cuenta;
+  document.getElementById("ciNombre").textContent = info.nombre;
+  const tipoRow = document.getElementById("ciTipoRow");
+  if (info.tipo) { tipoRow.style.display = "flex"; document.getElementById("ciTipo").textContent = info.tipo; }
+  else tipoRow.style.display = "none";
+  cuentaInfo.classList.add("show");
 });
 
 document.getElementById("ciCopyBtn").addEventListener("click", function(){
@@ -331,7 +381,7 @@ document.getElementById("ciCopyBtn").addEventListener("click", function(){
   if (navigator.clipboard) navigator.clipboard.writeText(num).then(marcarCopiado).catch(marcarCopiado);
 });
 
-/* ---------- comprobante ---------- */
+/* ---------- comprobante (foto opcional) ---------- */
 const comprobanteBox = document.getElementById("comprobanteBox");
 const fComprobante = document.getElementById("fComprobante");
 comprobanteBox.addEventListener("click", () => fComprobante.click());
@@ -364,23 +414,38 @@ document.getElementById("btnOk").addEventListener("click", async function(){
   const errEl = document.getElementById("msgErr");
   errEl.classList.remove("show");
 
-  if (!montoSel || montoSel <= 0) { errEl.textContent = "Ingresa o elige un monto válido."; errEl.classList.add("show"); return; }
-  if (!metodoSel) { errEl.textContent = "Selecciona un método de pago."; errEl.classList.add("show"); return; }
+  const bancoSel = document.getElementById("bancoSelect").value;
+  const monto = parseFloat(document.getElementById("montoInput").value) || 0;
+  const fecha = document.getElementById("fechaInput").value;
+  const hora = document.getElementById("horaInput").value;
+  const numeroComprobante = document.getElementById("numeroComprobanteInput").value.trim();
+  const observacion = document.getElementById("observacionInput").value.trim();
+  const esTransferencia = document.getElementById("esTransferenciaToggle").checked;
+  const metodoLabel = esTransferencia ? "Transferencia bancaria" : "Depósito";
+
   if (!bancoSel) { errEl.textContent = "Selecciona un banco."; errEl.classList.add("show"); return; }
-  if (!comprobanteFile) { errEl.textContent = "Adjunta el comprobante de pago."; errEl.classList.add("show"); comprobanteBox.scrollIntoView({behavior:"smooth",block:"center"}); return; }
+  if (!monto || monto <= 0) { errEl.textContent = "Ingresa el valor de la compra."; errEl.classList.add("show"); return; }
+  if (!fecha) { errEl.textContent = "Ingresa la fecha de la compra."; errEl.classList.add("show"); return; }
+  if (!numeroComprobante) { errEl.textContent = "Ingresa el número de comprobante."; errEl.classList.add("show"); return; }
 
   const btn = this;
   btn.disabled = true;
-  btn.textContent = "Subiendo comprobante…";
-  const comprobanteUrl = await subirComprobante();
+
+  let comprobanteUrl = "";
+  if (comprobanteFile) {
+    btn.textContent = "Subiendo comprobante…";
+    comprobanteUrl = await subirComprobante();
+  }
 
   btn.textContent = "Guardando…";
   try{
     await sb.from("recargas").insert({
       user_id: currentUser.id,
-      monto: montoSel,
-      metodo_pago: metodoSel,
+      monto: monto,
+      metodo_pago: metodoLabel,
       banco: bancoSel,
+      numero_comprobante: numeroComprobante,
+      observacion: (observacion ? observacion + " · " : "") + "Compra: " + fecha + (hora ? " " + hora : ""),
       comprobante_url: comprobanteUrl || null
     });
     document.getElementById("successOv").classList.add("open");
@@ -392,7 +457,7 @@ document.getElementById("btnOk").addEventListener("click", async function(){
   }
 
   btn.disabled = false;
-  btn.textContent = "Enviar solicitud de recarga";
+  btn.textContent = "Reportar recarga";
 });
 
 document.getElementById("successClose").addEventListener("click", () => {

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Panel — Rexpres Play</title>
+<title>Panel — FariPlay</title>
 <meta name="theme-color" content="#07040A">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2307040A'/%3E%3Cpolygon points='14,12 34,12 50,52 30,52' fill='%23FF7A1A'/%3E%3Cpolygon points='50,12 30,12 14,52 34,52' fill='%233A5CFF'/%3E%3C/svg%3E" type="image/svg+xml">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -58,6 +58,29 @@ a{color:inherit;text-decoration:none;}
 .denied{text-align:center;padding:80px 20px;}
 .denied h1{font-size:1.2rem;margin-bottom:10px;}
 .denied a{color:var(--orange-2);font-weight:800;}
+
+/* -------- menú ☰ compartido (todas las funciones) -------- */
+.hdr-actions{display:flex;align-items:center;gap:.6rem;}
+.hdr-greet{font-size:.78rem;font-weight:900;color:var(--orange-2);white-space:nowrap;}
+.navtog{display:flex;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;
+  width:36px;height:36px;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;flex:none;}
+.navtog span{width:16px;height:2.5px;background:#FF6347;border-radius:2px;}
+.nav{position:fixed;inset:0 0 auto 0;width:100%;background:var(--bg-1);
+  padding:5.5rem 1.6rem 2.4rem;transform:translateY(-100%);transition:transform .32s ease;
+  border-bottom:2px solid var(--orange);max-height:100vh;overflow-y:auto;z-index:299;}
+.nav.open{transform:translateY(0);}
+.nav-close{position:absolute;top:1rem;right:1.2rem;width:38px;height:38px;background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);border-radius:8px;color:var(--ink);font-size:1.3rem;line-height:1;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.nav-section{max-width:520px;margin:0 auto 1.6rem;}
+.nav-section-title{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--muted);margin-bottom:.8rem;}
+.nav-link{display:block;width:100%;text-align:left;background:none;border:none;font-family:inherit;
+  font-size:1.02rem;font-weight:800;color:var(--ink-dim);padding:.65rem 0;cursor:pointer;
+  border-bottom:1px solid rgba(255,255,255,.06);}
+.nav-link:hover{color:var(--orange-2);}
+.nav-link--danger:hover{color:#ff8080;}
+.nav-account-email{font-size:.78rem;color:var(--muted);padding-bottom:.6rem;word-break:break-all;}
 </style>
 </head>
 <body>
@@ -65,9 +88,30 @@ a{color:inherit;text-decoration:none;}
 <div id="authGate" style="position:fixed;inset:0;background:#07040A;z-index:999;display:flex;align-items:center;justify-content:center;color:#8B87A6;">Verificando acceso…</div>
 
 <header class="hdr">
-  <a href="index.html"><img src="logo.png" alt="Rexpres Play" class="brand-logo" onerror="this.style.display='none'"></a>
-  <a href="#" id="logoutBtn" class="logout">Cerrar sesión</a>
+  <a href="index.html"><img src="logo.png" alt="FariPlay" class="brand-logo" onerror="this.style.display='none'"></a>
+  <div class="hdr-actions">
+    <span class="hdr-greet" id="hdrGreet">Admin</span>
+    <button class="navtog" id="navtog" aria-label="Menú" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
 </header>
+
+<nav class="nav" id="nav">
+  <button class="nav-close" id="navClose" aria-label="Cerrar menú">✕</button>
+  <div class="nav-section">
+    <p class="nav-section-title">Explorar</p>
+    <a href="index.html" class="nav-link">Inicio</a>
+    <a href="index.html#paquetes" class="nav-link">Paquetes</a>
+  </div>
+  <div class="nav-section">
+    <p class="nav-section-title">Mi cuenta</p>
+    <p class="nav-account-email" id="navAccountEmail"></p>
+    <a href="perfil.html" class="nav-link">Mi perfil</a>
+    <a href="mis-pedidos.html" class="nav-link">Mis pedidos</a>
+    <a href="recargar.html" class="nav-link">Recargar saldo</a>
+    <a href="admin.html" class="nav-link">Panel admin</a>
+    <button type="button" class="nav-link nav-link--danger" id="navSalirBtn">Cerrar sesión</button>
+  </div>
+</nav>
 
 <div class="wrap" id="appWrap" style="display:none;">
   <div class="tabs">
@@ -112,6 +156,8 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     return;
   }
 
+  document.getElementById("navAccountEmail").textContent = session.user.email;
+
   gate.style.display = "none";
   document.getElementById("appWrap").style.display = "block";
   cargarPedidos();
@@ -119,11 +165,19 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   cargarPrecios();
 })();
 
-document.getElementById("logoutBtn").addEventListener("click", async (e) => {
-  e.preventDefault();
+document.getElementById("navSalirBtn").addEventListener("click", async () => {
   await sb.auth.signOut();
   location.href = "index.html";
 });
+
+const navEl = document.getElementById("nav");
+const navtogBtn = document.getElementById("navtog");
+navtogBtn.addEventListener("click", () => {
+  const open = navEl.classList.toggle("open");
+  navtogBtn.setAttribute("aria-expanded", open);
+});
+document.getElementById("navClose").addEventListener("click", () => navEl.classList.remove("open"));
+navEl.addEventListener("click", (e) => { if (e.target.closest("a")) navEl.classList.remove("open"); });
 
 document.querySelectorAll(".tab").forEach(tab => {
   tab.addEventListener("click", () => {
