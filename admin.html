@@ -111,6 +111,20 @@ a{color:inherit;text-decoration:none;}
 .nav-link:hover{color:var(--orange-2);}
 .nav-link--danger:hover{color:#ff8080;}
 .nav-account-email{font-size:.78rem;color:var(--muted);padding-bottom:.6rem;word-break:break-all;}
+
+/* -------- filtros de transacciones -------- */
+.admin-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
+.filter-chip{background:var(--bg-1);border:1px solid rgba(255,255,255,.15);color:var(--ink-dim);
+  border-radius:20px;padding:8px 14px;font-family:var(--font);font-size:.76rem;font-weight:800;cursor:pointer;white-space:nowrap;}
+.filter-chip.active{background:linear-gradient(135deg,var(--orange-2),var(--orange));border-color:transparent;color:#1A0500;}
+.filter-date{background:var(--bg-1);border:1px solid rgba(255,255,255,.15);border-radius:20px;color:var(--ink);
+  font-family:var(--font);font-size:.76rem;font-weight:800;padding:8px 12px;}
+.filter-empty{text-align:center;color:var(--muted);padding:24px;font-size:.82rem;}
+
+/* -------- eliminar -------- */
+.delete-btn{margin-top:10px;background:rgba(255,59,59,.1);border:1px solid rgba(255,59,59,.3);color:#ff8080;
+  border-radius:6px;padding:8px 14px;font-family:var(--font);font-weight:800;font-size:.76rem;cursor:pointer;}
+.delete-btn:hover{background:rgba(255,59,59,.18);}
 </style>
 </head>
 <body>
@@ -151,10 +165,22 @@ a{color:inherit;text-decoration:none;}
   </div>
 
   <div class="panel active" id="panelPedidos">
+    <div class="admin-filters">
+      <button type="button" class="filter-chip active" data-panel="ped" data-filter="hoy">Hoy</button>
+      <button type="button" class="filter-chip" data-panel="ped" data-filter="pendientes">Por confirmar</button>
+      <button type="button" class="filter-chip" data-panel="ped" data-filter="todos">Todos</button>
+      <input type="date" class="filter-date" id="pedFecha" data-panel="ped">
+    </div>
     <div id="ordersList"><p class="msg">Cargando pedidos…</p></div>
   </div>
 
   <div class="panel" id="panelRecargas">
+    <div class="admin-filters">
+      <button type="button" class="filter-chip active" data-panel="rec" data-filter="hoy">Hoy</button>
+      <button type="button" class="filter-chip" data-panel="rec" data-filter="pendientes">Por confirmar</button>
+      <button type="button" class="filter-chip" data-panel="rec" data-filter="todos">Todos</button>
+      <input type="date" class="filter-date" id="recFecha" data-panel="rec">
+    </div>
     <div id="recargasList"><p class="msg">Cargando recargas…</p></div>
   </div>
 
@@ -220,14 +246,11 @@ document.querySelectorAll(".tab").forEach(tab => {
 
 /* -------- pedidos -------- */
 let TODOS_LOS_PEDIDOS_ADMIN = [];
+let pedFiltro = "hoy", pedFechaCustom = "";
 
-async function cargarPedidos(){
-  const { data: pedidos, error } = await sb.from("pedidos").select("*").order("created_at", { ascending: false }).limit(80);
+function renderPedidos(pedidos){
   const list = document.getElementById("ordersList");
-  if (error) { list.innerHTML = '<p class="msg">No se pudieron cargar los pedidos.</p>'; return; }
-  if (!pedidos.length) { list.innerHTML = '<p class="msg">Todavía no hay pedidos.</p>'; return; }
-
-  TODOS_LOS_PEDIDOS_ADMIN = pedidos;
+  if (!pedidos.length) { list.innerHTML = '<p class="filter-empty">No hay pedidos con este filtro.</p>'; return; }
 
   list.innerHTML = pedidos.map(p => {
     const fecha = new Date(p.created_at).toLocaleString("es-EC", { dateStyle: "short", timeStyle: "short" });
@@ -267,23 +290,43 @@ async function cargarPedidos(){
             </select>
             <button type="button" class="save-btn" data-id="${p.id}" data-tabla="pedidos">Guardar</button>
           </div>
+          <button type="button" class="delete-btn" data-id="${p.id}" data-tabla="pedidos">🗑 Eliminar pedido</button>
         </div>
       </div>`;
   }).join("");
 
   wireEditButtons(list);
+  wireDeleteButtons(list, "pedidos");
+}
+
+function aplicarFiltroPedidos(){
+  document.getElementById("pedFecha").value = pedFiltro === "fecha" ? pedFechaCustom : "";
+  let arr = TODOS_LOS_PEDIDOS_ADMIN;
+  if (pedFiltro === "hoy") {
+    const hoy = new Date().toDateString();
+    arr = arr.filter(p => new Date(p.created_at).toDateString() === hoy);
+  } else if (pedFiltro === "pendientes") {
+    arr = arr.filter(p => (p.estado || "pendiente") === "pendiente");
+  } else if (pedFiltro === "fecha" && pedFechaCustom) {
+    arr = arr.filter(p => new Date(p.created_at).toLocaleDateString("en-CA") === pedFechaCustom);
+  }
+  renderPedidos(arr);
+}
+
+async function cargarPedidos(){
+  const { data: pedidos, error } = await sb.from("pedidos").select("*").order("created_at", { ascending: false }).limit(300);
+  if (error) { document.getElementById("ordersList").innerHTML = '<p class="msg">No se pudieron cargar los pedidos.</p>'; return; }
+  TODOS_LOS_PEDIDOS_ADMIN = pedidos || [];
+  aplicarFiltroPedidos();
 }
 
 /* -------- recargas -------- */
 let TODAS_LAS_RECARGAS_ADMIN = [];
+let recFiltro = "hoy", recFechaCustom = "";
 
-async function cargarRecargas(){
-  const { data: recargas, error } = await sb.from("recargas").select("*").order("created_at", { ascending: false }).limit(100);
+function renderRecargas(recargas){
   const list = document.getElementById("recargasList");
-  if (error) { list.innerHTML = '<p class="msg">No se pudieron cargar las recargas (¿ya creaste la tabla "recargas" en Supabase?).</p>'; return; }
-  if (!recargas.length) { list.innerHTML = '<p class="msg">Todavía no hay recargas.</p>'; return; }
-
-  TODAS_LAS_RECARGAS_ADMIN = recargas;
+  if (!recargas.length) { list.innerHTML = '<p class="filter-empty">No hay recargas con este filtro.</p>'; return; }
 
   list.innerHTML = recargas.map(r => {
     const fecha = new Date(r.created_at).toLocaleString("es-EC", { dateStyle: "short", timeStyle: "short" });
@@ -321,12 +364,59 @@ async function cargarRecargas(){
             </select>
             <button type="button" class="save-btn" data-id="${r.id}" data-tabla="recargas">Guardar</button>
           </div>
+          <button type="button" class="delete-btn" data-id="${r.id}" data-tabla="recargas">🗑 Eliminar recarga</button>
         </div>
       </div>`;
   }).join("");
 
   wireEditButtons(list);
+  wireDeleteButtons(list, "recargas");
 }
+
+function aplicarFiltroRecargas(){
+  document.getElementById("recFecha").value = recFiltro === "fecha" ? recFechaCustom : "";
+  let arr = TODAS_LAS_RECARGAS_ADMIN;
+  if (recFiltro === "hoy") {
+    const hoy = new Date().toDateString();
+    arr = arr.filter(r => new Date(r.created_at).toDateString() === hoy);
+  } else if (recFiltro === "pendientes") {
+    arr = arr.filter(r => (r.estado || "pendiente") === "pendiente");
+  } else if (recFiltro === "fecha" && recFechaCustom) {
+    arr = arr.filter(r => new Date(r.created_at).toLocaleDateString("en-CA") === recFechaCustom);
+  }
+  renderRecargas(arr);
+}
+
+async function cargarRecargas(){
+  const { data: recargas, error } = await sb.from("recargas").select("*").order("created_at", { ascending: false }).limit(300);
+  if (error) { document.getElementById("recargasList").innerHTML = '<p class="msg">No se pudieron cargar las recargas (¿ya creaste la tabla "recargas" en Supabase?).</p>'; return; }
+  TODAS_LAS_RECARGAS_ADMIN = recargas || [];
+  aplicarFiltroRecargas();
+}
+
+/* -------- chips y fecha de filtro -------- */
+document.querySelectorAll(".filter-chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    const panel = chip.dataset.panel;
+    document.querySelectorAll('.filter-chip[data-panel="' + panel + '"]').forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    if (panel === "ped") { pedFiltro = chip.dataset.filter; pedFechaCustom = ""; aplicarFiltroPedidos(); }
+    else { recFiltro = chip.dataset.filter; recFechaCustom = ""; aplicarFiltroRecargas(); }
+  });
+});
+
+document.getElementById("pedFecha").addEventListener("change", function(){
+  pedFechaCustom = this.value;
+  pedFiltro = this.value ? "fecha" : "hoy";
+  document.querySelectorAll('.filter-chip[data-panel="ped"]').forEach(c => c.classList.remove("active"));
+  aplicarFiltroPedidos();
+});
+document.getElementById("recFecha").addEventListener("change", function(){
+  recFechaCustom = this.value;
+  recFiltro = this.value ? "fecha" : "hoy";
+  document.querySelectorAll('.filter-chip[data-panel="rec"]').forEach(c => c.classList.remove("active"));
+  aplicarFiltroRecargas();
+});
 
 /* -------- editar / guardar estado (compartido) -------- */
 function wireEditButtons(list){
@@ -355,8 +445,40 @@ function wireEditButtons(list){
         const badge = card.querySelector(".badge");
         badge.textContent = nuevoEstado;
         badge.className = "badge " + nuevoEstado;
+        // actualiza también la caché en memoria
+        const cache = tabla === "pedidos" ? TODOS_LOS_PEDIDOS_ADMIN : TODAS_LAS_RECARGAS_ADMIN;
+        const item = cache.find(x => String(x.id) === String(id));
+        if (item) item.estado = nuevoEstado;
       }
       setTimeout(() => { btn.textContent = "Guardar"; btn.classList.remove("saved"); panel.classList.remove("open"); }, 1200);
+    });
+  });
+}
+
+/* -------- eliminar (compartido) -------- */
+function wireDeleteButtons(list, tabla){
+  list.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      const etiqueta = tabla === "pedidos" ? "este pedido" : "esta recarga";
+      if (!confirm("¿Seguro que quieres eliminar " + etiqueta + "? Esta acción no se puede deshacer.")) return;
+
+      btn.textContent = "Eliminando…";
+      btn.disabled = true;
+      const { error } = await sb.from(tabla).delete().eq("id", id);
+      if (error) {
+        btn.textContent = "🗑 Error, reintenta";
+        btn.disabled = false;
+        return;
+      }
+      if (tabla === "pedidos") {
+        TODOS_LOS_PEDIDOS_ADMIN = TODOS_LOS_PEDIDOS_ADMIN.filter(x => String(x.id) !== String(id));
+      } else {
+        TODAS_LAS_RECARGAS_ADMIN = TODAS_LAS_RECARGAS_ADMIN.filter(x => String(x.id) !== String(id));
+      }
+      const card = list.querySelector('.order[data-id="' + id + '"]');
+      if (card) card.remove();
     });
   });
 }
