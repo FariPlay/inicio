@@ -82,7 +82,7 @@ h1{font-size:1.25rem;font-weight:900;text-transform:uppercase;margin-bottom:6px;
 
 .comprobante-wrap{display:none;margin-top:6px;}
 .comprobante-wrap.show{display:block;}
-.comprobante-box{border:2px dashed rgba(255,255,255,.16);border-radius:8px;padding:22px 14px;text-align:center;cursor:pointer;}
+.comprobante-box{display:block;border:2px dashed rgba(255,255,255,.16);border-radius:8px;padding:22px 14px;text-align:center;cursor:pointer;}
 .comprobante-box.has-file{padding:14px;}
 .comprobante-box.has-file{border-style:solid;border-color:rgba(62,207,110,.5);background:rgba(62,207,110,.05);}
 .comprobante-txt{font-size:.82rem;font-weight:800;margin-top:6px;}
@@ -253,13 +253,13 @@ h1{font-size:1.25rem;font-weight:900;text-transform:uppercase;margin-bottom:6px;
 
     <div class="comprobante-wrap show" style="margin-top:18px;">
       <p class="bancos-label">Adjuntar foto del comprobante *</p>
-      <div class="comprobante-box" id="comprobanteBox">
+      <label class="comprobante-box" id="comprobanteBox" for="fComprobante">
         <img id="comprobanteThumb" class="comprobante-thumb" style="display:none;" alt="Vista previa">
         <div id="comprobanteIcon" style="font-size:1.6rem;">📎</div>
         <div class="comprobante-txt">Toca para subir tu comprobante</div>
         <div class="comprobante-hint">JPG o PNG desde tu galería · Máx. 5MB</div>
         <input type="file" id="fComprobante" accept="image/*" style="display:none;">
-      </div>
+      </label>
       <p class="comprobante-filename" id="comprobanteFilename"></p>
     </div>
   </div>
@@ -434,7 +434,7 @@ const comprobanteBox = document.getElementById("comprobanteBox");
 const fComprobante = document.getElementById("fComprobante");
 const comprobanteThumb = document.getElementById("comprobanteThumb");
 const comprobanteIcon = document.getElementById("comprobanteIcon");
-comprobanteBox.addEventListener("click", () => fComprobante.click());
+// El <label for="fComprobante"> ya abre el selector de forma nativa; no hace falta JS para eso.
 fComprobante.addEventListener("change", function(){
   const file = this.files[0];
   if (!file) return;
