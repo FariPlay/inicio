@@ -356,9 +356,7 @@ function mostrarDetalleRecarga(id){
   html += `<div class="detail-row"><span>N° de comprobante</span><b>${r.numero_comprobante || '—'}</b></div>`;
   if (r.observacion) html += `<div class="detail-row"><span>Observación</span><b>${r.observacion}</b></div>`;
   html += `<div class="detail-row"><span>Reportado</span><b>${fecha}</b></div>`;
-  if (r.comprobante_url) {
-    html += `<a href="${r.comprobante_url}" target="_blank" rel="noopener"><img src="${r.comprobante_url}" class="detail-img" alt="Comprobante"></a>`;
-  }
+  html += `<div class="detail-row"><span>Comprobante</span><b>${r.comprobante_url ? `<a href="${r.comprobante_url}" target="_blank" rel="noopener" style="color:var(--orange-2);font-weight:800;">Ver comprobante →</a>` : '—'}</b></div>`;
   document.getElementById("detailBody").innerHTML = html;
   document.getElementById("detailOv").classList.add("open");
 }
