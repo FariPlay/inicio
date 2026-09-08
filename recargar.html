@@ -441,16 +441,19 @@ fComprobante.addEventListener("change", function(){
 });
 
 async function subirComprobante(){
-  if (!comprobanteFile) return "";
+  if (!comprobanteFile) return { ok:false, url:"", error:"No hay archivo" };
   try{
     const fd = new FormData();
     fd.append("file", comprobanteFile);
     fd.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
     const resp = await fetch("https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/auto/upload", { method: "POST", body: fd });
     const data = await resp.json();
-    if (data && data.secure_url) return data.secure_url;
-  }catch(e){}
-  return "";
+    if (resp.ok && data && data.secure_url) return { ok:true, url:data.secure_url };
+    const motivo = (data && data.error && data.error.message) ? data.error.message : "Error desconocido al subir";
+    return { ok:false, url:"", error:motivo };
+  }catch(e){
+    return { ok:false, url:"", error:"Sin conexión o el servicio no respondió" };
+  }
 }
 
 /* ---------- enviar ---------- */
@@ -477,7 +480,14 @@ document.getElementById("btnOk").addEventListener("click", async function(){
   btn.disabled = true;
 
   btn.textContent = "Subiendo comprobante…";
-  const comprobanteUrl = await subirComprobante();
+  const subida = await subirComprobante();
+  if (!subida.ok) {
+    errEl.textContent = "No se pudo subir el comprobante (" + subida.error + "). Intenta de nuevo con otra foto.";
+    errEl.classList.add("show");
+    btn.disabled = false;
+    btn.textContent = "Reportar recarga";
+    return;
+  }
 
   btn.textContent = "Guardando…";
   try{
@@ -489,7 +499,7 @@ document.getElementById("btnOk").addEventListener("click", async function(){
       banco: bancoSel,
       numero_comprobante: numeroComprobante,
       observacion: (observacion ? observacion + " · " : "") + "Compra: " + fecha + (hora ? " " + hora : ""),
-      comprobante_url: comprobanteUrl || null
+      comprobante_url: subida.url
     });
     document.getElementById("successOv").classList.add("open");
     const { data: recargas } = await sb.from("recargas").select("*").eq("user_id", currentUser.id).order("created_at", { ascending: false });

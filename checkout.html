@@ -347,74 +347,23 @@ footer{background:var(--bg-0);border-top:1px solid rgba(255,255,255,.06);padding
     </div>
   </div>
 
-  <!-- PASO 2 — MÉTODO DE PAGO -->
+  <!-- PASO 2 — SALDO -->
   <div class="step-box">
     <div class="step-head">
       <div class="step-num b">2</div>
       <div>
-        <div class="step-title">Método de pago</div>
-        <div class="step-sub" style="color:var(--blue-2);">Selecciona cómo vas a pagar</div>
+        <div class="step-title">Pago con saldo</div>
+        <div class="step-sub" style="color:var(--blue-2);">Se descuenta de tu saldo FariPlay al instante</div>
       </div>
     </div>
     <div class="step-body">
-      <div class="metodos-grid">
-        <div class="metodo-btn" id="mSaldo" data-metodo="saldo">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
-          <span class="metodo-name">Saldo</span>
-          <span class="metodo-desc" id="saldoDisponibleTxt">Cargando…</span>
+      <div class="saldo-wrap" id="saldoWrap">
+        <div class="instruccion show" style="margin-bottom:10px;">
+          💰&nbsp;&nbsp;<p>Tu saldo disponible: <strong id="saldoDisponibleTxt">Cargando…</strong></p>
         </div>
-        <div class="metodo-btn" id="mTransferencia" data-metodo="transferencia">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h18M5 10v9m4-9v9m6-9v9m4-9v9M3 19h18M12 3 3 8h18z"/></svg>
-          <span class="metodo-name">Transferencia</span>
-          <span class="metodo-desc">Banco a banco</span>
-        </div>
-        <div class="metodo-btn" id="mDeposito" data-metodo="deposito">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v14M5 9l7 7 7-7"/><path d="M4 21h16"/></svg>
-          <span class="metodo-name">Depósito</span>
-          <span class="metodo-desc">Ventanilla o cajero</span>
-        </div>
-      </div>
-
-      <div class="saldo-wrap" id="saldoWrap" style="display:none;margin-top:14px;">
-        <div class="instruccion show" id="iSaldoOk" style="display:none;">💎&nbsp;&nbsp;<p>Se descontará <strong id="saldoADescontar">$0.00</strong> de tu saldo disponible. La recarga queda confirmada al instante.</p></div>
+        <div class="instruccion show" id="iSaldoOk" style="display:none;">💎&nbsp;&nbsp;<p>Se descontará <strong id="saldoADescontar">$0.00</strong> de tu saldo. Tu pedido queda confirmado al instante.</p></div>
         <div class="instruccion show" id="iSaldoInsuficiente" style="display:none;background:rgba(255,59,59,.08);border-color:rgba(255,59,59,.3);">
           ⚠️&nbsp;&nbsp;<p>Tu saldo no alcanza para este paquete. <a href="recargar.html" style="color:var(--orange-2);font-weight:800;">Recarga saldo aquí →</a></p>
-        </div>
-      </div>
-
-      <!-- Bancos (solo transferencia/depósito) -->
-      <div class="bancos-wrap" id="bancosWrap">
-        <p class="bancos-label">Selecciona el banco</p>
-        <div class="bancos-grid">
-          <div class="banco-btn" data-banco="Banco Pichincha" id="bPichincha"><span class="banco-name">Banco Pichincha</span><span class="banco-check">✓</span></div>
-          <div class="banco-btn" data-banco="Produbanco" id="bProdubanco"><span class="banco-name">Produbanco</span><span class="banco-check">✓</span></div>
-          <div class="banco-btn" data-banco="Banco Guayaquil" id="bGuayaquil"><span class="banco-name">Banco Guayaquil</span><span class="banco-check">✓</span></div>
-        </div>
-
-        <div class="instruccion" id="iTransferencia">🏦&nbsp;&nbsp;<p>Realiza la <strong>transferencia</strong> a la cuenta seleccionada y adjunta el comprobante abajo.</p></div>
-        <div class="instruccion" id="iDeposito">💵&nbsp;&nbsp;<p>Realiza el <strong>depósito</strong> en ventanilla o cajero a la cuenta seleccionada y adjunta el comprobante abajo.</p></div>
-
-        <div class="cuenta-info" id="cuentaInfo">
-          <div class="ci-head" id="ciBancoNombre">Datos de la cuenta</div>
-          <div class="ci-row"><span class="ci-lbl">N° de cuenta</span><span class="ci-val" id="ciCuenta">—</span></div>
-          <div class="ci-row" id="ciTipoRow"><span class="ci-lbl">Tipo</span><span class="ci-val" id="ciTipo">—</span></div>
-          <div class="ci-row"><span class="ci-lbl">Titular</span><span class="ci-val" id="ciNombre">—</span></div>
-          <button type="button" class="ci-copy" id="ciCopyBtn">📋 Copiar número de cuenta</button>
-        </div>
-
-        <div class="comprobante-wrap" id="comprobanteWrap">
-          <p class="bancos-label" style="margin-top:16px;">Adjuntar comprobante de pago</p>
-          <div class="comprobante-box" id="comprobanteBox">
-            <div style="font-size:1.6rem;">📎</div>
-            <div class="comprobante-txt">Toca para subir tu comprobante</div>
-            <div class="comprobante-hint">JPG, PNG o PDF · Máx. 5MB</div>
-            <input type="file" id="fComprobante" accept="image/*,.pdf" style="display:none;">
-          </div>
-          <div class="comprobante-preview" id="comprobantePreview">
-            <button type="button" class="comprobante-remove" id="comprobanteRemove">✕</button>
-            <img id="comprobanteImg" src="" alt="Comprobante">
-          </div>
-          <p class="comprobante-filename" id="comprobanteFilename"></p>
         </div>
       </div>
     </div>
@@ -448,7 +397,7 @@ footer{background:var(--bg-0);border-top:1px solid rgba(255,255,255,.06);padding
         <div class="sum-row sum-total"><span class="sum-label">Total a pagar</span><span class="sum-val" id="sTotal">$0.00</span></div>
       </div>
       <div class="aviso">⚠️&nbsp;&nbsp;<p>Verifica que tu ID de jugador esté correcto antes de confirmar. No podemos revertir una recarga enviada a un ID equivocado.</p></div>
-      <button class="btn-ok" id="btnOk">Confirmar pedido por WhatsApp</button>
+      <button class="btn-ok" id="btnOk">Confirmar pedido</button>
       <p class="secure-note">🔒 Tu pedido se coordina de forma segura vía WhatsApp</p>
     </div>
   </div>
@@ -514,7 +463,7 @@ var price = parseFloat(params.get("price")) || 0;
 document.getElementById("svcName").textContent = amt + (isNaN(Number(amt.replace(/,/g,""))) ? "" : " 💎");
 document.getElementById("svcBonus").textContent = bonus > 0 ? ("+" + bonus + " de bono") : "";
 
-var descuento = 0, codigoUsado = null, metodoSel = "", bancoSel = "";
+var descuento = 0, codigoUsado = null;
 
 function actualizarResumen(){
   var tot = Math.max(price - descuento, 0);
@@ -539,12 +488,14 @@ authPromise.then(async function(user){
   if(!user) return;
   saldoDisponible = await calcularSaldo(user.id);
   var tot = Math.max(price - descuento, 0);
-  var txt = document.getElementById("saldoDisponibleTxt");
+  document.getElementById("saldoDisponibleTxt").textContent = "$" + saldoDisponible.toFixed(2);
+  document.getElementById("saldoADescontar").textContent = "$" + tot.toFixed(2);
   if(saldoDisponible >= tot && tot > 0){
-    txt.textContent = "$" + saldoDisponible.toFixed(2) + " disponible";
+    document.getElementById("iSaldoOk").style.display = "flex";
+    document.getElementById("iSaldoInsuficiente").style.display = "none";
   }else{
-    txt.textContent = "$" + saldoDisponible.toFixed(2) + " · insuficiente";
-    document.getElementById("mSaldo").style.opacity = ".55";
+    document.getElementById("iSaldoOk").style.display = "none";
+    document.getElementById("iSaldoInsuficiente").style.display = "flex";
   }
 });
 
@@ -574,132 +525,6 @@ navtogBtn.addEventListener("click", function(){
 document.getElementById("navClose").addEventListener("click", function(){ navEl.classList.remove("open"); });
 navEl.addEventListener("click", function(e){ if(e.target.closest("a")) navEl.classList.remove("open"); });
 
-/* ---------- métodos de pago ---------- */
-var bancosInfo = {
-  "Banco Pichincha": { cuenta:"2100215429", tipo:null, nombre:"Bemovil Ecuador S. A." },
-  "Produbanco":       { cuenta:"20005251786", tipo:"Ahorros", nombre:"Olga Pineida" },
-  "Banco Guayaquil":  { cuenta:"36999165", tipo:"Ahorros", nombre:"Holguer Farinango" }
-};
-var bancosIds = { "Banco Pichincha":"bPichincha", "Produbanco":"bProdubanco", "Banco Guayaquil":"bGuayaquil" };
-
-var metodoBtns = document.querySelectorAll(".metodo-btn");
-var bancosWrap = document.getElementById("bancosWrap");
-
-metodoBtns.forEach(function(btn){
-  btn.addEventListener("click", function(){
-    metodoSel = btn.getAttribute("data-metodo");
-    bancoSel = "";
-    metodoBtns.forEach(function(b){ b.classList.toggle("selected", b === btn); });
-
-    document.getElementById("cuentaInfo").classList.remove("show");
-    document.getElementById("comprobanteWrap").classList.remove("show");
-    document.querySelectorAll(".banco-btn").forEach(function(b){ b.classList.remove("selected"); });
-    document.getElementById("iTransferencia").classList.remove("show");
-    document.getElementById("iDeposito").classList.remove("show");
-    bancosWrap.classList.remove("show");
-    document.getElementById("saldoWrap").style.display = "none";
-    document.getElementById("iSaldoOk").style.display = "none";
-    document.getElementById("iSaldoInsuficiente").style.display = "none";
-
-    if(metodoSel === "saldo"){
-      var tot = Math.max(price - descuento, 0);
-      document.getElementById("saldoWrap").style.display = "block";
-      document.getElementById("saldoADescontar").textContent = "$" + tot.toFixed(2);
-      if(saldoDisponible >= tot && tot > 0){
-        document.getElementById("iSaldoOk").style.display = "flex";
-      }else{
-        document.getElementById("iSaldoInsuficiente").style.display = "flex";
-      }
-      return;
-    }
-
-    bancosWrap.classList.add("show");
-    document.getElementById("i" + (metodoSel === "transferencia" ? "Transferencia" : "Deposito")).classList.add("show");
-
-    // Banco Pichincha solo se ofrece para Transferencia
-    document.getElementById("bPichincha").style.display = (metodoSel === "transferencia") ? "flex" : "none";
-  });
-});
-
-document.querySelectorAll(".banco-btn").forEach(function(btn){
-  btn.addEventListener("click", function(){
-    var banco = btn.getAttribute("data-banco");
-    bancoSel = banco;
-    document.querySelectorAll(".banco-btn").forEach(function(b){ b.classList.remove("selected"); });
-    btn.classList.add("selected");
-
-    var info = bancosInfo[banco];
-    document.getElementById("ciBancoNombre").textContent = banco;
-    document.getElementById("ciCuenta").textContent = info.cuenta;
-    document.getElementById("ciNombre").textContent = info.nombre;
-    var tipoRow = document.getElementById("ciTipoRow");
-    if(info.tipo){ tipoRow.style.display = "flex"; document.getElementById("ciTipo").textContent = info.tipo; }
-    else{ tipoRow.style.display = "none"; }
-    document.getElementById("cuentaInfo").classList.add("show");
-    document.getElementById("comprobanteWrap").classList.add("show");
-  });
-});
-
-document.getElementById("ciCopyBtn").addEventListener("click", function(){
-  var num = document.getElementById("ciCuenta").textContent;
-  var btn = this;
-  function marcarCopiado(){
-    btn.textContent = "✓ Copiado";
-    btn.classList.add("copied");
-    setTimeout(function(){ btn.textContent = "📋 Copiar número de cuenta"; btn.classList.remove("copied"); }, 1800);
-  }
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(num).then(marcarCopiado).catch(marcarCopiado);
-  }else{
-    var t = document.createElement("textarea");
-    t.value = num; document.body.appendChild(t); t.select();
-    try{ document.execCommand("copy"); }catch(e){}
-    document.body.removeChild(t);
-    marcarCopiado();
-  }
-});
-
-/* ---------- comprobante ---------- */
-var comprobanteBase64 = "", comprobanteNombre = "", comprobanteFile = null;
-var comprobanteBox = document.getElementById("comprobanteBox");
-var fComprobante = document.getElementById("fComprobante");
-var comprobantePrev = document.getElementById("comprobantePreview");
-var comprobanteImg = document.getElementById("comprobanteImg");
-var comprobanteFname = document.getElementById("comprobanteFilename");
-
-comprobanteBox.addEventListener("click", function(){ fComprobante.click(); });
-fComprobante.addEventListener("change", function(){
-  var file = this.files[0];
-  if(!file) return;
-  if(file.size > 5 * 1024 * 1024){ alert("El archivo debe pesar máximo 5MB."); this.value=""; return; }
-  comprobanteFile = file;
-  comprobanteNombre = file.name;
-  var reader = new FileReader();
-  reader.onload = function(e){
-    comprobanteBase64 = e.target.result;
-    comprobanteBox.classList.add("has-file");
-    comprobanteBox.querySelector(".comprobante-txt").textContent = "Comprobante listo ✔";
-    comprobanteBox.querySelector(".comprobante-hint").textContent = "Toca para cambiar el archivo";
-    comprobanteFname.textContent = "📄 " + comprobanteNombre;
-    if(file.type.startsWith("image/")){
-      comprobanteImg.src = comprobanteBase64;
-      comprobantePrev.classList.add("show");
-    }else{
-      comprobantePrev.classList.remove("show");
-    }
-  };
-  reader.readAsDataURL(file);
-});
-document.getElementById("comprobanteRemove").addEventListener("click", function(e){
-  e.stopPropagation();
-  comprobanteBase64 = ""; comprobanteNombre = ""; comprobanteFile = null;
-  fComprobante.value = "";
-  comprobantePrev.classList.remove("show");
-  comprobanteBox.classList.remove("has-file");
-  comprobanteBox.querySelector(".comprobante-txt").textContent = "Toca para subir tu comprobante";
-  comprobanteBox.querySelector(".comprobante-hint").textContent = "JPG, PNG o PDF · Máx. 5MB";
-});
-
 /* ---------- toast flotante ---------- */
 var toastEl = document.getElementById("toast"), toastTimer = null;
 function showToast(msg, type){
@@ -724,88 +549,30 @@ document.getElementById("promoBtn").addEventListener("click", function(){
   actualizarResumen();
 });
 
-/* =====================================================================
-   SUBIR COMPROBANTE A CLOUDINARY — mismas credenciales de tu cuenta
-   ---------------------------------------------------------------------
-   wa.me solo puede prellenar TEXTO, nunca adjuntar un archivo. Por eso
-   subimos la imagen a Cloudinary y mandamos el ENLACE directo dentro
-   del mensaje del pedido — al tocarlo en WhatsApp se abre la foto.
-   Si la subida falla (sin internet, etc.) se descarga al celular del
-   cliente como respaldo, para que nunca se pierda el comprobante.
-===================================================================== */
-var CLOUDINARY_CLOUD_NAME    = "wgp1dbjg";
-var CLOUDINARY_UPLOAD_PRESET = "rexpres";
-
-async function subirComprobante(){
-  if(!comprobanteFile) return "";
-  try{
-    var fd = new FormData();
-    fd.append("file", comprobanteFile);
-    fd.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-    var resp = await fetch("https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD_NAME + "/auto/upload", { method:"POST", body:fd });
-    var data = await resp.json();
-    if(data && data.secure_url) return data.secure_url;
-  }catch(e){ /* sigue al respaldo de descarga */ }
-  return "";
-}
-
-function descargarComprobante(){
-  if(!comprobanteFile) return;
-  var url = URL.createObjectURL(comprobanteFile);
-  var a = document.createElement("a");
-  a.href = url; a.download = comprobanteNombre || "comprobante";
-  document.body.appendChild(a); a.click();
-  document.body.removeChild(a);
-  setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
-}
-
 /* ---------- confirmar pedido ---------- */
 document.getElementById("btnOk").addEventListener("click", async function(){
   var id = document.getElementById("fId").value.trim();
   if(!/^\d{6,15}$/.test(id)){ document.getElementById("fId").focus(); alert("El ID debe tener solo números, entre 6 y 15 dígitos."); return; }
-  if(!metodoSel){ alert("Selecciona un método de pago."); return; }
 
   var tot = Math.max(price - descuento, 0);
-  var pagaConSaldo = (metodoSel === "saldo");
-  var necesitaBanco = (metodoSel === "transferencia" || metodoSel === "deposito");
 
-  if(pagaConSaldo && saldoDisponible < tot){
+  if(saldoDisponible < tot){
     alert("Tu saldo no alcanza para este paquete. Recárgalo primero.");
     return;
-  }
-  if(necesitaBanco){
-    if(!bancoSel){ alert("Selecciona un banco."); return; }
-    if(!comprobanteBase64){ alert("Adjunta el comprobante de pago."); document.getElementById("comprobanteBox").scrollIntoView({behavior:"smooth",block:"center"}); return; }
   }
 
   var btn = this;
   btn.disabled = true;
 
-  var comprobanteUrl = "";
-  if(necesitaBanco){
-    btn.textContent = "Subiendo comprobante…";
-    comprobanteUrl = await subirComprobante();
-    if(!comprobanteUrl && comprobanteFile) descargarComprobante();
-  }
-
-  var metodoLabel = pagaConSaldo
-    ? "Saldo FariPlay"
-    : {transferencia:"Transferencia bancaria", deposito:"Depósito"}[metodoSel];
+  var metodoLabel = "Saldo FariPlay";
 
   var msg = "¡Hola FariPlay! 🚀\n\n*Pedido de diamantes Free Fire:*\n";
   msg += "• Paquete: " + amt + (bonus > 0 ? " (+"+bonus+" bono)" : "") + "\n";
   msg += "• ID de jugador: " + id + "\n";
-  msg += "• Método de pago: " + metodoLabel + "\n";
-  if(necesitaBanco) msg += "• Banco: " + bancoSel + "\n";
   msg += "• Subtotal: $" + price.toFixed(2) + "\n";
   if(descuento > 0) msg += "• Código: " + codigoUsado + " (-$" + descuento.toFixed(2) + ")\n";
   msg += "• *Total: $" + tot.toFixed(2) + "*\n";
-  if(pagaConSaldo) msg += "• 💎 Pagado con saldo FariPlay (ya confirmado)\n";
-  if(necesitaBanco){
-    msg += comprobanteUrl
-      ? "• 📎 Comprobante: " + comprobanteUrl + "\n"
-      : "• 📎 Comprobante: se descargó a tu celular, adjúntalo aquí 👇\n";
-  }
+  msg += "• 💎 Pagado con saldo FariPlay (ya confirmado)\n";
 
   btn.textContent = "Guardando pedido…";
   try{
@@ -816,13 +583,13 @@ document.getElementById("btnOk").addEventListener("click", async function(){
       bono: bonus,
       precio: price,
       metodo_pago: metodoLabel,
-      banco: necesitaBanco ? bancoSel : null,
+      banco: null,
       codigo_cupon: codigoUsado,
       descuento: descuento,
       total: tot,
       player_id: id,
-      comprobante_url: comprobanteUrl || null,
-      estado: pagaConSaldo ? "confirmado" : "pendiente"
+      comprobante_url: null,
+      estado: "confirmado"
     });
   }catch(e){ /* si falla el guardado, el pedido igual se envía por WhatsApp */ }
 
@@ -830,7 +597,7 @@ document.getElementById("btnOk").addEventListener("click", async function(){
   window.open("https://wa.me/" + ORDER_NUMBER + "?text=" + encodeURIComponent(msg), "_blank", "noopener");
 
   btn.disabled = false;
-  btn.textContent = "Confirmar pedido por WhatsApp";
+  btn.textContent = "Confirmar pedido";
   document.getElementById("successOv").classList.add("open");
 });
 
