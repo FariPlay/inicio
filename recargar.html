@@ -83,10 +83,13 @@ h1{font-size:1.25rem;font-weight:900;text-transform:uppercase;margin-bottom:6px;
 .comprobante-wrap{display:none;margin-top:6px;}
 .comprobante-wrap.show{display:block;}
 .comprobante-box{border:2px dashed rgba(255,255,255,.16);border-radius:8px;padding:22px 14px;text-align:center;cursor:pointer;}
+.comprobante-box.has-file{padding:14px;}
 .comprobante-box.has-file{border-style:solid;border-color:rgba(62,207,110,.5);background:rgba(62,207,110,.05);}
 .comprobante-txt{font-size:.82rem;font-weight:800;margin-top:6px;}
 .comprobante-hint{font-size:.68rem;color:var(--muted);margin-top:3px;}
 .comprobante-filename{font-size:.72rem;color:var(--green);margin-top:8px;font-weight:700;text-align:center;}
+.comprobante-thumb{width:56px;height:56px;border-radius:6px;object-fit:cover;margin:0 auto 8px;display:block;
+  border:1px solid rgba(62,207,110,.4);}
 
 .btn-ok{width:100%;background:linear-gradient(135deg,var(--red),var(--orange) 55%,var(--orange-2));color:#1A0500;
   border:none;border-radius:8px;padding:15px;font-family:var(--font);font-weight:900;text-transform:uppercase;
@@ -251,7 +254,8 @@ h1{font-size:1.25rem;font-weight:900;text-transform:uppercase;margin-bottom:6px;
     <div class="comprobante-wrap show" style="margin-top:18px;">
       <p class="bancos-label">Adjuntar foto del comprobante *</p>
       <div class="comprobante-box" id="comprobanteBox">
-        <div style="font-size:1.6rem;">📎</div>
+        <img id="comprobanteThumb" class="comprobante-thumb" style="display:none;" alt="Vista previa">
+        <div id="comprobanteIcon" style="font-size:1.6rem;">📎</div>
         <div class="comprobante-txt">Toca para subir tu comprobante</div>
         <div class="comprobante-hint">JPG o PNG desde tu galería · Máx. 5MB</div>
         <input type="file" id="fComprobante" accept="image/*" style="display:none;">
@@ -428,6 +432,8 @@ document.getElementById("ciCopyBtn").addEventListener("click", function(){
 /* ---------- comprobante (foto obligatoria) ---------- */
 const comprobanteBox = document.getElementById("comprobanteBox");
 const fComprobante = document.getElementById("fComprobante");
+const comprobanteThumb = document.getElementById("comprobanteThumb");
+const comprobanteIcon = document.getElementById("comprobanteIcon");
 comprobanteBox.addEventListener("click", () => fComprobante.click());
 fComprobante.addEventListener("change", function(){
   const file = this.files[0];
@@ -438,6 +444,14 @@ fComprobante.addEventListener("change", function(){
   comprobanteBox.querySelector(".comprobante-txt").textContent = "Comprobante listo ✔";
   comprobanteBox.querySelector(".comprobante-hint").textContent = "Toca para cambiar el archivo";
   document.getElementById("comprobanteFilename").textContent = "📄 " + file.name;
+
+  const reader = new FileReader();
+  reader.onload = function(e){
+    comprobanteThumb.src = e.target.result;
+    comprobanteThumb.style.display = "block";
+    comprobanteIcon.style.display = "none";
+  };
+  reader.readAsDataURL(file);
 });
 
 async function subirComprobante(){
