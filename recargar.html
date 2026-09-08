@@ -435,15 +435,28 @@ const fComprobante = document.getElementById("fComprobante");
 const comprobanteThumb = document.getElementById("comprobanteThumb");
 const comprobanteIcon = document.getElementById("comprobanteIcon");
 // El <label for="fComprobante"> ya abre el selector de forma nativa; no hace falta JS para eso.
-fComprobante.addEventListener("change", function(){
+fComprobante.addEventListener("change", async function(){
   const file = this.files[0];
   if (!file) return;
   if (file.size > 5 * 1024 * 1024) { alert("El archivo debe pesar máximo 5MB."); this.value = ""; return; }
-  comprobanteFile = file;
+
+  comprobanteBox.querySelector(".comprobante-txt").textContent = "Leyendo imagen…";
+
+  // Leemos los bytes de la imagen AHORA MISMO (no cuando se envíe el formulario).
+  // Con el selector rápido de fotos de Android, la referencia al archivo puede
+  // caducar si esperamos hasta el final para subirla; guardándola ya como bytes
+  // en memoria evitamos que eso rompa la subida más adelante.
+  try{
+    const buffer = await file.arrayBuffer();
+    comprobanteFile = new File([buffer], file.name || "comprobante.jpg", { type: file.type || "image/jpeg" });
+  }catch(e){
+    comprobanteFile = file; // respaldo por si el navegador no soporta arrayBuffer()
+  }
+
   comprobanteBox.classList.add("has-file");
   comprobanteBox.querySelector(".comprobante-txt").textContent = "Comprobante listo ✔";
   comprobanteBox.querySelector(".comprobante-hint").textContent = "Toca para cambiar el archivo";
-  document.getElementById("comprobanteFilename").textContent = "📄 " + file.name;
+  document.getElementById("comprobanteFilename").textContent = "📄 " + (file.name || "comprobante.jpg");
 
   const reader = new FileReader();
   reader.onload = function(e){
@@ -451,7 +464,7 @@ fComprobante.addEventListener("change", function(){
     comprobanteThumb.style.display = "block";
     comprobanteIcon.style.display = "none";
   };
-  reader.readAsDataURL(file);
+  reader.readAsDataURL(comprobanteFile);
 });
 
 async function subirComprobante(){
