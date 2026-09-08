@@ -109,6 +109,11 @@ h1{font-size:1.25rem;font-weight:900;text-transform:uppercase;margin-bottom:6px;
 .badge.confirmado{background:rgba(62,207,110,.12);color:var(--green);border:1px solid rgba(62,207,110,.3);}
 .badge.rechazado{background:rgba(255,59,59,.12);color:#ff8080;border:1px solid rgba(255,59,59,.3);}
 .empty{text-align:center;padding:30px 20px;color:var(--muted);font-size:.85rem;}
+.detail-row{display:flex;justify-content:space-between;gap:10px;font-size:.82rem;padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,.07);color:var(--ink-dim);}
+.detail-row:last-of-type{border-bottom:none;}
+.detail-row b{color:var(--ink);text-align:right;}
+.detail-img{max-width:100%;border-radius:8px;margin-top:12px;display:block;}
 
 /* -------- pantalla de éxito -------- */
 .success-ov{position:fixed;inset:0;background:rgba(5,3,8,.9);backdrop-filter:blur(6px);z-index:300;
@@ -275,6 +280,14 @@ h1{font-size:1.25rem;font-weight:900;text-transform:uppercase;margin-bottom:6px;
   </div>
 </div>
 
+<div class="success-ov" id="detailOv">
+  <div class="success-card" style="text-align:left;max-width:400px;">
+    <p class="step-title" style="margin-bottom:14px;">Detalle de tu recarga</p>
+    <div id="detailBody"></div>
+    <button class="success-btn" id="detailClose" style="margin-top:18px;">Cerrar</button>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL = "https://zdefkvvodijmrlhxvlrr.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_C0ur5kEiRQ0TYDpgtiaF8Q_w2lCVCQA";
@@ -302,14 +315,17 @@ async function calcularSaldo(userId){
   return recargado - gastado;
 }
 
+let TODAS_MIS_RECARGAS = [];
+
 function pintarHistorial(recargas){
+  TODAS_MIS_RECARGAS = recargas;
   const list = document.getElementById("recargasList");
   if (!recargas.length) { list.innerHTML = '<p class="empty">Todavía no tienes recargas.</p>'; return; }
   list.innerHTML = recargas.map(r => {
     const fecha = new Date(r.created_at).toLocaleString("es-EC", { dateStyle: "medium", timeStyle: "short" });
     const estado = r.estado || "pendiente";
     return `
-      <div class="recarga-item">
+      <div class="recarga-item" data-id="${r.id}" style="cursor:pointer;">
         <div>
           <div class="recarga-monto">+$${Number(r.monto).toFixed(2)}</div>
           <div class="recarga-meta">${fecha} · ${r.metodo_pago}${r.banco ? ' · ' + r.banco : ''}</div>
@@ -317,7 +333,35 @@ function pintarHistorial(recargas){
         <span class="badge ${estado}">${estado}</span>
       </div>`;
   }).join("");
+
+  list.querySelectorAll(".recarga-item").forEach(item => {
+    item.addEventListener("click", () => mostrarDetalleRecarga(item.dataset.id));
+  });
 }
+
+function mostrarDetalleRecarga(id){
+  const r = TODAS_MIS_RECARGAS.find(x => String(x.id) === String(id));
+  if (!r) return;
+  const fecha = new Date(r.created_at).toLocaleString("es-EC", { dateStyle: "medium", timeStyle: "short" });
+  const estado = r.estado || "pendiente";
+  let html = "";
+  html += `<div class="detail-row"><span>Monto</span><b>$${Number(r.monto).toFixed(2)}</b></div>`;
+  html += `<div class="detail-row"><span>Estado</span><b><span class="badge ${estado}">${estado}</span></b></div>`;
+  html += `<div class="detail-row"><span>Método</span><b>${r.metodo_pago || '—'}</b></div>`;
+  html += `<div class="detail-row"><span>Banco</span><b>${r.banco || '—'}</b></div>`;
+  html += `<div class="detail-row"><span>N° de comprobante</span><b>${r.numero_comprobante || '—'}</b></div>`;
+  if (r.observacion) html += `<div class="detail-row"><span>Observación</span><b>${r.observacion}</b></div>`;
+  html += `<div class="detail-row"><span>Reportado</span><b>${fecha}</b></div>`;
+  if (r.comprobante_url) {
+    html += `<a href="${r.comprobante_url}" target="_blank" rel="noopener"><img src="${r.comprobante_url}" class="detail-img" alt="Comprobante"></a>`;
+  }
+  document.getElementById("detailBody").innerHTML = html;
+  document.getElementById("detailOv").classList.add("open");
+}
+
+document.getElementById("detailClose").addEventListener("click", () => {
+  document.getElementById("detailOv").classList.remove("open");
+});
 
 (async function init(){
   const { data: { session } } = await sb.auth.getSession();
@@ -439,6 +483,7 @@ document.getElementById("btnOk").addEventListener("click", async function(){
   try{
     await sb.from("recargas").insert({
       user_id: currentUser.id,
+      user_email: currentUser.email,
       monto: monto,
       metodo_pago: metodoLabel,
       banco: bancoSel,
@@ -459,7 +504,7 @@ document.getElementById("btnOk").addEventListener("click", async function(){
 });
 
 document.getElementById("successClose").addEventListener("click", () => {
-  document.getElementById("successOv").classList.remove("open");
+  location.reload();
 });
 </script>
 </body>

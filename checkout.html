@@ -811,6 +811,7 @@ document.getElementById("btnOk").addEventListener("click", async function(){
   try{
     await sb.from("pedidos").insert({
       user_id: currentUser.id,
+      user_email: currentUser.email,
       paquete: amt,
       bono: bonus,
       precio: price,

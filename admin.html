@@ -44,6 +44,36 @@ a{color:inherit;text-decoration:none;}
 .estado-select{margin-top:10px;width:100%;background:var(--bg-0);border:1px solid rgba(255,255,255,.15);
   border-radius:5px;padding:9px 10px;color:var(--ink);font-family:var(--font);font-size:.8rem;font-weight:800;}
 
+/* -------- badge de estado (solo lectura) -------- */
+.badge{display:inline-block;font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;
+  padding:4px 10px;border-radius:20px;margin-top:8px;}
+.badge.pendiente{background:rgba(255,178,56,.12);color:var(--orange-2);border:1px solid rgba(255,178,56,.3);}
+.badge.confirmado{background:rgba(62,207,110,.12);color:var(--green);border:1px solid rgba(62,207,110,.3);}
+.badge.entregado{background:rgba(91,124,255,.12);color:var(--blue-2);border:1px solid rgba(91,124,255,.3);}
+.badge.rechazado{background:rgba(255,59,59,.12);color:#ff8080;border:1px solid rgba(255,59,59,.3);}
+
+/* -------- fila resumen clicable + detalle expandible -------- */
+.order-top{cursor:pointer;}
+.order-toggle{display:flex;align-items:center;gap:8px;}
+.chev{width:14px;height:14px;flex:none;color:var(--muted);transition:transform .2s;}
+.order.open .chev{transform:rotate(180deg);}
+.order-detail{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed rgba(255,255,255,.12);}
+.order.open .order-detail{display:block;}
+.detail-row{display:flex;justify-content:space-between;gap:10px;font-size:.78rem;padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,.06);color:var(--ink-dim);}
+.detail-row:last-of-type{border-bottom:none;}
+.detail-row b{color:var(--ink);text-align:right;}
+.detail-img{max-width:100%;border-radius:8px;margin-top:10px;display:block;}
+.edit-toggle{margin-top:12px;background:rgba(91,124,255,.12);border:1px solid rgba(91,124,255,.3);color:var(--blue-2);
+  border-radius:6px;padding:8px 14px;font-family:var(--font);font-weight:800;font-size:.76rem;cursor:pointer;}
+.edit-panel{display:none;margin-top:10px;gap:8px;align-items:center;}
+.edit-panel.open{display:flex;}
+.edit-panel select{flex:1;background:var(--bg-0);border:1px solid rgba(255,255,255,.15);border-radius:5px;
+  padding:9px 10px;color:var(--ink);font-family:var(--font);font-size:.8rem;font-weight:800;}
+.save-btn{background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;border:none;border-radius:6px;
+  padding:9px 16px;font-family:var(--font);font-weight:900;font-size:.76rem;cursor:pointer;white-space:nowrap;}
+.save-btn.saved{background:var(--green);color:#04160b;}
+
 /* -------- precios -------- */
 .price-row{display:flex;align-items:center;gap:10px;background:linear-gradient(160deg,var(--bg-2),var(--bg-1));
   border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:13px 14px;margin-bottom:10px;}
@@ -189,72 +219,144 @@ document.querySelectorAll(".tab").forEach(tab => {
 });
 
 /* -------- pedidos -------- */
+let TODOS_LOS_PEDIDOS_ADMIN = [];
+
 async function cargarPedidos(){
   const { data: pedidos, error } = await sb.from("pedidos").select("*").order("created_at", { ascending: false }).limit(80);
   const list = document.getElementById("ordersList");
   if (error) { list.innerHTML = '<p class="msg">No se pudieron cargar los pedidos.</p>'; return; }
   if (!pedidos.length) { list.innerHTML = '<p class="msg">Todavía no hay pedidos.</p>'; return; }
 
+  TODOS_LOS_PEDIDOS_ADMIN = pedidos;
+
   list.innerHTML = pedidos.map(p => {
     const fecha = new Date(p.created_at).toLocaleString("es-EC", { dateStyle: "short", timeStyle: "short" });
+    const estado = p.estado || "pendiente";
+    const clientId = "FP-" + String(p.user_id || "").slice(0,6).toUpperCase();
     return `
-      <div class="order">
-        <div class="order-top">
-          <div>
-            <div class="order-pkg">${p.paquete}${p.bono > 0 ? ' (+' + p.bono + ')' : ''}</div>
-            <div class="order-meta">
-              ${fecha} · ID: ${p.player_id} · ${p.metodo_pago || ''}${p.banco ? ' · ' + p.banco : ''}
-              ${p.comprobante_url ? '<br><a href="' + p.comprobante_url + '" target="_blank" rel="noopener">Ver comprobante →</a>' : ''}
+      <div class="order" data-id="${p.id}">
+        <div class="order-top" onclick="this.parentElement.classList.toggle('open')">
+          <div class="order-toggle">
+            <svg class="chev" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div>
+              <div class="order-pkg">${p.paquete}${p.bono > 0 ? ' (+' + p.bono + ')' : ''}</div>
+              <div class="order-meta">${fecha} · ID jugador: ${p.player_id}</div>
+              <span class="badge ${estado}">${estado}</span>
             </div>
           </div>
           <div class="order-total">$${Number(p.total).toFixed(2)}</div>
         </div>
-        <select class="estado-select" data-id="${p.id}">
-          <option value="pendiente" ${p.estado === "pendiente" ? "selected" : ""}>Pendiente</option>
-          <option value="confirmado" ${p.estado === "confirmado" ? "selected" : ""}>Confirmado</option>
-          <option value="entregado" ${p.estado === "entregado" ? "selected" : ""}>Entregado</option>
-        </select>
+
+        <div class="order-detail">
+          <div class="detail-row"><span>Cliente</span><b>${clientId}${p.user_email ? ' · ' + p.user_email : ''}</b></div>
+          <div class="detail-row"><span>Paquete</span><b>${p.paquete}${p.bono > 0 ? ' (+' + p.bono + ' bono)' : ''}</b></div>
+          <div class="detail-row"><span>ID de jugador</span><b>${p.player_id}</b></div>
+          <div class="detail-row"><span>Método de pago</span><b>${p.metodo_pago || '—'}</b></div>
+          <div class="detail-row"><span>Banco</span><b>${p.banco || '—'}</b></div>
+          ${p.codigo_cupon ? `<div class="detail-row"><span>Cupón</span><b>${p.codigo_cupon} (-$${Number(p.descuento||0).toFixed(2)})</b></div>` : ''}
+          <div class="detail-row"><span>Total</span><b>$${Number(p.total).toFixed(2)}</b></div>
+          <div class="detail-row"><span>Fecha</span><b>${fecha}</b></div>
+          ${p.comprobante_url ? `<a href="${p.comprobante_url}" target="_blank" rel="noopener"><img src="${p.comprobante_url}" class="detail-img" alt="Comprobante"></a>` : '<p class="detail-row"><span>Comprobante</span><b>—</b></p>'}
+
+          <button type="button" class="edit-toggle" data-id="${p.id}">✏️ Editar estado</button>
+          <div class="edit-panel" data-id="${p.id}">
+            <select class="edit-select">
+              <option value="pendiente" ${estado === "pendiente" ? "selected" : ""}>Pendiente</option>
+              <option value="confirmado" ${estado === "confirmado" ? "selected" : ""}>Confirmado</option>
+              <option value="entregado" ${estado === "entregado" ? "selected" : ""}>Entregado</option>
+            </select>
+            <button type="button" class="save-btn" data-id="${p.id}" data-tabla="pedidos">Guardar</button>
+          </div>
+        </div>
       </div>`;
   }).join("");
 
-  list.querySelectorAll(".estado-select").forEach(sel => {
-    sel.addEventListener("change", async () => {
-      await sb.from("pedidos").update({ estado: sel.value }).eq("id", sel.dataset.id);
-    });
-  });
+  wireEditButtons(list);
 }
 
 /* -------- recargas -------- */
+let TODAS_LAS_RECARGAS_ADMIN = [];
+
 async function cargarRecargas(){
   const { data: recargas, error } = await sb.from("recargas").select("*").order("created_at", { ascending: false }).limit(100);
   const list = document.getElementById("recargasList");
   if (error) { list.innerHTML = '<p class="msg">No se pudieron cargar las recargas (¿ya creaste la tabla "recargas" en Supabase?).</p>'; return; }
   if (!recargas.length) { list.innerHTML = '<p class="msg">Todavía no hay recargas.</p>'; return; }
 
+  TODAS_LAS_RECARGAS_ADMIN = recargas;
+
   list.innerHTML = recargas.map(r => {
     const fecha = new Date(r.created_at).toLocaleString("es-EC", { dateStyle: "short", timeStyle: "short" });
+    const estado = r.estado || "pendiente";
+    const clientId = "FP-" + String(r.user_id || "").slice(0,6).toUpperCase();
     return `
-      <div class="order">
-        <div class="order-top">
-          <div>
-            <div class="order-pkg">$${Number(r.monto).toFixed(2)}</div>
-            <div class="order-meta">
-              ${fecha} · ${r.metodo_pago || ''}${r.banco ? ' · ' + r.banco : ''} · usuario: ${r.user_id.slice(0,8)}…
-              ${r.comprobante_url ? '<br><a href="' + r.comprobante_url + '" target="_blank" rel="noopener">Ver comprobante →</a>' : ''}
+      <div class="order" data-id="${r.id}">
+        <div class="order-top" onclick="this.parentElement.classList.toggle('open')">
+          <div class="order-toggle">
+            <svg class="chev" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div>
+              <div class="order-pkg">$${Number(r.monto).toFixed(2)}</div>
+              <div class="order-meta">${fecha} · ${r.banco || ''}</div>
+              <span class="badge ${estado}">${estado}</span>
             </div>
           </div>
         </div>
-        <select class="estado-select" data-id="${r.id}" data-tabla="recargas">
-          <option value="pendiente" ${r.estado === "pendiente" ? "selected" : ""}>Pendiente</option>
-          <option value="confirmado" ${r.estado === "confirmado" ? "selected" : ""}>Confirmado</option>
-          <option value="rechazado" ${r.estado === "rechazado" ? "selected" : ""}>Rechazado</option>
-        </select>
+
+        <div class="order-detail">
+          <div class="detail-row"><span>Cliente</span><b>${clientId}${r.user_email ? ' · ' + r.user_email : ''}</b></div>
+          <div class="detail-row"><span>Monto</span><b>$${Number(r.monto).toFixed(2)}</b></div>
+          <div class="detail-row"><span>Método</span><b>${r.metodo_pago || '—'}</b></div>
+          <div class="detail-row"><span>Banco</span><b>${r.banco || '—'}</b></div>
+          <div class="detail-row"><span>N° de comprobante</span><b>${r.numero_comprobante || '—'}</b></div>
+          ${r.observacion ? `<div class="detail-row"><span>Observación</span><b>${r.observacion}</b></div>` : ''}
+          <div class="detail-row"><span>Reportado</span><b>${fecha}</b></div>
+          ${r.comprobante_url ? `<a href="${r.comprobante_url}" target="_blank" rel="noopener"><img src="${r.comprobante_url}" class="detail-img" alt="Comprobante"></a>` : '<p class="detail-row"><span>Comprobante</span><b>—</b></p>'}
+
+          <button type="button" class="edit-toggle" data-id="${r.id}">✏️ Editar estado</button>
+          <div class="edit-panel" data-id="${r.id}">
+            <select class="edit-select">
+              <option value="pendiente" ${estado === "pendiente" ? "selected" : ""}>Pendiente</option>
+              <option value="confirmado" ${estado === "confirmado" ? "selected" : ""}>Confirmado</option>
+              <option value="rechazado" ${estado === "rechazado" ? "selected" : ""}>Rechazado</option>
+            </select>
+            <button type="button" class="save-btn" data-id="${r.id}" data-tabla="recargas">Guardar</button>
+          </div>
+        </div>
       </div>`;
   }).join("");
 
-  list.querySelectorAll(".estado-select").forEach(sel => {
-    sel.addEventListener("change", async () => {
-      await sb.from("recargas").update({ estado: sel.value }).eq("id", sel.dataset.id);
+  wireEditButtons(list);
+}
+
+/* -------- editar / guardar estado (compartido) -------- */
+function wireEditButtons(list){
+  list.querySelectorAll(".edit-toggle").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const panel = list.querySelector('.edit-panel[data-id="' + btn.dataset.id + '"]');
+      panel.classList.toggle("open");
+    });
+  });
+
+  list.querySelectorAll(".save-btn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const panel = btn.closest(".edit-panel");
+      const nuevoEstado = panel.querySelector(".edit-select").value;
+      const tabla = btn.dataset.tabla;
+      const id = btn.dataset.id;
+
+      btn.textContent = "Guardando…";
+      const { error } = await sb.from(tabla).update({ estado: nuevoEstado }).eq("id", id);
+      btn.textContent = error ? "Error" : "✓ Guardado";
+      if (!error) {
+        btn.classList.add("saved");
+        const card = list.querySelector('.order[data-id="' + id + '"]');
+        const badge = card.querySelector(".badge");
+        badge.textContent = nuevoEstado;
+        badge.className = "badge " + nuevoEstado;
+      }
+      setTimeout(() => { btn.textContent = "Guardar"; btn.classList.remove("saved"); panel.classList.remove("open"); }, 1200);
     });
   });
 }
