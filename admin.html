@@ -692,13 +692,11 @@ async function importarCategoria(btn){
     const cat = TODAS_LAS_CATEGORIAS.find(c => c.tipo === tipo && c.category_id === categoryId);
     if (cat) cat.sincronizado = true;
     aplicarFiltroCatalogo();
-      }catch(err){
-        alert("Error de conexión al importar.");
-        btn.disabled = false;
-        btn.textContent = "Importar productos";
-      }
-    });
-  });
+  }catch(err){
+    alert("Error de conexión al importar.");
+    btn.disabled = false;
+    btn.textContent = "Importar productos";
+  }
 }
 
 async function cargarProductosDeCategoria(tipo, categoryId, box){
