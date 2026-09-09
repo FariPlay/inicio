@@ -125,6 +125,57 @@ a{color:inherit;text-decoration:none;}
 .delete-btn{margin-top:10px;background:rgba(255,59,59,.1);border:1px solid rgba(255,59,59,.3);color:#ff8080;
   border-radius:6px;padding:8px 14px;font-family:var(--font);font-weight:800;font-size:.76rem;cursor:pointer;}
 .delete-btn:hover{background:rgba(255,59,59,.18);}
+
+/* -------- catálogo -------- */
+.cat-search{width:100%;background:var(--bg-1);border:1px solid rgba(255,255,255,.12);border-radius:8px;
+  padding:11px 14px;color:var(--ink);font-family:var(--font);font-size:.85rem;outline:none;margin-bottom:8px;}
+.cat-search:focus{border-color:var(--orange);}
+.cat-count{font-size:.72rem;color:var(--muted);margin-bottom:12px;}
+.cat-item{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
+  border-left:3px solid rgba(255,255,255,.15);border-radius:8px;padding:13px 15px;margin-bottom:8px;}
+.cat-item.synced{border-left-color:var(--green);}
+.cat-top{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;}
+.cat-name{font-size:.88rem;font-weight:800;}
+.cat-tag{display:inline-block;font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.4px;
+  color:var(--muted);margin-top:2px;}
+.cat-import-btn{background:rgba(91,124,255,.12);border:1px solid rgba(91,124,255,.3);color:var(--blue-2);
+  border-radius:6px;padding:8px 12px;font-family:var(--font);font-weight:800;font-size:.72rem;cursor:pointer;
+  white-space:nowrap;flex:none;}
+.cat-import-btn:disabled{opacity:.6;cursor:wait;}
+.cat-synced-badge{font-size:.68rem;font-weight:900;color:var(--green);flex:none;}
+.cat-products{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed rgba(255,255,255,.1);}
+.cat-products.open{display:block;}
+.prod-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);
+  flex-wrap:wrap;}
+.prod-row:last-child{border-bottom:none;}
+.prod-name{flex:1;min-width:120px;font-size:.8rem;font-weight:700;}
+.prod-cost{font-size:.68rem;color:var(--muted);white-space:nowrap;}
+.prod-price-input{width:78px;background:var(--bg-0);border:1px solid rgba(255,255,255,.15);border-radius:5px;
+  padding:7px 8px;color:var(--ink);font-family:var(--font);font-size:.78rem;text-align:right;}
+.prod-toggle{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--ink-dim);white-space:nowrap;}
+.prod-save{background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;border:none;
+  border-radius:5px;padding:7px 11px;font-family:var(--font);font-weight:900;font-size:.7rem;cursor:pointer;}
+.prod-save.saved{background:var(--green);color:#04160b;}
+
+/* -------- modal para pedir la clave -------- */
+.modal-ov{position:fixed;inset:0;background:rgba(5,3,8,.88);backdrop-filter:blur(6px);z-index:400;
+  display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-ov.open{display:flex;}
+.modal-card{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.1);
+  border-top:2px solid var(--orange);border-radius:12px;padding:28px 24px;max-width:340px;width:100%;text-align:center;}
+.modal-icon{font-size:1.8rem;margin-bottom:8px;}
+.modal-title{font-weight:900;font-size:1rem;margin-bottom:8px;}
+.modal-text{font-size:.78rem;color:var(--ink-dim);line-height:1.5;margin-bottom:14px;}
+.modal-error{font-size:.74rem;color:#ff8080;margin-bottom:10px;}
+.modal-input{width:100%;background:var(--bg-0);border:1px solid rgba(255,255,255,.15);border-radius:6px;
+  padding:11px 13px;color:var(--ink);font-family:var(--font);font-size:.85rem;outline:none;margin-bottom:12px;}
+.modal-input:focus{border-color:var(--orange);}
+.modal-remember{display:flex;align-items:center;gap:7px;font-size:.76rem;color:var(--ink-dim);
+  justify-content:center;margin-bottom:16px;}
+.modal-actions{display:flex;gap:10px;}
+.modal-btn{flex:1;background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;border:none;
+  border-radius:6px;padding:11px;font-family:var(--font);font-weight:900;font-size:.78rem;cursor:pointer;}
+.modal-btn.ghost{background:none;border:1px solid rgba(255,255,255,.15);color:var(--ink-dim);}
 </style>
 </head>
 <body>
@@ -161,6 +212,7 @@ a{color:inherit;text-decoration:none;}
   <div class="tabs">
     <div class="tab active" data-tab="pedidos">Pedidos</div>
     <div class="tab" data-tab="recargas">Recargas</div>
+    <div class="tab" data-tab="catalogo">Catálogo</div>
     <div class="tab" data-tab="precios">Precios</div>
   </div>
 
@@ -184,6 +236,18 @@ a{color:inherit;text-decoration:none;}
     <div id="recargasList"><p class="msg">Cargando recargas…</p></div>
   </div>
 
+  <div class="panel" id="panelCatalogo">
+    <div class="admin-filters">
+      <button type="button" class="filter-chip active" data-panel="cat" data-filter="todos">Todos</button>
+      <button type="button" class="filter-chip" data-panel="cat" data-filter="topup">Juegos</button>
+      <button type="button" class="filter-chip" data-panel="cat" data-filter="giftcard">Tarjetas</button>
+      <button type="button" class="filter-chip" data-panel="cat" data-filter="gamekey">Llaves</button>
+    </div>
+    <input type="text" id="catSearch" class="cat-search" placeholder="Buscar categoría…">
+    <p class="cat-count" id="catCount"></p>
+    <div id="catalogoList"><p class="msg">Cargando categorías…</p></div>
+  </div>
+
   <div class="panel" id="panelPrecios">
     <div id="pricesList"><p class="msg">Cargando precios…</p></div>
   </div>
@@ -192,6 +256,21 @@ a{color:inherit;text-decoration:none;}
 <div id="deniedWrap" style="display:none;" class="wrap denied">
   <h1>Esta sección es solo para el administrador</h1>
   <p><a href="index.html">← Volver a la tienda</a></p>
+</div>
+
+<div class="modal-ov" id="syncKeyModal">
+  <div class="modal-card">
+    <div class="modal-icon">🔒</div>
+    <p class="modal-title">Clave de sincronización</p>
+    <p class="modal-text">Ingresa tu clave para poder importar productos de FazerCards. Se guarda solo en este navegador, nunca en el código de la página.</p>
+    <p class="modal-error" id="syncKeyError" style="display:none;">Esa clave no fue aceptada. Verifica que sea igual a la que pusiste en val.town.</p>
+    <input type="password" id="syncKeyInput" class="modal-input" placeholder="Tu ADMIN_SYNC_KEY" autocomplete="off">
+    <label class="modal-remember"><input type="checkbox" id="syncKeyRemember"> Recordar en este navegador</label>
+    <div class="modal-actions">
+      <button type="button" class="modal-btn ghost" id="syncKeyCancel">Cancelar</button>
+      <button type="button" class="modal-btn" id="syncKeyConfirm">Confirmar</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -218,6 +297,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   document.getElementById("appWrap").style.display = "block";
   cargarPedidos();
   cargarRecargas();
+  cargarCatalogo();
   cargarPrecios();
 })();
 
@@ -482,6 +562,192 @@ function wireDeleteButtons(list, tabla){
     });
   });
 }
+
+/* -------- catálogo (FazerCards) -------- */
+// El admin_key aquí solo protege lecturas del catálogo (no gasta dinero real);
+// el riesgo si alguien la ve es bajo, a diferencia de la llave de FazerCards
+// o la service_role de Supabase, que NUNCA deben ir en un archivo .html.
+const VAL_TOWN_URL = "https://demiacapital--0a4dc2f8a8e211f1a6ca1607ee4eb77e.web.val.run";
+// La clave de sincronización NUNCA se escribe aquí en el código — se pide
+// una vez por sesión y se guarda solo en la memoria de este navegador.
+let ADMIN_SYNC_KEY = sessionStorage.getItem("fp_admin_sync_key") || localStorage.getItem("fp_admin_sync_key") || "";
+
+function pedirClaveYEjecutar(accion){
+  if (ADMIN_SYNC_KEY) { accion(); return; }
+  document.getElementById("syncKeyError").style.display = "none";
+  document.getElementById("syncKeyModal").classList.add("open");
+  document.getElementById("syncKeyInput").focus();
+  window._accionPendiente = accion;
+}
+
+document.getElementById("syncKeyConfirm").addEventListener("click", () => {
+  const valor = document.getElementById("syncKeyInput").value.trim();
+  if (!valor) return;
+  ADMIN_SYNC_KEY = valor;
+  if (document.getElementById("syncKeyRemember").checked) {
+    localStorage.setItem("fp_admin_sync_key", valor);
+  } else {
+    sessionStorage.setItem("fp_admin_sync_key", valor);
+  }
+  document.getElementById("syncKeyModal").classList.remove("open");
+  document.getElementById("syncKeyInput").value = "";
+  if (window._accionPendiente) { window._accionPendiente(); window._accionPendiente = null; }
+});
+document.getElementById("syncKeyCancel").addEventListener("click", () => {
+  document.getElementById("syncKeyModal").classList.remove("open");
+  window._accionPendiente = null;
+});
+
+let TODAS_LAS_CATEGORIAS = [];
+let catFiltro = "todos", catBusqueda = "";
+
+async function cargarCatalogo(){
+  const { data: categorias, error } = await sb.from("catalogo_categorias").select("*").order("nombre", { ascending: true });
+  if (error) { document.getElementById("catalogoList").innerHTML = '<p class="msg">No se pudo cargar el catálogo.</p>'; return; }
+  TODAS_LAS_CATEGORIAS = categorias || [];
+  aplicarFiltroCatalogo();
+}
+
+function aplicarFiltroCatalogo(){
+  let arr = TODAS_LAS_CATEGORIAS;
+  if (catFiltro !== "todos") arr = arr.filter(c => c.tipo === catFiltro);
+  if (catBusqueda) arr = arr.filter(c => c.nombre.toLowerCase().includes(catBusqueda));
+  document.getElementById("catCount").textContent = arr.length + " de " + TODAS_LAS_CATEGORIAS.length + " categorías";
+  renderCatalogo(arr);
+}
+
+const TIPO_LABEL = { topup: "Recarga de juego", giftcard: "Tarjeta de regalo", gamekey: "Llave de juego" };
+
+function renderCatalogo(categorias){
+  const list = document.getElementById("catalogoList");
+  if (!categorias.length) { list.innerHTML = '<p class="filter-empty">No hay categorías con este filtro.</p>'; return; }
+
+  // limitamos el render a 150 a la vez para que no se sienta pesado; el buscador ayuda a llegar a lo que quieres
+  const visibles = categorias.slice(0, 150);
+
+  list.innerHTML = visibles.map(c => `
+    <div class="cat-item ${c.sincronizado ? 'synced' : ''}" data-tipo="${c.tipo}" data-category-id="${c.category_id}">
+      <div class="cat-top" data-toggle="${c.tipo}:${c.category_id}">
+        <div>
+          <div class="cat-name">${c.nombre}</div>
+          <span class="cat-tag">${TIPO_LABEL[c.tipo] || c.tipo}</span>
+        </div>
+        ${c.sincronizado
+          ? '<span class="cat-synced-badge">✓ Importado</span>'
+          : `<button type="button" class="cat-import-btn" data-tipo="${c.tipo}" data-category-id="${c.category_id}">Importar productos</button>`}
+      </div>
+      <div class="cat-products" id="prods-${c.tipo}-${c.category_id}"></div>
+    </div>`).join("");
+
+  if (categorias.length > visibles.length) {
+    list.innerHTML += `<p class="filter-empty">Mostrando ${visibles.length} de ${categorias.length} — usa el buscador para ver más.</p>`;
+  }
+
+  // click en categoría ya importada -> mostrar/ocultar sus productos
+  list.querySelectorAll('.cat-top').forEach(top => {
+    top.addEventListener("click", (e) => {
+      if (e.target.closest(".cat-import-btn")) return;
+      const [tipo, categoryId] = top.dataset.toggle.split(":");
+      const cat = TODAS_LAS_CATEGORIAS.find(c => c.tipo === tipo && c.category_id === categoryId);
+      if (!cat || !cat.sincronizado) return;
+      const box = document.getElementById(`prods-${tipo}-${categoryId}`);
+      const yaAbierto = box.classList.contains("open");
+      box.classList.toggle("open");
+      if (!yaAbierto && !box.dataset.loaded) cargarProductosDeCategoria(tipo, categoryId, box);
+    });
+  });
+
+  // botón "Importar productos"
+  list.querySelectorAll(".cat-import-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      pedirClaveYEjecutar(() => importarCategoria(btn));
+    });
+  });
+}
+
+async function importarCategoria(btn){
+  const tipo = btn.dataset.tipo, categoryId = btn.dataset.categoryId;
+  btn.disabled = true;
+  btn.textContent = "Importando…";
+  try{
+    const url = `${VAL_TOWN_URL}/?action=sync-offers&tipo=${encodeURIComponent(tipo)}&category_id=${encodeURIComponent(categoryId)}&admin_key=${encodeURIComponent(ADMIN_SYNC_KEY)}`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    if (resp.status === 401) {
+      // la clave guardada ya no sirve: la borramos y volvemos a pedirla
+      ADMIN_SYNC_KEY = "";
+      sessionStorage.removeItem("fp_admin_sync_key");
+      localStorage.removeItem("fp_admin_sync_key");
+      btn.disabled = false;
+      btn.textContent = "Importar productos";
+      document.getElementById("syncKeyError").style.display = "block";
+      pedirClaveYEjecutar(() => importarCategoria(btn));
+      return;
+    }
+
+    if (!data.ok) { alert("No se pudo importar: " + JSON.stringify(data.error || data)); btn.disabled = false; btn.textContent = "Importar productos"; return; }
+
+    const cat = TODAS_LAS_CATEGORIAS.find(c => c.tipo === tipo && c.category_id === categoryId);
+    if (cat) cat.sincronizado = true;
+    aplicarFiltroCatalogo();
+      }catch(err){
+        alert("Error de conexión al importar.");
+        btn.disabled = false;
+        btn.textContent = "Importar productos";
+      }
+    });
+  });
+}
+
+async function cargarProductosDeCategoria(tipo, categoryId, box){
+  box.innerHTML = '<p class="filter-empty">Cargando productos…</p>';
+  const { data: productos, error } = await sb.from("catalogo").select("*").eq("tipo", tipo).eq("category_id", categoryId);
+  if (error || !productos || !productos.length) { box.innerHTML = '<p class="filter-empty">No se encontraron productos.</p>'; return; }
+  box.dataset.loaded = "1";
+
+  box.innerHTML = productos.map(p => `
+    <div class="prod-row" data-id="${p.id}">
+      <span class="prod-name">${p.offer_name}</span>
+      <span class="prod-cost">mayorista $${Number(p.precio_mayorista).toFixed(2)}</span>
+      <input type="number" step="0.01" class="prod-price-input" placeholder="Precio" value="${p.precio_venta != null ? p.precio_venta : ''}">
+      <label class="prod-toggle"><input type="checkbox" ${p.activo ? "checked" : ""}> Activo</label>
+      <button type="button" class="prod-save" data-id="${p.id}">Guardar</button>
+    </div>`).join("");
+
+  box.querySelectorAll(".prod-save").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const row = btn.closest(".prod-row");
+      const precioVenta = parseFloat(row.querySelector(".prod-price-input").value);
+      const activo = row.querySelector('input[type="checkbox"]').checked;
+      if (activo && (isNaN(precioVenta) || precioVenta <= 0)) { alert("Ponle un precio de venta antes de activarlo."); return; }
+
+      btn.textContent = "Guardando…";
+      const { error } = await sb.from("catalogo").update({
+        precio_venta: isNaN(precioVenta) ? null : precioVenta,
+        activo: activo
+      }).eq("id", btn.dataset.id);
+      btn.textContent = error ? "Error" : "✓ Guardado";
+      btn.classList.toggle("saved", !error);
+      setTimeout(() => { btn.textContent = "Guardar"; btn.classList.remove("saved"); }, 1500);
+    });
+  });
+}
+
+document.querySelectorAll('.filter-chip[data-panel="cat"]').forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll('.filter-chip[data-panel="cat"]').forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    catFiltro = chip.dataset.filter;
+    aplicarFiltroCatalogo();
+  });
+});
+
+document.getElementById("catSearch").addEventListener("input", (e) => {
+  catBusqueda = e.target.value.trim().toLowerCase();
+  aplicarFiltroCatalogo();
+});
 
 /* -------- precios -------- */
 async function cargarPrecios(){
