@@ -130,6 +130,11 @@ a{color:inherit;text-decoration:none;}
 .cat-search{width:100%;background:var(--bg-1);border:1px solid rgba(255,255,255,.12);border-radius:8px;
   padding:11px 14px;color:var(--ink);font-family:var(--font);font-size:.85rem;outline:none;margin-bottom:8px;}
 .cat-search:focus{border-color:var(--orange);}
+.refresh-cats-btn{width:100%;background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;
+  border:none;border-radius:8px;padding:12px;font-family:var(--font);font-weight:900;font-size:.8rem;
+  cursor:pointer;margin-bottom:6px;}
+.refresh-cats-btn:disabled{opacity:.6;cursor:wait;}
+.refresh-cats-hint{font-size:.72rem;color:var(--muted);margin-bottom:12px;min-height:1em;}
 .cat-count{font-size:.72rem;color:var(--muted);margin-bottom:12px;}
 .cat-item{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
   border-left:3px solid rgba(255,255,255,.15);border-radius:8px;padding:13px 15px;margin-bottom:8px;}
@@ -262,6 +267,8 @@ a{color:inherit;text-decoration:none;}
   </div>
 
   <div class="panel" id="panelCatalogo">
+    <button type="button" class="refresh-cats-btn" id="refreshCatsBtn">🔄 Actualizar lista completa de categorías desde FazerCards</button>
+    <p class="refresh-cats-hint" id="refreshCatsHint"></p>
     <div class="admin-filters">
       <button type="button" class="filter-chip active" data-panel="cat" data-filter="todos">Todos</button>
       <button type="button" class="filter-chip" data-panel="cat" data-filter="topup">Juegos</button>
@@ -641,6 +648,46 @@ document.getElementById("syncKeyCancel").addEventListener("click", () => {
 
 let TODAS_LAS_CATEGORIAS = [];
 let catFiltro = "todos", catBusqueda = "";
+
+document.getElementById("refreshCatsBtn").addEventListener("click", () => {
+  pedirClaveYEjecutar(actualizarCategorias);
+});
+
+async function actualizarCategorias(){
+  const btn = document.getElementById("refreshCatsBtn");
+  const hint = document.getElementById("refreshCatsHint");
+  btn.disabled = true;
+  btn.textContent = "Consultando FazerCards, puede tardar un momento…";
+  hint.textContent = "";
+
+  try{
+    const url = `${VAL_TOWN_URL}/?action=sync-categories&admin_key=${encodeURIComponent(ADMIN_SYNC_KEY)}`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    if (resp.status === 401) {
+      ADMIN_SYNC_KEY = "";
+      sessionStorage.removeItem("fp_admin_sync_key");
+      localStorage.removeItem("fp_admin_sync_key");
+      btn.disabled = false;
+      btn.textContent = "🔄 Actualizar lista completa de categorías desde FazerCards";
+      pedirClaveYEjecutar(actualizarCategorias);
+      return;
+    }
+
+    if (!data.ok) {
+      hint.textContent = "Error: " + JSON.stringify(data.error || data);
+    } else {
+      hint.textContent = `✓ ${data.total} categorías traídas (${data.conValidacion || 0} con validación de ID)` +
+        (data.errores ? " — hubo errores parciales: " + JSON.stringify(data.errores) : "");
+      await cargarCatalogo();
+    }
+  }catch(e){
+    hint.textContent = "Error de conexión.";
+  }
+  btn.disabled = false;
+  btn.textContent = "🔄 Actualizar lista completa de categorías desde FazerCards";
+}
 
 async function cargarCatalogo(){
   const { data: categorias, error } = await sb.from("catalogo_categorias").select("*").order("nombre", { ascending: true });
