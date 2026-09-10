@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel — FariPlay</title>
+<meta name="theme-color" content="#07040A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2307040A'/%3E%3Cpolygon points='14,12 34,12 50,52 30,52' fill='%23FF7A1A'/%3E%3Cpolygon points='50,12 30,12 14,52 34,52' fill='%233A5CFF'/%3E%3C/svg%3E" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg-0:#07040A; --bg-1:#120B18; --bg-2:#1B1024;
+  --blue:#3A5CFF; --blue-2:#5B7CFF; --orange:#FF7A1A; --orange-2:#FFB238;
+  --ink:#FFFFFF; --ink-dim:#C9C6DA; --muted:#8B87A6; --green:#3ECF6E; --red:#FF3B3B;
+  --font:Arial,Helvetica,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg-0);color:var(--ink);font-family:var(--font);min-height:100vh;min-height:100dvh;position:relative;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,122,26,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,122,26,.035) 1px,transparent 1px);
+  background-size:38px 38px;}
+a{color:inherit;text-decoration:none;}
+.hdr{background:rgba(7,4,10,.92);backdrop-filter:blur(16px);position:sticky;top:0;z-index:100;height:58px;
+  padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--orange);}
+.brand-logo{height:26px;width:auto;}
+.logout{font-size:.78rem;color:var(--muted);}
+.wrap{max-width:640px;margin:0 auto;padding:22px 16px 60px;position:relative;z-index:1;}
+
+.tabs{display:flex;gap:6px;margin-bottom:20px;background:var(--bg-1);border-radius:6px;padding:4px;}
+.tab{flex:1;text-align:center;padding:11px;border-radius:5px;font-size:.78rem;font-weight:900;text-transform:uppercase;
+  letter-spacing:.5px;cursor:pointer;color:var(--muted);}
+.tab.active{background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* -------- pedidos -------- */
+.order{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
+  border-left:3px solid var(--orange);border-radius:6px;padding:15px 16px;margin-bottom:10px;}
+.order-top{display:flex;justify-content:space-between;gap:10px;}
+.order-pkg{font-weight:900;font-size:.98rem;}
+.order-total{font-weight:900;color:var(--orange-2);}
+.order-meta{font-size:.74rem;color:var(--muted);margin-top:6px;line-height:1.6;}
+.order-meta a{color:var(--blue-2);font-weight:800;}
+.estado-select{margin-top:10px;width:100%;background:var(--bg-0);border:1px solid rgba(255,255,255,.15);
+  border-radius:5px;padding:9px 10px;color:var(--ink);font-family:var(--font);font-size:.8rem;font-weight:800;}
+
+/* -------- badge de estado (solo lectura) -------- */
+.badge{display:inline-block;font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;
+  padding:4px 10px;border-radius:20px;margin-top:8px;}
+.badge.pendiente{background:rgba(255,178,56,.12);color:var(--orange-2);border:1px solid rgba(255,178,56,.3);}
+.badge.confirmado{background:rgba(62,207,110,.12);color:var(--green);border:1px solid rgba(62,207,110,.3);}
+.badge.entregado{background:rgba(91,124,255,.12);color:var(--blue-2);border:1px solid rgba(91,124,255,.3);}
+.badge.rechazado{background:rgba(255,59,59,.12);color:#ff8080;border:1px solid rgba(255,59,59,.3);}
+
+/* -------- fila resumen clicable + detalle expandible -------- */
+.order-top{cursor:pointer;}
+.order-toggle{display:flex;align-items:center;gap:8px;}
+.chev{width:14px;height:14px;flex:none;color:var(--muted);transition:transform .2s;}
+.order.open .chev{transform:rotate(180deg);}
+.order-detail{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed rgba(255,255,255,.12);}
+.order.open .order-detail{display:block;}
+.detail-row{display:flex;justify-content:space-between;gap:10px;font-size:.78rem;padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,.06);color:var(--ink-dim);}
+.detail-row:last-of-type{border-bottom:none;}
+.detail-row b{color:var(--ink);text-align:right;}
+.detail-img{max-width:100%;border-radius:8px;margin-top:10px;display:block;}
+.edit-toggle{margin-top:12px;background:rgba(91,124,255,.12);border:1px solid rgba(91,124,255,.3);color:var(--blue-2);
+  border-radius:6px;padding:8px 14px;font-family:var(--font);font-weight:800;font-size:.76rem;cursor:pointer;}
+.edit-panel{display:none;margin-top:10px;gap:8px;align-items:center;}
+.edit-panel.open{display:flex;}
+.edit-panel select{flex:1;background:var(--bg-0);border:1px solid rgba(255,255,255,.15);border-radius:5px;
+  padding:9px 10px;color:var(--ink);font-family:var(--font);font-size:.8rem;font-weight:800;}
+.save-btn{background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;border:none;border-radius:6px;
+  padding:9px 16px;font-family:var(--font);font-weight:900;font-size:.76rem;cursor:pointer;white-space:nowrap;}
+.save-btn.saved{background:var(--green);color:#04160b;}
+
+/* -------- precios -------- */
+.price-row{display:flex;align-items:center;gap:10px;background:linear-gradient(160deg,var(--bg-2),var(--bg-1));
+  border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:13px 14px;margin-bottom:10px;}
+.price-name{flex:1;font-weight:900;font-size:.9rem;}
+.price-input{width:90px;background:var(--bg-0);border:1px solid rgba(255,255,255,.15);border-radius:5px;
+  padding:9px 10px;color:var(--ink);font-family:var(--font);font-size:.9rem;text-align:right;}
+.price-save{background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;border:none;
+  border-radius:5px;padding:9px 14px;font-weight:900;font-size:.75rem;text-transform:uppercase;cursor:pointer;}
+.price-save.saved{background:var(--green);color:#04160b;}
+
+.msg{text-align:center;color:var(--muted);font-size:.85rem;padding:30px;}
+.denied{text-align:center;padding:80px 20px;}
+.denied h1{font-size:1.2rem;margin-bottom:10px;}
+.denied a{color:var(--orange-2);font-weight:800;}
+
+/* -------- menú ☰ compartido (todas las funciones) -------- */
+.hdr-actions{display:flex;align-items:center;gap:.6rem;}
+.hdr-greet{font-size:.78rem;font-weight:900;color:var(--orange-2);white-space:nowrap;}
+.navtog{display:flex;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;
+  width:36px;height:36px;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;flex:none;}
+.navtog span{width:16px;height:2.5px;background:#FF6347;border-radius:2px;}
+.nav{position:fixed;inset:0 0 auto 0;width:100%;background:var(--bg-1);
+  padding:5.5rem 1.6rem 2.4rem;transform:translateY(-100%);transition:transform .32s ease;
+  border-bottom:2px solid var(--orange);max-height:100vh;overflow-y:auto;z-index:299;}
+.nav.open{transform:translateY(0);}
+.nav-close{position:absolute;top:1rem;right:1.2rem;width:38px;height:38px;background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);border-radius:8px;color:var(--ink);font-size:1.3rem;line-height:1;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.nav-section{max-width:520px;margin:0 auto 1.6rem;}
+.nav-section-title{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--muted);margin-bottom:.8rem;}
+.nav-link{display:block;width:100%;text-align:left;background:none;border:none;font-family:inherit;
+  font-size:1.02rem;font-weight:800;color:var(--ink-dim);padding:.65rem 0;cursor:pointer;
+  border-bottom:1px solid rgba(255,255,255,.06);}
+.nav-link:hover{color:var(--orange-2);}
+.nav-link--danger:hover{color:#ff8080;}
+.nav-account-email{font-size:.78rem;color:var(--muted);padding-bottom:.6rem;word-break:break-all;}
+
+/* -------- filtros de transacciones -------- */
+.admin-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
+.filter-chip{background:var(--bg-1);border:1px solid rgba(255,255,255,.15);color:var(--ink-dim);
+  border-radius:20px;padding:8px 14px;font-family:var(--font);font-size:.76rem;font-weight:800;cursor:pointer;white-space:nowrap;}
+.filter-chip.active{background:linear-gradient(135deg,var(--orange-2),var(--orange));border-color:transparent;color:#1A0500;}
+.filter-date{background:var(--bg-1);border:1px solid rgba(255,255,255,.15);border-radius:20px;color:var(--ink);
+  font-family:var(--font);font-size:.76rem;font-weight:800;padding:8px 12px;}
+.filter-empty{text-align:center;color:var(--muted);padding:24px;font-size:.82rem;}
+
+/* -------- eliminar -------- */
+.delete-btn{margin-top:10px;background:rgba(255,59,59,.1);border:1px solid rgba(255,59,59,.3);color:#ff8080;
+  border-radius:6px;padding:8px 14px;font-family:var(--font);font-weight:800;font-size:.76rem;cursor:pointer;}
+.delete-btn:hover{background:rgba(255,59,59,.18);}
+
+/* -------- catálogo -------- */
+.cat-search{width:100%;background:var(--bg-1);border:1px solid rgba(255,255,255,.12);border-radius:8px;
+  padding:11px 14px;color:var(--ink);font-family:var(--font);font-size:.85rem;outline:none;margin-bottom:8px;}
+.cat-search:focus{border-color:var(--orange);}
+.refresh-cats-btn{width:100%;background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;
+  border:none;border-radius:8px;padding:12px;font-family:var(--font);font-weight:900;font-size:.8rem;
+  cursor:pointer;margin-bottom:6px;}
+.refresh-cats-btn:disabled{opacity:.6;cursor:wait;}
+.refresh-cats-hint{font-size:.72rem;color:var(--muted);margin-bottom:12px;min-height:1em;}
+.cat-count{font-size:.72rem;color:var(--muted);margin-bottom:12px;}
+.cat-item{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
+  border-left:3px solid rgba(255,255,255,.15);border-radius:8px;padding:13px 15px;margin-bottom:8px;}
+.cat-item.synced{border-left-color:var(--green);}
+.cat-top{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;}
+.cat-name{font-size:.88rem;font-weight:800;}
+.cat-tag{display:inline-block;font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.4px;
+  color:var(--muted);margin-top:2px;}
+.cat-import-btn{background:rgba(91,124,255,.12);border:1px solid rgba(91,124,255,.3);color:var(--blue-2);
+  border-radius:6px;padding:8px 12px;font-family:var(--font);font-weight:800;font-size:.72rem;cursor:pointer;
+  white-space:nowrap;flex:none;}
+.cat-import-btn:disabled{opacity:.6;cursor:wait;}
+.debug-id-badge{font-size:.62rem;font-weight:800;color:var(--muted);}
+.debug-btn{background:none;border:none;color:var(--blue-2);font-family:var(--font);font-size:.66rem;
+  font-weight:800;cursor:pointer;text-decoration:underline;padding:0;}
+
+/* -------- buscador en vivo (diagnóstico) -------- */
+.live-search-box{background:rgba(91,124,255,.06);border:1px solid rgba(91,124,255,.22);border-radius:8px;
+  padding:14px;margin-bottom:16px;}
+.live-search-title{font-size:.8rem;font-weight:900;color:var(--blue-2);margin-bottom:4px;}
+.live-search-hint{font-size:.7rem;color:var(--muted);line-height:1.4;margin-bottom:10px;}
+.live-search-row{display:flex;gap:6px;flex-wrap:wrap;}
+.live-search-select{background:var(--bg-0);border:1px solid rgba(255,255,255,.15);border-radius:6px;
+  padding:8px 6px;color:var(--ink);font-family:var(--font);font-size:.75rem;}
+.live-search-input{flex:1;min-width:100px;background:var(--bg-0);border:1px solid rgba(255,255,255,.15);
+  border-radius:6px;padding:8px 10px;color:var(--ink);font-family:var(--font);font-size:.8rem;}
+.live-search-btn{background:linear-gradient(135deg,var(--blue-2),var(--blue));color:#fff;border:none;
+  border-radius:6px;padding:8px 14px;font-family:var(--font);font-weight:900;font-size:.75rem;cursor:pointer;}
+.live-search-btn:disabled{opacity:.6;cursor:wait;}
+#liveSearchResult{margin-top:10px;font-size:.78rem;}
+.lsr-item{background:var(--bg-0);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:8px 10px;
+  margin-top:6px;display:flex;justify-content:space-between;gap:8px;}
+.lsr-item b{color:var(--orange-2);}
+.lsr-total{color:var(--muted);font-size:.72rem;margin-top:6px;}
+.cat-synced-badge{font-size:.68rem;font-weight:900;color:var(--green);flex:none;}
+.cat-reimport-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--ink-dim);
+  border-radius:6px;width:26px;height:26px;font-size:.85rem;cursor:pointer;flex:none;}
+.cat-reimport-btn:disabled{opacity:.5;cursor:wait;}
+.cat-products{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed rgba(255,255,255,.1);}
+.cat-products.open{display:block;}
+.prod-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);
+  flex-wrap:wrap;}
+.prod-row:last-child{border-bottom:none;}
+.prod-name{flex:1;min-width:120px;font-size:.8rem;font-weight:700;}
+.prod-cost{font-size:.68rem;color:var(--muted);white-space:nowrap;}
+.prod-price-input{width:78px;background:var(--bg-0);border:1px solid rgba(255,255,255,.15);border-radius:5px;
+  padding:7px 8px;color:var(--ink);font-family:var(--font);font-size:.78rem;text-align:right;}
+.prod-toggle{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--ink-dim);white-space:nowrap;}
+.prod-save{background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;border:none;
+  border-radius:5px;padding:7px 11px;font-family:var(--font);font-weight:900;font-size:.7rem;cursor:pointer;}
+.prod-save.saved{background:var(--green);color:#04160b;}
+
+/* -------- modal para pedir la clave -------- */
+.modal-ov{position:fixed;inset:0;background:rgba(5,3,8,.88);backdrop-filter:blur(6px);z-index:400;
+  display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-ov.open{display:flex;}
+.modal-card{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.1);
+  border-top:2px solid var(--orange);border-radius:12px;padding:28px 24px;max-width:340px;width:100%;text-align:center;}
+.modal-icon{font-size:1.8rem;margin-bottom:8px;}
+.modal-title{font-weight:900;font-size:1rem;margin-bottom:8px;}
+.modal-text{font-size:.78rem;color:var(--ink-dim);line-height:1.5;margin-bottom:14px;}
+.modal-error{font-size:.74rem;color:#ff8080;margin-bottom:10px;}
+.modal-input{width:100%;background:var(--bg-0);border:1px solid rgba(255,255,255,.15);border-radius:6px;
+  padding:11px 13px;color:var(--ink);font-family:var(--font);font-size:.85rem;outline:none;margin-bottom:12px;}
+.modal-input:focus{border-color:var(--orange);}
+.modal-remember{display:flex;align-items:center;gap:7px;font-size:.76rem;color:var(--ink-dim);
+  justify-content:center;margin-bottom:16px;}
+.modal-actions{display:flex;gap:10px;}
+.modal-btn{flex:1;background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;border:none;
+  border-radius:6px;padding:11px;font-family:var(--font);font-weight:900;font-size:.78rem;cursor:pointer;}
+.modal-btn.ghost{background:none;border:1px solid rgba(255,255,255,.15);color:var(--ink-dim);}
+</style>
+</head>
+<body>
+
+<div id="authGate" style="position:fixed;inset:0;background:#07040A;z-index:999;display:flex;align-items:center;justify-content:center;color:#8B87A6;">Verificando acceso…</div>
+
+<header class="hdr">
+  <a href="index.html"><img src="logo.png" alt="FariPlay" class="brand-logo" onerror="this.style.display='none'"></a>
+  <div class="hdr-actions">
+    <span class="hdr-greet" id="hdrGreet">Admin</span>
+    <button class="navtog" id="navtog" aria-label="Menú" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<nav class="nav" id="nav">
+  <button class="nav-close" id="navClose" aria-label="Cerrar menú">✕</button>
+  <div class="nav-section">
+    <p class="nav-section-title">Explorar</p>
+    <a href="index.html" class="nav-link">Inicio</a>
+    <a href="index.html#paquetes" class="nav-link">Paquetes</a>
+  </div>
+  <div class="nav-section">
+    <p class="nav-section-title">Mi cuenta</p>
+    <p class="nav-account-email" id="navAccountEmail"></p>
+    <a href="perfil.html" class="nav-link">Mi perfil</a>
+    <a href="mis-pedidos.html" class="nav-link">Mis pedidos</a>
+    <a href="recargar.html" class="nav-link">Recargar saldo</a>
+    <a href="admin.html" class="nav-link">Panel admin</a>
+    <button type="button" class="nav-link nav-link--danger" id="navSalirBtn">Cerrar sesión</button>
+  </div>
+</nav>
+
+<div class="wrap" id="appWrap" style="display:none;">
+  <div class="tabs">
+    <div class="tab active" data-tab="pedidos">Pedidos</div>
+    <div class="tab" data-tab="recargas">Recargas</div>
+    <div class="tab" data-tab="catalogo">Catálogo</div>
+    <div class="tab" data-tab="precios">Precios</div>
+  </div>
+
+  <div class="panel active" id="panelPedidos">
+    <div class="admin-filters">
+      <button type="button" class="filter-chip active" data-panel="ped" data-filter="hoy">Hoy</button>
+      <button type="button" class="filter-chip" data-panel="ped" data-filter="pendientes">Por confirmar</button>
+      <button type="button" class="filter-chip" data-panel="ped" data-filter="todos">Todos</button>
+      <input type="date" class="filter-date" id="pedFecha" data-panel="ped">
+    </div>
+    <div id="ordersList"><p class="msg">Cargando pedidos…</p></div>
+  </div>
+
+  <div class="panel" id="panelRecargas">
+    <div class="admin-filters">
+      <button type="button" class="filter-chip active" data-panel="rec" data-filter="hoy">Hoy</button>
+      <button type="button" class="filter-chip" data-panel="rec" data-filter="pendientes">Por confirmar</button>
+      <button type="button" class="filter-chip" data-panel="rec" data-filter="todos">Todos</button>
+      <input type="date" class="filter-date" id="recFecha" data-panel="rec">
+    </div>
+    <div id="recargasList"><p class="msg">Cargando recargas…</p></div>
+  </div>
+
+  <div class="panel" id="panelCatalogo">
+    <button type="button" class="refresh-cats-btn" id="refreshCatsBtn">🔄 Actualizar lista completa de categorías desde FazerCards</button>
+    <p class="refresh-cats-hint" id="refreshCatsHint"></p>
+    <div class="admin-filters">
+      <button type="button" class="filter-chip active" data-panel="cat" data-filter="todos">Todos</button>
+      <button type="button" class="filter-chip" data-panel="cat" data-filter="topup">Juegos</button>
+      <button type="button" class="filter-chip" data-panel="cat" data-filter="giftcard">Tarjetas</button>
+      <button type="button" class="filter-chip" data-panel="cat" data-filter="gamekey">Llaves</button>
+    </div>
+    <input type="text" id="catSearch" class="cat-search" placeholder="Buscar categoría (ya sincronizadas)…">
+    <p class="cat-count" id="catCount"></p>
+
+    <div class="live-search-box">
+      <p class="live-search-title">🔍 Buscar EN VIVO en FazerCards (diagnóstico)</p>
+      <p class="live-search-hint">Esto no usa tu tabla de Supabase — pregunta directo a FazerCards, para saber si algo no aparece porque falta sincronizar o porque de plano no existe en tu cuenta.</p>
+      <div class="live-search-row">
+        <select id="liveSearchTipo" class="live-search-select">
+          <option value="topup">Juegos</option>
+          <option value="giftcard">Tarjetas de regalo</option>
+          <option value="gamekey">Llaves</option>
+        </select>
+        <input type="text" id="liveSearchInput" class="live-search-input" placeholder="Ej. PUBG">
+        <button type="button" class="live-search-btn" id="liveSearchBtn">Buscar</button>
+      </div>
+      <div id="liveSearchResult"></div>
+    </div>
+
+    <div id="catalogoList"><p class="msg">Cargando categorías…</p></div>
+  </div>
+
+  <div class="panel" id="panelPrecios">
+    <div id="pricesList"><p class="msg">Cargando precios…</p></div>
+  </div>
+</div>
+
+<div id="deniedWrap" style="display:none;" class="wrap denied">
+  <h1>Esta sección es solo para el administrador</h1>
+  <p><a href="index.html">← Volver a la tienda</a></p>
+</div>
+
+<div class="modal-ov" id="syncKeyModal">
+  <div class="modal-card">
+    <div class="modal-icon">🔒</div>
+    <p class="modal-title">Clave de sincronización</p>
+    <p class="modal-text">Ingresa tu clave para poder importar productos de FazerCards. Se guarda solo en este navegador, nunca en el código de la página.</p>
+    <p class="modal-error" id="syncKeyError" style="display:none;">Esa clave no fue aceptada. Verifica que sea igual a la que pusiste en val.town.</p>
+    <input type="password" id="syncKeyInput" class="modal-input" placeholder="Tu ADMIN_SYNC_KEY" autocomplete="off">
+    <label class="modal-remember"><input type="checkbox" id="syncKeyRemember"> Recordar en este navegador</label>
+    <div class="modal-actions">
+      <button type="button" class="modal-btn ghost" id="syncKeyCancel">Cancelar</button>
+      <button type="button" class="modal-btn" id="syncKeyConfirm">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ADMIN_EMAIL = "hfarinango2707@gmail.com";
+const SUPABASE_URL = "https://zdefkvvodijmrlhxvlrr.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_C0ur5kEiRQ0TYDpgtiaF8Q_w2lCVCQA";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+(async function init(){
+  const { data: { session } } = await sb.auth.getSession();
+  const gate = document.getElementById("authGate");
+
+  if (!session) { location.href = "auth.html?redirect=admin.html"; return; }
+
+  if (session.user.email !== ADMIN_EMAIL) {
+    gate.style.display = "none";
+    document.getElementById("deniedWrap").style.display = "block";
+    return;
+  }
+
+  document.getElementById("navAccountEmail").textContent = session.user.email;
+
+  gate.style.display = "none";
+  document.getElementById("appWrap").style.display = "block";
+  cargarPedidos();
+  cargarRecargas();
+  cargarCatalogo();
+  cargarPrecios();
+})();
+
+document.getElementById("navSalirBtn").addEventListener("click", async () => {
+  await sb.auth.signOut();
+  location.href = "index.html";
+});
+
+const navEl = document.getElementById("nav");
+const navtogBtn = document.getElementById("navtog");
+navtogBtn.addEventListener("click", () => {
+  const open = navEl.classList.toggle("open");
+  navtogBtn.setAttribute("aria-expanded", open);
+});
+document.getElementById("navClose").addEventListener("click", () => navEl.classList.remove("open"));
+navEl.addEventListener("click", (e) => { if (e.target.closest("a")) navEl.classList.remove("open"); });
+
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+    tab.classList.add("active");
+    document.getElementById("panel" + tab.dataset.tab.charAt(0).toUpperCase() + tab.dataset.tab.slice(1)).classList.add("active");
+  });
+});
+
+/* -------- pedidos -------- */
+let TODOS_LOS_PEDIDOS_ADMIN = [];
+let pedFiltro = "hoy", pedFechaCustom = "";
+
+function renderPedidos(pedidos){
+  const list = document.getElementById("ordersList");
+  if (!pedidos.length) { list.innerHTML = '<p class="filter-empty">No hay pedidos con este filtro.</p>'; return; }
+
+  list.innerHTML = pedidos.map(p => {
+    const fecha = new Date(p.created_at).toLocaleString("es-EC", { dateStyle: "short", timeStyle: "short" });
+    const estado = p.estado || "pendiente";
+    const clientId = "FP-" + String(p.user_id || "").slice(0,6).toUpperCase();
+    return `
+      <div class="order" data-id="${p.id}">
+        <div class="order-top" onclick="this.parentElement.classList.toggle('open')">
+          <div class="order-toggle">
+            <svg class="chev" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div>
+              <div class="order-pkg">${p.paquete}${p.bono > 0 ? ' (+' + p.bono + ')' : ''}</div>
+              <div class="order-meta">${fecha} · ID jugador: ${p.player_id}</div>
+              <span class="badge ${estado}">${estado}</span>
+            </div>
+          </div>
+          <div class="order-total">$${Number(p.total).toFixed(2)}</div>
+        </div>
+
+        <div class="order-detail">
+          <div class="detail-row"><span>Cliente</span><b>${clientId}${p.user_email ? ' · ' + p.user_email : ''}</b></div>
+          <div class="detail-row"><span>Paquete</span><b>${p.paquete}${p.bono > 0 ? ' (+' + p.bono + ' bono)' : ''}</b></div>
+          <div class="detail-row"><span>ID de jugador</span><b>${p.player_id}</b></div>
+          <div class="detail-row"><span>Método de pago</span><b>${p.metodo_pago || '—'}</b></div>
+          <div class="detail-row"><span>Banco</span><b>${p.banco || '—'}</b></div>
+          ${p.codigo_cupon ? `<div class="detail-row"><span>Cupón</span><b>${p.codigo_cupon} (-$${Number(p.descuento||0).toFixed(2)})</b></div>` : ''}
+          <div class="detail-row"><span>Total</span><b>$${Number(p.total).toFixed(2)}</b></div>
+          <div class="detail-row"><span>Fecha</span><b>${fecha}</b></div>
+          ${p.comprobante_url ? `<a href="${p.comprobante_url}" target="_blank" rel="noopener"><img src="${p.comprobante_url}" class="detail-img" alt="Comprobante"></a>` : '<p class="detail-row"><span>Comprobante</span><b>—</b></p>'}
+
+          <button type="button" class="edit-toggle" data-id="${p.id}">✏️ Editar estado</button>
+          <div class="edit-panel" data-id="${p.id}">
+            <select class="edit-select">
+              <option value="pendiente" ${estado === "pendiente" ? "selected" : ""}>Pendiente</option>
+              <option value="confirmado" ${estado === "confirmado" ? "selected" : ""}>Confirmado</option>
+              <option value="entregado" ${estado === "entregado" ? "selected" : ""}>Entregado</option>
+            </select>
+            <button type="button" class="save-btn" data-id="${p.id}" data-tabla="pedidos">Guardar</button>
+          </div>
+          <button type="button" class="delete-btn" data-id="${p.id}" data-tabla="pedidos">🗑 Eliminar pedido</button>
+        </div>
+      </div>`;
+  }).join("");
+
+  wireEditButtons(list);
+  wireDeleteButtons(list, "pedidos");
+}
+
+function aplicarFiltroPedidos(){
+  document.getElementById("pedFecha").value = pedFiltro === "fecha" ? pedFechaCustom : "";
+  let arr = TODOS_LOS_PEDIDOS_ADMIN;
+  if (pedFiltro === "hoy") {
+    const hoy = new Date().toDateString();
+    arr = arr.filter(p => new Date(p.created_at).toDateString() === hoy);
+  } else if (pedFiltro === "pendientes") {
+    arr = arr.filter(p => (p.estado || "pendiente") === "pendiente");
+  } else if (pedFiltro === "fecha" && pedFechaCustom) {
+    arr = arr.filter(p => new Date(p.created_at).toLocaleDateString("en-CA") === pedFechaCustom);
+  }
+  renderPedidos(arr);
+}
+
+async function cargarPedidos(){
+  const { data: pedidos, error } = await sb.from("pedidos").select("*").order("created_at", { ascending: false }).limit(300);
+  if (error) { document.getElementById("ordersList").innerHTML = '<p class="msg">No se pudieron cargar los pedidos.</p>'; return; }
+  TODOS_LOS_PEDIDOS_ADMIN = pedidos || [];
+  aplicarFiltroPedidos();
+}
+
+/* -------- recargas -------- */
+let TODAS_LAS_RECARGAS_ADMIN = [];
+let recFiltro = "hoy", recFechaCustom = "";
+
+function renderRecargas(recargas){
+  const list = document.getElementById("recargasList");
+  if (!recargas.length) { list.innerHTML = '<p class="filter-empty">No hay recargas con este filtro.</p>'; return; }
+
+  list.innerHTML = recargas.map(r => {
+    const fecha = new Date(r.created_at).toLocaleString("es-EC", { dateStyle: "short", timeStyle: "short" });
+    const estado = r.estado || "pendiente";
+    const clientId = "FP-" + String(r.user_id || "").slice(0,6).toUpperCase();
+    return `
+      <div class="order" data-id="${r.id}">
+        <div class="order-top" onclick="this.parentElement.classList.toggle('open')">
+          <div class="order-toggle">
+            <svg class="chev" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div>
+              <div class="order-pkg">$${Number(r.monto).toFixed(2)}</div>
+              <div class="order-meta">${fecha} · ${r.banco || ''}</div>
+              <span class="badge ${estado}">${estado}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="order-detail">
+          <div class="detail-row"><span>Cliente</span><b>${clientId}${r.user_email ? ' · ' + r.user_email : ''}</b></div>
+          <div class="detail-row"><span>Monto</span><b>$${Number(r.monto).toFixed(2)}</b></div>
+          <div class="detail-row"><span>Método</span><b>${r.metodo_pago || '—'}</b></div>
+          <div class="detail-row"><span>Banco</span><b>${r.banco || '—'}</b></div>
+          <div class="detail-row"><span>N° de comprobante</span><b>${r.numero_comprobante || '—'}</b></div>
+          ${r.observacion ? `<div class="detail-row"><span>Observación</span><b>${r.observacion}</b></div>` : ''}
+          <div class="detail-row"><span>Reportado</span><b>${fecha}</b></div>
+          ${r.comprobante_url ? `<a href="${r.comprobante_url}" target="_blank" rel="noopener"><img src="${r.comprobante_url}" class="detail-img" alt="Comprobante"></a>` : '<p class="detail-row"><span>Comprobante</span><b>—</b></p>'}
+
+          <button type="button" class="edit-toggle" data-id="${r.id}">✏️ Editar estado</button>
+          <div class="edit-panel" data-id="${r.id}">
+            <select class="edit-select">
+              <option value="pendiente" ${estado === "pendiente" ? "selected" : ""}>Pendiente</option>
+              <option value="confirmado" ${estado === "confirmado" ? "selected" : ""}>Confirmado</option>
+              <option value="rechazado" ${estado === "rechazado" ? "selected" : ""}>Rechazado</option>
+            </select>
+            <button type="button" class="save-btn" data-id="${r.id}" data-tabla="recargas">Guardar</button>
+          </div>
+          <button type="button" class="delete-btn" data-id="${r.id}" data-tabla="recargas">🗑 Eliminar recarga</button>
+        </div>
+      </div>`;
+  }).join("");
+
+  wireEditButtons(list);
+  wireDeleteButtons(list, "recargas");
+}
+
+function aplicarFiltroRecargas(){
+  document.getElementById("recFecha").value = recFiltro === "fecha" ? recFechaCustom : "";
+  let arr = TODAS_LAS_RECARGAS_ADMIN;
+  if (recFiltro === "hoy") {
+    const hoy = new Date().toDateString();
+    arr = arr.filter(r => new Date(r.created_at).toDateString() === hoy);
+  } else if (recFiltro === "pendientes") {
+    arr = arr.filter(r => (r.estado || "pendiente") === "pendiente");
+  } else if (recFiltro === "fecha" && recFechaCustom) {
+    arr = arr.filter(r => new Date(r.created_at).toLocaleDateString("en-CA") === recFechaCustom);
+  }
+  renderRecargas(arr);
+}
+
+async function cargarRecargas(){
+  const { data: recargas, error } = await sb.from("recargas").select("*").order("created_at", { ascending: false }).limit(300);
+  if (error) { document.getElementById("recargasList").innerHTML = '<p class="msg">No se pudieron cargar las recargas (¿ya creaste la tabla "recargas" en Supabase?).</p>'; return; }
+  TODAS_LAS_RECARGAS_ADMIN = recargas || [];
+  aplicarFiltroRecargas();
+}
+
+/* -------- chips y fecha de filtro -------- */
+document.querySelectorAll(".filter-chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    const panel = chip.dataset.panel;
+    document.querySelectorAll('.filter-chip[data-panel="' + panel + '"]').forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    if (panel === "ped") { pedFiltro = chip.dataset.filter; pedFechaCustom = ""; aplicarFiltroPedidos(); }
+    else { recFiltro = chip.dataset.filter; recFechaCustom = ""; aplicarFiltroRecargas(); }
+  });
+});
+
+document.getElementById("pedFecha").addEventListener("change", function(){
+  pedFechaCustom = this.value;
+  pedFiltro = this.value ? "fecha" : "hoy";
+  document.querySelectorAll('.filter-chip[data-panel="ped"]').forEach(c => c.classList.remove("active"));
+  aplicarFiltroPedidos();
+});
+document.getElementById("recFecha").addEventListener("change", function(){
+  recFechaCustom = this.value;
+  recFiltro = this.value ? "fecha" : "hoy";
+  document.querySelectorAll('.filter-chip[data-panel="rec"]').forEach(c => c.classList.remove("active"));
+  aplicarFiltroRecargas();
+});
+
+/* -------- editar / guardar estado (compartido) -------- */
+function wireEditButtons(list){
+  list.querySelectorAll(".edit-toggle").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const panel = list.querySelector('.edit-panel[data-id="' + btn.dataset.id + '"]');
+      panel.classList.toggle("open");
+    });
+  });
+
+  list.querySelectorAll(".save-btn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const panel = btn.closest(".edit-panel");
+      const nuevoEstado = panel.querySelector(".edit-select").value;
+      const tabla = btn.dataset.tabla;
+      const id = btn.dataset.id;
+
+      btn.textContent = "Guardando…";
+      const { error } = await sb.from(tabla).update({ estado: nuevoEstado }).eq("id", id);
+      btn.textContent = error ? "Error" : "✓ Guardado";
+      if (!error) {
+        btn.classList.add("saved");
+        const card = list.querySelector('.order[data-id="' + id + '"]');
+        const badge = card.querySelector(".badge");
+        badge.textContent = nuevoEstado;
+        badge.className = "badge " + nuevoEstado;
+        // actualiza también la caché en memoria
+        const cache = tabla === "pedidos" ? TODOS_LOS_PEDIDOS_ADMIN : TODAS_LAS_RECARGAS_ADMIN;
+        const item = cache.find(x => String(x.id) === String(id));
+        if (item) item.estado = nuevoEstado;
+      }
+      setTimeout(() => { btn.textContent = "Guardar"; btn.classList.remove("saved"); panel.classList.remove("open"); }, 1200);
+    });
+  });
+}
+
+/* -------- eliminar (compartido) -------- */
+function wireDeleteButtons(list, tabla){
+  list.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      const etiqueta = tabla === "pedidos" ? "este pedido" : "esta recarga";
+      if (!confirm("¿Seguro que quieres eliminar " + etiqueta + "? Esta acción no se puede deshacer.")) return;
+
+      btn.textContent = "Eliminando…";
+      btn.disabled = true;
+      const { error } = await sb.from(tabla).delete().eq("id", id);
+      if (error) {
+        btn.textContent = "🗑 Error, reintenta";
+        btn.disabled = false;
+        return;
+      }
+      if (tabla === "pedidos") {
+        TODOS_LOS_PEDIDOS_ADMIN = TODOS_LOS_PEDIDOS_ADMIN.filter(x => String(x.id) !== String(id));
+      } else {
+        TODAS_LAS_RECARGAS_ADMIN = TODAS_LAS_RECARGAS_ADMIN.filter(x => String(x.id) !== String(id));
+      }
+      const card = list.querySelector('.order[data-id="' + id + '"]');
+      if (card) card.remove();
+    });
+  });
+}
+
+/* -------- catálogo (FazerCards) -------- */
+// El admin_key aquí solo protege lecturas del catálogo (no gasta dinero real);
+// el riesgo si alguien la ve es bajo, a diferencia de la llave de FazerCards
+// o la service_role de Supabase, que NUNCA deben ir en un archivo .html.
+const VAL_TOWN_URL = "https://demiacapital--0a4dc2f8a8e211f1a6ca1607ee4eb77e.web.val.run";
+// La clave de sincronización NUNCA se escribe aquí en el código — se pide
+// una vez por sesión y se guarda solo en la memoria de este navegador.
+let ADMIN_SYNC_KEY = sessionStorage.getItem("fp_admin_sync_key") || localStorage.getItem("fp_admin_sync_key") || "";
+
+function pedirClaveYEjecutar(accion){
+  if (ADMIN_SYNC_KEY) { accion(); return; }
+  document.getElementById("syncKeyError").style.display = "none";
+  document.getElementById("syncKeyModal").classList.add("open");
+  document.getElementById("syncKeyInput").focus();
+  window._accionPendiente = accion;
+}
+
+document.getElementById("syncKeyConfirm").addEventListener("click", () => {
+  const valor = document.getElementById("syncKeyInput").value.trim();
+  if (!valor) return;
+  ADMIN_SYNC_KEY = valor;
+  if (document.getElementById("syncKeyRemember").checked) {
+    localStorage.setItem("fp_admin_sync_key", valor);
+  } else {
+    sessionStorage.setItem("fp_admin_sync_key", valor);
+  }
+  document.getElementById("syncKeyModal").classList.remove("open");
+  document.getElementById("syncKeyInput").value = "";
+  if (window._accionPendiente) { window._accionPendiente(); window._accionPendiente = null; }
+});
+document.getElementById("syncKeyCancel").addEventListener("click", () => {
+  document.getElementById("syncKeyModal").classList.remove("open");
+  window._accionPendiente = null;
+});
+
+let TODAS_LAS_CATEGORIAS = [];
+let catFiltro = "todos", catBusqueda = "";
+
+document.getElementById("refreshCatsBtn").addEventListener("click", () => {
+  pedirClaveYEjecutar(actualizarCategorias);
+});
+
+async function actualizarCategorias(){
+  const btn = document.getElementById("refreshCatsBtn");
+  const hint = document.getElementById("refreshCatsHint");
+  btn.disabled = true;
+  btn.textContent = "Consultando FazerCards, puede tardar un momento…";
+  hint.textContent = "";
+
+  try{
+    const url = `${VAL_TOWN_URL}/?action=sync-categories&admin_key=${encodeURIComponent(ADMIN_SYNC_KEY)}`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    if (resp.status === 401) {
+      ADMIN_SYNC_KEY = "";
+      sessionStorage.removeItem("fp_admin_sync_key");
+      localStorage.removeItem("fp_admin_sync_key");
+      btn.disabled = false;
+      btn.textContent = "🔄 Actualizar lista completa de categorías desde FazerCards";
+      pedirClaveYEjecutar(actualizarCategorias);
+      return;
+    }
+
+    if (!data.ok) {
+      hint.textContent = "Error: " + JSON.stringify(data.error || data);
+    } else {
+      hint.textContent = `✓ ${data.total} categorías traídas (${data.conValidacion || 0} con validación de ID)` +
+        (data.errores ? " — hubo errores parciales: " + JSON.stringify(data.errores) : "");
+      await cargarCatalogo();
+    }
+  }catch(e){
+    hint.textContent = "Error de conexión.";
+  }
+  btn.disabled = false;
+  btn.textContent = "🔄 Actualizar lista completa de categorías desde FazerCards";
+}
+
+async function cargarCatalogo(){
+  const { data: categorias, error } = await sb.from("catalogo_categorias").select("*").order("nombre", { ascending: true });
+  if (error) { document.getElementById("catalogoList").innerHTML = '<p class="msg">No se pudo cargar el catálogo.</p>'; return; }
+  TODAS_LAS_CATEGORIAS = categorias || [];
+  aplicarFiltroCatalogo();
+}
+
+function aplicarFiltroCatalogo(){
+  let arr = TODAS_LAS_CATEGORIAS;
+  if (catFiltro !== "todos") arr = arr.filter(c => c.tipo === catFiltro);
+  if (catBusqueda) arr = arr.filter(c => c.nombre.toLowerCase().includes(catBusqueda));
+  document.getElementById("catCount").textContent = arr.length + " de " + TODAS_LAS_CATEGORIAS.length + " categorías";
+  renderCatalogo(arr);
+}
+
+const TIPO_LABEL = { topup: "Recarga de juego", giftcard: "Tarjeta de regalo", gamekey: "Llave de juego" };
+
+function renderCatalogo(categorias){
+  const list = document.getElementById("catalogoList");
+  if (!categorias.length) { list.innerHTML = '<p class="filter-empty">No hay categorías con este filtro.</p>'; return; }
+
+  // limitamos el render a 150 a la vez para que no se sienta pesado; el buscador ayuda a llegar a lo que quieres
+  const visibles = categorias.slice(0, 150);
+
+  list.innerHTML = visibles.map(c => `
+    <div class="cat-item ${c.sincronizado ? 'synced' : ''}" data-tipo="${c.tipo}" data-category-id="${c.category_id}">
+      <div class="cat-top" data-toggle="${c.tipo}:${c.category_id}">
+        <div>
+          <div class="cat-name">${c.nombre}</div>
+          <span class="cat-tag">${TIPO_LABEL[c.tipo] || c.tipo} · ${c.category_id}</span>
+          ${c.tipo === "topup" ? `<div><span class="debug-id-badge">${c.soporta_validacion ? '✓ admite validar ID' : '— sin validación'}</span> <button type="button" class="debug-btn" data-category-id="${c.category_id}">🔍 Verificar</button></div>` : ''}
+        </div>
+        ${c.sincronizado
+          ? `<span class="cat-synced-badge">✓ Importado</span> <button type="button" class="cat-reimport-btn" data-tipo="${c.tipo}" data-category-id="${c.category_id}">↻</button>`
+          : `<button type="button" class="cat-import-btn" data-tipo="${c.tipo}" data-category-id="${c.category_id}">Importar productos</button>`}
+      </div>
+      <div class="cat-products" id="prods-${c.tipo}-${c.category_id}"></div>
+    </div>`).join("");
+
+  if (categorias.length > visibles.length) {
+    list.innerHTML += `<p class="filter-empty">Mostrando ${visibles.length} de ${categorias.length} — usa el buscador para ver más.</p>`;
+  }
+
+  // botón de diagnóstico: revisa contra FazerCards si esta categoría admite validar ID
+  list.querySelectorAll(".debug-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      pedirClaveYEjecutar(() => verificarValidacion(btn));
+    });
+  });
+
+  // click en categoría ya importada -> mostrar/ocultar sus productos
+  list.querySelectorAll('.cat-top').forEach(top => {
+    top.addEventListener("click", (e) => {
+      if (e.target.closest(".cat-import-btn, .cat-reimport-btn, .debug-btn")) return;
+      const [tipo, categoryId] = top.dataset.toggle.split(":");
+      const cat = TODAS_LAS_CATEGORIAS.find(c => c.tipo === tipo && c.category_id === categoryId);
+      if (!cat || !cat.sincronizado) return;
+      const box = document.getElementById(`prods-${tipo}-${categoryId}`);
+      const yaAbierto = box.classList.contains("open");
+      box.classList.toggle("open");
+      if (!yaAbierto && !box.dataset.loaded) cargarProductosDeCategoria(tipo, categoryId, box);
+    });
+  });
+
+  // botón "Importar productos" (nuevas) y "↻" (reimportar ya sincronizadas)
+  list.querySelectorAll(".cat-import-btn, .cat-reimport-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      pedirClaveYEjecutar(() => importarCategoria(btn));
+    });
+  });
+}
+
+async function verificarValidacion(btn){
+  const categoryId = btn.dataset.categoryId;
+  btn.disabled = true;
+  btn.textContent = "Verificando…";
+  try{
+    const url = `${VAL_TOWN_URL}/?action=debug-validate-id&category_id=${encodeURIComponent(categoryId)}&admin_key=${encodeURIComponent(ADMIN_SYNC_KEY)}`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    if (resp.status === 401) {
+      ADMIN_SYNC_KEY = "";
+      sessionStorage.removeItem("fp_admin_sync_key");
+      localStorage.removeItem("fp_admin_sync_key");
+      btn.disabled = false;
+      btn.textContent = "🔍 Verificar";
+      pedirClaveYEjecutar(() => verificarValidacion(btn));
+      return;
+    }
+
+    if (data.encontrado) {
+      alert("✓ SÍ admite validar ID.\n\nDetalle de FazerCards:\n" + JSON.stringify(data.detalle, null, 2));
+    } else {
+      alert("✗ FazerCards NO tiene a \"" + categoryId + "\" en su lista de validación.\n\nTotal de juegos con validación: " + data.total_juegos_con_validacion + "\n\nAlgunos category_id de ejemplo que sí tienen validación:\n" + data.primeros_10_category_id.join("\n"));
+    }
+  }catch(e){
+    alert("Error de conexión al verificar.");
+  }
+  btn.disabled = false;
+  btn.textContent = "🔍 Verificar";
+}
+
+async function importarCategoria(btn){
+  const tipo = btn.dataset.tipo, categoryId = btn.dataset.categoryId;
+  const textoOriginal = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "…";
+  try{
+    const url = `${VAL_TOWN_URL}/?action=sync-offers&tipo=${encodeURIComponent(tipo)}&category_id=${encodeURIComponent(categoryId)}&admin_key=${encodeURIComponent(ADMIN_SYNC_KEY)}`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    if (resp.status === 401) {
+      // la clave guardada ya no sirve: la borramos y volvemos a pedirla
+      ADMIN_SYNC_KEY = "";
+      sessionStorage.removeItem("fp_admin_sync_key");
+      localStorage.removeItem("fp_admin_sync_key");
+      btn.disabled = false;
+      btn.textContent = textoOriginal;
+      document.getElementById("syncKeyError").style.display = "block";
+      pedirClaveYEjecutar(() => importarCategoria(btn));
+      return;
+    }
+
+    if (!data.ok) { alert("No se pudo importar: " + JSON.stringify(data.error || data)); btn.disabled = false; btn.textContent = textoOriginal; return; }
+
+    if (data.aviso) alert("⚠️ " + data.aviso);
+
+    const cat = TODAS_LAS_CATEGORIAS.find(c => c.tipo === tipo && c.category_id === categoryId);
+    if (cat) cat.sincronizado = true;
+    aplicarFiltroCatalogo();
+  }catch(err){
+    alert("Error de conexión al importar.");
+    btn.disabled = false;
+    btn.textContent = textoOriginal;
+  }
+}
+
+async function cargarProductosDeCategoria(tipo, categoryId, box){
+  box.innerHTML = '<p class="filter-empty">Cargando productos…</p>';
+  const { data: productos, error } = await sb.from("catalogo").select("*").eq("tipo", tipo).eq("category_id", categoryId);
+  if (error || !productos || !productos.length) { box.innerHTML = '<p class="filter-empty">No se encontraron productos.</p>'; return; }
+  box.dataset.loaded = "1";
+
+  box.innerHTML = productos.map(p => `
+    <div class="prod-row" data-id="${p.id}">
+      <span class="prod-name">${p.offer_name}</span>
+      <span class="prod-cost">mayorista $${Number(p.precio_mayorista).toFixed(2)}</span>
+      <input type="number" step="0.01" class="prod-price-input" placeholder="Precio" value="${p.precio_venta != null ? p.precio_venta : ''}">
+      <label class="prod-toggle"><input type="checkbox" ${p.activo ? "checked" : ""}> Activo</label>
+      <button type="button" class="prod-save" data-id="${p.id}">Guardar</button>
+    </div>`).join("");
+
+  box.querySelectorAll(".prod-save").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const row = btn.closest(".prod-row");
+      const precioVenta = parseFloat(row.querySelector(".prod-price-input").value);
+      const activo = row.querySelector('input[type="checkbox"]').checked;
+      if (activo && (isNaN(precioVenta) || precioVenta <= 0)) { alert("Ponle un precio de venta antes de activarlo."); return; }
+
+      btn.textContent = "Guardando…";
+      const { error } = await sb.from("catalogo").update({
+        precio_venta: isNaN(precioVenta) ? null : precioVenta,
+        activo: activo
+      }).eq("id", btn.dataset.id);
+      btn.textContent = error ? "Error" : "✓ Guardado";
+      btn.classList.toggle("saved", !error);
+      setTimeout(() => { btn.textContent = "Guardar"; btn.classList.remove("saved"); }, 1500);
+    });
+  });
+}
+
+document.querySelectorAll('.filter-chip[data-panel="cat"]').forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll('.filter-chip[data-panel="cat"]').forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    catFiltro = chip.dataset.filter;
+    aplicarFiltroCatalogo();
+  });
+});
+
+document.getElementById("catSearch").addEventListener("input", (e) => {
+  catBusqueda = e.target.value.trim().toLowerCase();
+  aplicarFiltroCatalogo();
+});
+
+/* -------- buscador en vivo (diagnóstico contra FazerCards directo) -------- */
+document.getElementById("liveSearchBtn").addEventListener("click", () => {
+  pedirClaveYEjecutar(buscarEnVivo);
+});
+document.getElementById("liveSearchInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") pedirClaveYEjecutar(buscarEnVivo);
+});
+
+async function buscarEnVivo(){
+  const btn = document.getElementById("liveSearchBtn");
+  const resultBox = document.getElementById("liveSearchResult");
+  const query = document.getElementById("liveSearchInput").value.trim();
+  const tipo = document.getElementById("liveSearchTipo").value;
+  if (!query) return;
+
+  btn.disabled = true;
+  btn.textContent = "Buscando…";
+  resultBox.innerHTML = "";
+
+  try{
+    const url = `${VAL_TOWN_URL}/?action=debug-search&tipo=${encodeURIComponent(tipo)}&query=${encodeURIComponent(query)}&admin_key=${encodeURIComponent(ADMIN_SYNC_KEY)}`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    if (resp.status === 401) {
+      ADMIN_SYNC_KEY = "";
+      sessionStorage.removeItem("fp_admin_sync_key");
+      localStorage.removeItem("fp_admin_sync_key");
+      btn.disabled = false;
+      btn.textContent = "Buscar";
+      pedirClaveYEjecutar(buscarEnVivo);
+      return;
+    }
+
+    if (!data.ok) {
+      resultBox.innerHTML = `<p class="lsr-total">Error: ${JSON.stringify(data.error || data)}</p>`;
+    } else if (!data.coincidencias.length) {
+      resultBox.innerHTML = `<p class="lsr-total">FazerCards tiene ${data.total_en_fazercards} categorías de este tipo en total, pero ninguna coincide con "${query}". Probablemente ese producto no está disponible en tu cuenta/plan.</p>`;
+    } else {
+      resultBox.innerHTML = data.coincidencias.map(it => `<div class="lsr-item"><span>${it.name}</span><b>${it.category_id}</b></div>`).join("") +
+        `<p class="lsr-total">${data.coincidencias.length} coincidencia(s) de ${data.total_en_fazercards} categorías totales en FazerCards.</p>`;
+    }
+  }catch(e){
+    resultBox.innerHTML = `<p class="lsr-total">Error de conexión.</p>`;
+  }
+  btn.disabled = false;
+  btn.textContent = "Buscar";
+}
+
+/* -------- precios -------- */
+async function cargarPrecios(){
+  const { data: precios, error } = await sb.from("precios").select("*").order("orden", { ascending: true });
+  const list = document.getElementById("pricesList");
+  if (error) { list.innerHTML = '<p class="msg">No se pudieron cargar los precios.</p>'; return; }
+
+  list.innerHTML = precios.map(p => `
+    <div class="price-row">
+      <span class="price-name">${p.id} 💎${p.bono > 0 ? ' <small>(+' + p.bono + ')</small>' : ''}</span>
+      <input type="number" step="0.01" class="price-input" data-id="${p.id}" value="${p.precio}">
+      <button class="price-save" data-id="${p.id}">Guardar</button>
+    </div>`).join("");
+
+  list.querySelectorAll(".price-save").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const input = list.querySelector('.price-input[data-id="' + btn.dataset.id + '"]');
+      const nuevoPrecio = parseFloat(input.value);
+      if (isNaN(nuevoPrecio) || nuevoPrecio <= 0) { alert("Precio inválido."); return; }
+      btn.textContent = "Guardando…";
+      const { error } = await sb.from("precios").update({ precio: nuevoPrecio, updated_at: new Date().toISOString() }).eq("id", btn.dataset.id);
+      btn.textContent = error ? "Error" : "✓ Guardado";
+      if (!error) btn.classList.add("saved");
+      setTimeout(() => { btn.textContent = "Guardar"; btn.classList.remove("saved"); }, 1800);
+    });
+  });
+}
+</script>
+</body>
+</html>
