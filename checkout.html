@@ -3,241 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Confirmar pedido — FariPlay</title>
+<title>Confirmar compra — FariPlay</title>
 <meta name="theme-color" content="#07040A">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2307040A'/%3E%3Cpolygon points='14,12 34,12 50,52 30,52' fill='%23FF7A1A'/%3E%3Cpolygon points='50,12 30,12 14,52 34,52' fill='%233A5CFF'/%3E%3C/svg%3E" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --bg-0:#07040A; --bg-1:#120B18; --bg-2:#1B1024;
-  --blue:#3A5CFF; --blue-2:#5B7CFF;
-  --orange:#FF7A1A; --orange-2:#FFB238; --red:#FF3B3B;
-  --green:#3ECF6E; --cyan:#3FE0E8;
-  --ink:#FFFFFF; --ink-dim:#C9C6DA; --ink-faint:#8B87A6; --muted:#635E7E;
+  --blue:#3A5CFF; --blue-2:#5B7CFF; --orange:#FF7A1A; --orange-2:#FFB238;
+  --ink:#FFFFFF; --ink-dim:#C9C6DA; --muted:#8B87A6; --green:#3ECF6E; --red:#FF3B3B;
   --font:Arial,Helvetica,sans-serif;
-  --ease:cubic-bezier(.2,.85,.3,1);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{background:var(--bg-0);color:var(--ink);font-family:var(--font);overflow-x:hidden;}
-body{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;position:relative;}
-main{flex:1;}
-a{text-decoration:none;color:inherit;}
-img,svg{display:block;max-width:100%;}
-::selection{background:var(--orange);color:#1A0500;}
-
+body{background:var(--bg-0);color:var(--ink);font-family:var(--font);min-height:100vh;min-height:100dvh;
+  position:relative;overflow-x:hidden;}
 body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:
-    radial-gradient(50% 40% at 85% 0%, rgba(255,59,59,.16), transparent 60%),
-    radial-gradient(45% 40% at 8% 8%, rgba(58,92,255,.2), transparent 60%),
-    linear-gradient(rgba(255,122,26,.035) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,122,26,.035) 1px,transparent 1px);
-  background-size:auto,auto,38px 38px,38px 38px;}
+  background-image:linear-gradient(rgba(255,122,26,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,122,26,.035) 1px,transparent 1px);
+  background-size:38px 38px;}
+a{color:inherit;text-decoration:none;}
 
-/* ---------- header ---------- */
-.hdr{background:rgba(7,4,10,.92);backdrop-filter:blur(16px);position:sticky;top:0;z-index:100;
-  height:58px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid rgba(255,122,26,.18);}
-.brand{display:flex;align-items:center;gap:.5rem;}
-.brand-logo{height:28px;width:auto;flex:none;}
-.bmark{width:26px;height:22px;position:relative;flex:none;}
-.bslab{position:absolute;width:60%;height:46%;clip-path:polygon(0 0,70% 0,100% 100%,30% 100%);}
-.bslab.a{top:0;left:0;background:var(--blue-2);}
-.bslab.b{bottom:0;right:0;background:var(--orange);}
-.bword{font-weight:900;font-size:1.02rem;text-transform:uppercase;}
-.bword i{color:var(--orange-2);font-style:normal;}
-.wa-mini{width:36px;height:36px;border-radius:8px;background:#1c1024;border:1px solid rgba(255,122,26,.4);
-  display:flex;align-items:center;justify-content:center;}
-.wa-mini svg{width:18px;height:18px;color:#25D366;}
-
-/* ---------- wrap ---------- */
-.wrap{padding:20px 14px 10px;max-width:480px;margin:0 auto;width:100%;position:relative;z-index:1;}
-.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:900;color:var(--orange-2);
-  text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;}
-.checkout-grid{display:block;}
-.co-main{min-width:0;}
-.co-side{margin-top:0;}
-
-@media (min-width:900px){
-  .wrap{max-width:1080px;padding:52px 32px 60px;}
-  .back-btn{margin-bottom:24px;font-size:12px;}
-  .checkout-grid{display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:start;}
-  .co-side{position:sticky;top:88px;}
-  .svc-card{padding:20px;}
-  .step-title{font-size:1.02rem;}
-}
-
-/* ---------- service card ---------- */
-.svc-card{position:relative;isolation:isolate;background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
-  border-top:2px solid var(--orange);border-radius:6px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:16px;
-  box-shadow:0 16px 34px -18px rgba(255,122,26,.4);}
-.svc-card::before,.svc-card::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--orange);opacity:.75;}
-.svc-card::before{top:-2px;left:-2px;border-right:none;border-bottom:none;}
-.svc-card::after{bottom:-2px;right:-2px;border-left:none;border-top:none;}
-.svc-gem{width:60px;height:60px;flex:none;background:radial-gradient(circle at 35% 30%,#16202e,var(--bg-0));
-  border:1px solid rgba(63,224,232,.35);border-radius:8px;display:flex;align-items:center;justify-content:center;
-  box-shadow:inset 0 0 16px rgba(63,224,232,.12);}
-.svc-gem svg{width:38px;filter:drop-shadow(0 3px 8px rgba(63,224,232,.5));}
-.svc-name{font-size:1.15rem;font-weight:900;line-height:1.1;}
-.svc-bonus{font-size:.72rem;color:var(--orange-2);font-weight:800;margin-top:4px;}
-.svc-tag{display:inline-block;background:rgba(255,122,26,.12);border:1px solid rgba(255,122,26,.4);
-  padding:2px 9px;border-radius:3px;font-size:.62rem;font-weight:900;color:var(--orange-2);
-  text-transform:uppercase;letter-spacing:.5px;margin-top:7px;}
-
-/* ---------- step box ---------- */
-.step-box{position:relative;isolation:isolate;background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
-  border-radius:6px;margin-bottom:14px;overflow:visible;transition:border-color .25s,box-shadow .25s;}
-.step-box:hover{border-color:rgba(255,122,26,.35);box-shadow:0 18px 36px -20px rgba(255,122,26,.35);}
-.step-box::before,.step-box::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--orange);opacity:0;transition:opacity .25s;}
-.step-box::before{top:-2px;left:-2px;border-right:none;border-bottom:none;}
-.step-box::after{bottom:-2px;right:-2px;border-left:none;border-top:none;}
-.step-box:hover::before,.step-box:hover::after{opacity:.8;}
-.step-head{padding:15px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.06);
-  border-radius:6px 6px 0 0;overflow:hidden;}
-.step-num{width:30px;height:30px;min-width:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;
-  font-size:.85rem;font-weight:900;font-family:var(--font);}
-.step-num.o{background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;box-shadow:0 0 14px -2px rgba(255,159,28,.7);}
-.step-num.b{background:linear-gradient(135deg,var(--blue-2),var(--blue));color:#fff;box-shadow:0 0 14px -2px rgba(58,92,255,.7);}
-.step-num.g{background:linear-gradient(135deg,#6EE7A0,var(--green));color:#04160b;box-shadow:0 0 14px -2px rgba(62,207,110,.7);}
-.step-title{font-size:.95rem;font-weight:900;text-transform:uppercase;letter-spacing:.02em;}
-.step-sub{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
-.step-body{padding:16px;}
-
-.field{margin-bottom:14px;}
-.field:last-child{margin-bottom:0;}
-.field-label{display:block;font-size:.66rem;font-weight:900;color:var(--muted);text-transform:uppercase;
-  letter-spacing:1.5px;margin-bottom:8px;}
-.field-input{width:100%;background:var(--bg-0);border:1px solid rgba(255,255,255,.1);border-radius:5px;
-  padding:13px 14px;color:var(--ink);font-size:.95rem;font-family:var(--font);outline:none;
-  transition:border-color .2s,box-shadow .2s;}
-.field-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,122,26,.15);}
-.field-hint{font-size:.68rem;color:var(--muted);margin-top:6px;font-weight:600;}
-
-/* ---------- payment methods ---------- */
-.metodos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px;}
-.metodo-btn{position:relative;background:var(--bg-0);border:2px solid rgba(255,255,255,.08);border-radius:6px;padding:16px 8px;
-  text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;
-  transition:border-color .2s,background .2s,transform .2s;
-  clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);}
-.metodo-btn:hover{transform:translateY(-2px);}
-.metodo-btn svg{width:22px;height:22px;color:var(--blue-2);}
-.metodo-btn.selected{border-color:var(--orange);background:rgba(255,122,26,.1);box-shadow:0 0 0 1px rgba(255,122,26,.3),0 10px 24px -12px rgba(255,122,26,.6);}
-.metodo-btn.selected svg{color:var(--orange-2);}
-.metodo-name{font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.03em;}
-.metodo-desc{font-size:.62rem;color:var(--muted);margin-top:1px;}
-
-.bancos-wrap{display:none;margin-top:14px;}
-.bancos-wrap.show{display:block;}
-.bancos-label{font-size:.66rem;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;}
-.bancos-grid{display:grid;gap:8px;}
-.banco-btn{background:var(--bg-0);border:2px solid rgba(255,255,255,.08);border-left:3px solid rgba(255,255,255,.14);border-radius:6px;padding:12px 14px;
-  cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:border-color .2s,background .2s,transform .2s;}
-.banco-btn:hover{transform:translateX(2px);}
-.banco-btn.selected{border-color:var(--orange);border-left-color:var(--orange);background:rgba(255,122,26,.08);box-shadow:0 8px 20px -12px rgba(255,122,26,.6);}
-.banco-name{font-size:.85rem;font-weight:800;}
-.banco-check{width:16px;height:16px;border-radius:50%;border:2px solid var(--muted);display:flex;align-items:center;
-  justify-content:center;font-size:.6rem;color:transparent;}
-.banco-btn.selected .banco-check{border-color:var(--orange);background:var(--orange);color:#1A0500;}
-
-.instruccion{display:none;gap:10px;background:rgba(58,92,255,.07);border:1px solid rgba(58,92,255,.28);
-  border-radius:6px;padding:12px 14px;margin-top:12px;font-size:.78rem;color:var(--ink-dim);line-height:1.5;}
-.instruccion.show{display:flex;}
-
-.cuenta-info{display:none;background:var(--bg-0);border:1px solid rgba(255,255,255,.08);border-radius:6px;
-  padding:14px 16px;margin-top:12px;}
-.cuenta-info.show{display:block;}
-.ci-head{font-size:.72rem;font-weight:900;color:var(--orange-2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
-.ci-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);}
-.ci-row:last-of-type{border:none;}
-.ci-lbl{font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
-.ci-val{font-size:.85rem;font-weight:800;}
-.ci-copy{margin-top:10px;width:100%;background:rgba(255,122,26,.1);border:1px solid var(--orange);border-radius:5px;
-  padding:9px;color:var(--orange-2);font-size:.75rem;font-weight:900;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;}
-.ci-copy.copied{background:rgba(62,207,110,.14);border-color:var(--green);color:var(--green);}
-
-.comprobante-wrap{display:none;margin-top:16px;}
-.comprobante-wrap.show{display:block;}
-.comprobante-box{border:2px dashed rgba(255,255,255,.16);border-radius:6px;padding:22px 14px;text-align:center;
-  cursor:pointer;transition:border-color .2s,background .2s;}
-.comprobante-box:hover{border-color:var(--orange);background:rgba(255,122,26,.04);}
-.comprobante-box.has-file{border-style:solid;border-color:rgba(62,207,110,.5);background:rgba(62,207,110,.05);}
-.comprobante-txt{font-size:.82rem;font-weight:800;margin-top:6px;}
-.comprobante-hint{font-size:.68rem;color:var(--muted);margin-top:3px;}
-.comprobante-preview{display:none;margin-top:10px;position:relative;}
-.comprobante-preview.show{display:block;}
-.comprobante-preview img{width:100%;border-radius:6px;border:1px solid rgba(255,255,255,.1);}
-.comprobante-remove{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.65);
-  border:none;color:#fff;cursor:pointer;font-size:.85rem;}
-.comprobante-filename{font-size:.72rem;color:var(--green);margin-top:8px;font-weight:700;}
-
-/* ---------- cupón ---------- */
-.cupon-box{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,178,56,.28);
-  border-radius:6px;padding:16px;margin-bottom:14px;clip-path:polygon(14px 0,100% 0,100% 100%,0 100%,0 14px);}
-.cupon-label{font-size:.72rem;font-weight:900;color:var(--orange-2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;}
-.cupon-row{display:flex;gap:8px;}
-.cupon-input{flex:1;background:var(--bg-0);border:1px solid rgba(255,255,255,.1);border-radius:5px;
-  padding:12px 14px;color:var(--ink);font-size:.85rem;font-family:var(--font);outline:none;}
-.cupon-input:focus{border-color:var(--orange);}
-.cupon-apply{background:linear-gradient(135deg,var(--red),var(--orange));color:#1A0500;border:none;border-radius:5px;
-  padding:0 18px;font-weight:900;font-size:.78rem;text-transform:uppercase;cursor:pointer;letter-spacing:.5px;
-  clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);transition:transform .2s,box-shadow .2s;}
-.cupon-apply:hover{transform:translateY(-2px);box-shadow:0 10px 22px -8px rgba(255,59,59,.6);}
-.cupon-msg{font-size:.72rem;font-weight:800;margin-top:8px;display:none;}
-.cupon-msg.ok{display:block;color:var(--green);}
-.cupon-msg.err{display:block;color:var(--red);}
-
-/* ---------- toast flotante ---------- */
-.toast{position:fixed;left:50%;top:14px;transform:translateX(-50%) translateY(-16px);
-  background:var(--bg-2);border:1px solid rgba(255,255,255,.15);border-radius:8px;
-  padding:12px 20px;font-size:.82rem;font-weight:900;z-index:600;opacity:0;pointer-events:none;
-  transition:opacity .25s var(--ease),transform .25s var(--ease);box-shadow:0 14px 32px -10px rgba(0,0,0,.6);
-  max-width:88vw;text-align:center;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-.toast.ok{border-color:var(--green);color:var(--green);}
-.toast.err{border-color:var(--red);color:var(--red);}
-
-/* ---------- resumen ---------- */
-.summary{background:var(--bg-0);border:1px solid rgba(255,255,255,.08);border-top:2px solid var(--orange);border-radius:6px;padding:14px 16px;margin-bottom:14px;}
-.sum-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06);}
-.sum-row:last-child{border:none;}
-.sum-total{padding-top:10px;}
-.sum-total .sum-label,.sum-total .sum-val{font-size:1.05rem;font-weight:900;color:var(--orange-2);}
-.sum-label{font-size:.78rem;color:var(--muted);font-weight:700;}
-.sum-val{font-size:.85rem;font-weight:800;}
-.sum-desc .sum-val{color:var(--green);}
-
-.aviso{display:flex;gap:8px;background:rgba(255,178,56,.08);border:1px solid rgba(255,178,56,.28);border-radius:6px;
-  padding:11px 13px;margin-bottom:14px;font-size:.74rem;color:var(--ink-dim);line-height:1.5;}
-
-.btn-ok{width:100%;background:linear-gradient(135deg,var(--red),var(--orange) 55%,var(--orange-2));color:#1A0500;
-  border:none;border-radius:6px;padding:17px;font-size:.9rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;
-  cursor:pointer;box-shadow:0 0 0 1px rgba(255,122,26,.4),0 14px 32px -10px rgba(255,59,59,.65);
-  clip-path:polygon(14px 0,100% 0,calc(100% - 14px) 100%,0 100%);transition:transform .2s,box-shadow .2s;}
-.btn-ok:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 0 1px rgba(255,122,26,.6),0 18px 38px -8px rgba(255,59,59,.8);}
-.btn-ok:disabled{opacity:.6;cursor:wait;}
-.secure-note{text-align:center;font-size:.68rem;color:var(--muted);margin-top:10px;}
-
-/* ---------- WA float + footer ---------- */
-.wa-fab{position:fixed;right:1.1rem;bottom:1.1rem;z-index:150;width:52px;height:52px;border-radius:50%;
-  background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;
-  box-shadow:0 12px 26px -8px rgba(37,211,102,.6);}
-.wa-fab svg{width:26px;height:26px;}
-footer{background:var(--bg-0);border-top:1px solid rgba(255,255,255,.06);padding:1.6rem 14px;text-align:center;
-  font-size:.68rem;color:var(--muted);}
-
-/* ---------- success overlay ---------- */
-.success-ov{position:fixed;inset:0;z-index:400;background:rgba(4,3,8,.9);backdrop-filter:blur(6px);
-  display:none;align-items:center;justify-content:center;padding:20px;}
-.success-ov.open{display:flex;}
-.success-box{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(62,207,110,.35);
-  border-radius:10px;padding:36px 28px;text-align:center;max-width:360px;width:100%;}
-.success-check{width:64px;height:64px;border-radius:50%;background:rgba(62,207,110,.12);border:2px solid var(--green);
-  display:flex;align-items:center;justify-content:center;margin:0 auto 18px;}
-.success-check svg{width:30px;height:30px;stroke:var(--green);fill:none;stroke-width:3;}
-.success-title{font-size:1.15rem;font-weight:900;margin-bottom:8px;text-transform:uppercase;}
-.success-sub{font-size:.85rem;color:var(--ink-dim);line-height:1.6;margin-bottom:22px;}
-.success-btn{display:inline-block;background:linear-gradient(135deg,var(--red),var(--orange));color:#1A0500;
-  font-weight:900;padding:12px 26px;border-radius:6px;font-size:.82rem;text-transform:uppercase;letter-spacing:.5px;}
-
-/* -------- menú ☰ compartido (todas las funciones) -------- */
+.hdr{background:rgba(6,4,10,.97);backdrop-filter:blur(14px);position:sticky;top:0;z-index:100;height:58px;
+  padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,122,26,.2);}
+.brand-logo{height:26px;width:auto;}
 .hdr-actions{display:flex;align-items:center;gap:.6rem;}
 .hdr-greet{font-size:.78rem;font-weight:900;color:var(--orange-2);white-space:nowrap;}
 .navtog{display:flex;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;
@@ -259,34 +46,99 @@ footer{background:var(--bg-0);border-top:1px solid rgba(255,255,255,.06);padding
 .nav-link:hover{color:var(--orange-2);}
 .nav-link--danger:hover{color:#ff8080;}
 .nav-account-email{font-size:.78rem;color:var(--muted);padding-bottom:.6rem;word-break:break-all;}
+
+.wrap{padding:20px 14px 40px;max-width:440px;margin:0 auto;width:100%;position:relative;z-index:1;}
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:900;color:var(--ink-faint);
+  text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;}
+.back-btn:hover{color:var(--orange-2);}
+@media (min-width:900px){ .wrap{max-width:460px;padding:52px 32px 60px;} }
+
+.co-card{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
+  border-top:2px solid var(--orange);border-radius:10px;overflow:hidden;
+  box-shadow:0 20px 44px -22px rgba(0,0,0,.6);}
+.co-row{padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.06);}
+.co-row:last-child{border-bottom:none;}
+
+.svc-row{display:flex;align-items:center;gap:14px;}
+.svc-icon{width:52px;height:52px;flex:none;background:radial-gradient(circle at 35% 30%,#16202e,var(--bg-0));
+  border:1px solid rgba(63,224,232,.35);border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;}
+.svc-name{font-size:1rem;font-weight:900;line-height:1.2;}
+.svc-cat{font-size:.74rem;color:var(--orange-2);font-weight:800;margin-top:2px;}
+
+.field-label{display:block;font-size:.68rem;font-weight:900;color:var(--muted);text-transform:uppercase;
+  letter-spacing:1.2px;margin-bottom:8px;}
+.field-input{width:100%;background:var(--bg-0);border:1px solid rgba(255,255,255,.1);border-radius:6px;
+  padding:12px 14px;color:var(--ink);font-size:.92rem;font-family:var(--font);outline:none;
+  transition:border-color .2s,box-shadow .2s;margin-bottom:12px;}
+.field-input:last-child{margin-bottom:0;}
+.field-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,122,26,.15);}
+
+.validate-row{display:flex;gap:8px;align-items:center;margin-top:4px;}
+.validate-btn{background:rgba(91,124,255,.12);border:1px solid rgba(91,124,255,.3);color:var(--blue-2);
+  border-radius:6px;padding:10px 14px;font-family:var(--font);font-weight:800;font-size:.78rem;cursor:pointer;
+  white-space:nowrap;}
+.validate-btn:disabled{opacity:.6;cursor:wait;}
+.validate-ok{display:none;align-items:center;gap:8px;background:rgba(62,207,110,.1);border:1px solid rgba(62,207,110,.3);
+  border-radius:6px;padding:10px 14px;margin-top:10px;font-size:.82rem;color:var(--green);font-weight:800;}
+.validate-ok.show{display:flex;}
+.validate-err{display:none;font-size:.76rem;color:#ff8080;margin-top:8px;}
+.validate-err.show{display:block;}
+
+.saldo-row{display:flex;justify-content:space-between;align-items:center;}
+.saldo-lbl{font-size:.78rem;color:var(--muted);font-weight:700;}
+.saldo-val{font-size:1rem;font-weight:900;color:var(--orange-2);}
+.saldo-warn{margin-top:10px;font-size:.76rem;color:#ff9a9a;line-height:1.5;}
+.saldo-warn a{color:var(--orange-2);font-weight:800;}
+
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;}
+.sum-row.total{margin-top:6px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);}
+.sum-row.total .sum-label,.sum-row.total .sum-val{font-size:1.05rem;font-weight:900;color:var(--orange-2);}
+.sum-label{font-size:.8rem;color:var(--muted);font-weight:700;}
+.sum-val{font-size:.85rem;font-weight:800;}
+
+.btn-ok{width:100%;background:linear-gradient(135deg,var(--red),var(--orange) 55%,var(--orange-2));color:#1A0500;
+  border:none;border-radius:8px;padding:16px;font-size:.9rem;font-weight:900;text-transform:uppercase;letter-spacing:.4px;
+  cursor:pointer;box-shadow:0 0 0 1px rgba(255,122,26,.4),0 14px 32px -10px rgba(255,59,59,.55);
+  transition:transform .2s,box-shadow .2s;}
+.btn-ok:hover:not(:disabled){transform:translateY(-2px);}
+.btn-ok:disabled{opacity:.5;cursor:not-allowed;}
+.secure-note{text-align:center;font-size:.7rem;color:var(--muted);margin-top:12px;}
+
+.loading-page{text-align:center;padding:80px 20px;color:var(--muted);}
+
+/* -------- overlay de proceso / resultado -------- */
+.ov{position:fixed;inset:0;background:rgba(5,3,8,.94);backdrop-filter:blur(6px);z-index:500;
+  display:none;align-items:center;justify-content:center;padding:24px;}
+.ov.open{display:flex;}
+.ov-card{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.1);
+  border-radius:14px;padding:36px 26px;max-width:360px;width:100%;text-align:center;}
+.ov-card.ok{border-top:2px solid var(--green);}
+.ov-card.err{border-top:2px solid var(--red);}
+.spinner{width:44px;height:44px;border-radius:50%;border:4px solid rgba(255,255,255,.12);border-top-color:var(--orange);
+  animation:spin .8s linear infinite;margin:0 auto 18px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ov-icon{font-size:2.6rem;margin-bottom:10px;}
+.ov-title{font-weight:900;font-size:1.05rem;margin-bottom:8px;text-transform:uppercase;}
+.ov-text{font-size:.85rem;color:var(--ink-dim);line-height:1.6;margin-bottom:18px;}
+.ov-detail{background:var(--bg-0);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px 14px;
+  margin-bottom:18px;text-align:left;font-size:.78rem;}
+.ov-detail div{display:flex;justify-content:space-between;padding:3px 0;color:var(--ink-dim);}
+.ov-detail b{color:var(--ink);}
+.ov-actions{display:flex;flex-direction:column;gap:10px;}
+.ov-btn{width:100%;background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;font-weight:900;
+  text-transform:uppercase;font-size:.8rem;padding:12px;border-radius:8px;border:none;cursor:pointer;}
+.ov-btn.ghost{background:none;border:1px solid rgba(255,255,255,.15);color:var(--ink-dim);}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-<div id="authGate" style="position:fixed;inset:0;background:#07040A;z-index:999;display:flex;align-items:center;justify-content:center;color:#8B87A6;font-family:Arial,Helvetica,sans-serif;font-size:.85rem;">Verificando tu sesión…</div>
-
-<div class="toast" id="toast"></div>
-
-<div class="success-ov" id="successOv">
-  <div class="success-box">
-    <div class="success-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
-    <div class="success-title">Pedido enviado</div>
-    <p class="success-sub">Tu pedido fue enviado por WhatsApp.<br>Será confirmado ahí mismo — muchas gracias por tu compra.</p>
-    <a class="success-btn" href="index.html">Volver al inicio</a>
-  </div>
-</div>
+<div id="authGate" style="position:fixed;inset:0;background:#07040A;z-index:999;display:flex;align-items:center;justify-content:center;color:#8B87A6;">Verificando tu sesión…</div>
 
 <header class="hdr">
-  <a href="index.html" class="brand">
-    <img src="logo.png" alt="FariPlay" class="brand-logo"
-         onerror="this.style.display='none'">
-  </a>
+  <a href="index.html"><img src="logo.png" alt="FariPlay" class="brand-logo" onerror="this.style.display='none'"></a>
   <div class="hdr-actions">
     <span class="hdr-greet" id="hdrGreet"></span>
-    <a class="wa-mini" href="https://wa.me/593992225484" target="_blank" rel="noopener" aria-label="Ayuda por WhatsApp">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3zM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5-1.3c1.5.8 3.1 1.2 4.9 1.2h.1c5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg>
-    </a>
     <button class="navtog" id="navtog" aria-label="Menú" aria-expanded="false"><span></span><span></span><span></span></button>
   </div>
 </header>
@@ -296,7 +148,7 @@ footer{background:var(--bg-0);border-top:1px solid rgba(255,255,255,.06);padding
   <div class="nav-section">
     <p class="nav-section-title">Explorar</p>
     <a href="index.html" class="nav-link">Inicio</a>
-    <a href="index.html#paquetes" class="nav-link">Paquetes</a>
+    <a href="index.html#paquetes" class="nav-link">Catálogo</a>
   </div>
   <div class="nav-section">
     <p class="nav-section-title">Mi cuenta</p>
@@ -309,299 +161,307 @@ footer{background:var(--bg-0);border-top:1px solid rgba(255,255,255,.06);padding
   </div>
 </nav>
 
-<main>
-<div class="wrap">
+<div class="wrap" id="wrap" style="display:none;">
+  <a class="back-btn" href="index.html">← Volver</a>
+  <div id="loadState" class="loading-page">Cargando producto…</div>
 
-  <a class="back-btn" href="index.html">← Volver a paquetes</a>
+  <div class="co-card" id="coCard" style="display:none;">
 
-  <div class="checkout-grid">
-  <div class="co-main">
-
-  <!-- Tarjeta del servicio -->
-  <div class="svc-card">
-    <div class="svc-gem">
-      <svg viewBox="0 0 48 48"><polygon points="16,6 32,6 28,18 20,18" fill="#F4FFFE"/><polygon points="16,6 6,18 20,18" fill="#A6F3F7"/><polygon points="32,6 42,18 28,18" fill="#4FD8EB"/><polygon points="6,18 24,44 20,18" fill="#2CA9C9"/><polygon points="42,18 24,44 28,18" fill="#146788"/><polygon points="20,18 24,44 28,18" fill="#D8FCFF"/><g stroke="#0B4A5C" stroke-width="0.6" stroke-linejoin="round" fill="none" opacity=".55"><polygon points="16,6 32,6 28,18 20,18"/><polygon points="16,6 6,18 20,18"/><polygon points="32,6 42,18 28,18"/><polygon points="6,18 24,44 20,18"/><polygon points="42,18 24,44 28,18"/><polygon points="20,18 24,44 28,18"/></g><path d="M13.5 4.5 14.6 7.2 17.3 8.3 14.6 9.4 13.5 12.1 12.4 9.4 9.7 8.3 12.4 7.2Z" fill="#fff" opacity=".9"/></svg>
+    <div class="co-row svc-row">
+      <div class="svc-icon" id="svcIcon">🛒</div>
+      <div style="flex:1;min-width:0;">
+        <div class="svc-name" id="svcName">—</div>
+        <div class="svc-cat" id="svcCat"></div>
+      </div>
     </div>
-    <div style="flex:1;min-width:0;">
-      <div class="svc-name" id="svcName">—</div>
-      <div class="svc-bonus" id="svcBonus"></div>
-      <span class="svc-tag">Recarga Free Fire</span>
+
+    <div class="co-row" id="fieldsRow" style="display:none;"></div>
+
+    <div class="co-row">
+      <div class="saldo-row">
+        <span class="saldo-lbl">Saldo disponible</span>
+        <span class="saldo-val" id="saldoTxt">Cargando…</span>
+      </div>
+      <p class="saldo-warn" id="saldoInsuf" style="display:none;">No te alcanza para este producto. <a href="recargar.html">Recargar saldo →</a></p>
     </div>
+
+    <div class="co-row">
+      <div class="sum-row total"><span class="sum-label">Total</span><span class="sum-val" id="sTotal">$0.00</span></div>
+      <button class="btn-ok" id="btnOk" style="margin-top:16px;" disabled>Comprar ahora</button>
+      <p class="secure-note">Se paga al instante con tu saldo FariPlay</p>
+    </div>
+
   </div>
-
-  <!-- PASO 1 — ID DE JUGADOR -->
-  <div class="step-box">
-    <div class="step-head">
-      <div class="step-num o">1</div>
-      <div>
-        <div class="step-title">Información del jugador</div>
-        <div class="step-sub" style="color:var(--orange-2);">Datos para la recarga</div>
-      </div>
-    </div>
-    <div class="step-body">
-      <div class="field">
-        <label class="field-label">ID de jugador</label>
-        <input type="text" id="fId" class="field-input" placeholder="Ej. 123456789" inputmode="numeric" maxlength="15">
-        <p class="field-hint">Coloca el ID de tu jugador que se encuentra en el perfil de tu cuenta. Entre 6 y 15 dígitos.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- PASO 2 — SALDO -->
-  <div class="step-box">
-    <div class="step-head">
-      <div class="step-num b">2</div>
-      <div>
-        <div class="step-title">Pago con saldo</div>
-        <div class="step-sub" style="color:var(--blue-2);">Se descuenta de tu saldo FariPlay al instante</div>
-      </div>
-    </div>
-    <div class="step-body">
-      <div class="saldo-wrap" id="saldoWrap">
-        <div class="instruccion show" style="margin-bottom:10px;">
-          💰&nbsp;&nbsp;<p>Tu saldo disponible: <strong id="saldoDisponibleTxt">Cargando…</strong></p>
-        </div>
-        <div class="instruccion show" id="iSaldoOk" style="display:none;">💎&nbsp;&nbsp;<p>Se descontará <strong id="saldoADescontar">$0.00</strong> de tu saldo. Tu pedido queda confirmado al instante.</p></div>
-        <div class="instruccion show" id="iSaldoInsuficiente" style="display:none;background:rgba(255,59,59,.08);border-color:rgba(255,59,59,.3);">
-          ⚠️&nbsp;&nbsp;<p>Tu saldo no alcanza para este paquete. <a href="recargar.html" style="color:var(--orange-2);font-weight:800;">Recarga saldo aquí →</a></p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- CUPÓN -->
-  <div class="cupon-box">
-    <p class="cupon-label">🏷️ Colocar un código</p>
-    <div class="cupon-row">
-      <input type="text" id="promoIn" class="cupon-input" placeholder="Tu código aquí">
-      <button class="cupon-apply" id="promoBtn">Aplicar</button>
-    </div>
-  </div>
-
-  </div><!-- /co-main -->
-
-  <div class="co-side">
-  <!-- PASO 3 — CONFIRMACIÓN -->
-  <div class="step-box">
-    <div class="step-head">
-      <div class="step-num g">3</div>
-      <div>
-        <div class="step-title">Confirmación de pedido</div>
-        <div class="step-sub" style="color:var(--green);">Revisa el resumen antes de confirmar</div>
-      </div>
-    </div>
-    <div class="step-body">
-      <div class="summary">
-        <div class="sum-row"><span class="sum-label">Subtotal</span><span class="sum-val" id="sSub">$0.00</span></div>
-        <div class="sum-row sum-desc" id="sDescRow" style="display:none;"><span class="sum-label">Descuento</span><span class="sum-val" id="sDesc">-$0.00</span></div>
-        <div class="sum-row sum-total"><span class="sum-label">Total a pagar</span><span class="sum-val" id="sTotal">$0.00</span></div>
-      </div>
-      <div class="aviso">⚠️&nbsp;&nbsp;<p>Verifica que tu ID de jugador esté correcto antes de confirmar. No podemos revertir una recarga enviada a un ID equivocado.</p></div>
-      <button class="btn-ok" id="btnOk">Confirmar pedido</button>
-      <p class="secure-note">🔒 Tu pedido se coordina de forma segura vía WhatsApp</p>
-    </div>
-  </div>
-  </div><!-- /co-side -->
-  </div><!-- /checkout-grid -->
-
 </div>
-</main>
 
-<a href="https://wa.me/593992225484" class="wa-fab" target="_blank" rel="noopener" aria-label="WhatsApp">
-  <svg viewBox="0 0 32 32"><path fill="currentColor" d="M16 3C9 3 3.3 8.6 3.3 15.5c0 2.5.7 4.8 1.9 6.8L3 29l6.9-2.2c1.9 1.1 4.1 1.7 6.1 1.7 7 0 12.7-5.6 12.7-12.5S23 3 16 3zm0 22.7c-2 0-3.9-.6-5.5-1.6l-.4-.2-4.1 1.3 1.3-4-.3-.4a10.1 10.1 0 0 1-1.7-5.6C5.3 9.7 10 5.3 16 5.3S26.7 9.7 26.7 15.5 22 25.7 16 25.7zm5.9-7.5c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1a8.3 8.3 0 0 1-2.4-1.5 9 9 0 0 1-1.7-2.1c-.2-.3 0-.5.1-.6l.4-.5.3-.4a.6.6 0 0 0 0-.5c-.1-.2-.7-1.7-1-2.3s-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.8.4 3.6 3.6 0 0 0-1.1 2.7c0 1.6 1.2 3.1 1.3 3.3.2.2 2.4 3.7 5.9 5.1a19.9 19.9 0 0 0 2 .7 4.8 4.8 0 0 0 2.2.1c.7-.1 2-.8 2.3-1.6s.3-1.5.2-1.6-.3-.2-.6-.4z"/></svg>
-</a>
+<!-- overlay: procesando -->
+<div class="ov" id="ovProcessing">
+  <div class="ov-card">
+    <div class="spinner"></div>
+    <div class="ov-title">Procesando tu compra…</div>
+    <p class="ov-text">Estamos confirmando tu pedido, un momento.</p>
+  </div>
+</div>
 
-<footer>© <span id="yr"></span> FariPlay · Ecuador · Tienda independiente, no afiliada oficialmente a Garena.</footer>
+<!-- overlay: éxito -->
+<div class="ov" id="ovSuccess">
+  <div class="ov-card ok">
+    <div class="ov-icon">✅</div>
+    <div class="ov-title">¡Compra realizada!</div>
+    <p class="ov-text">Tu pedido se procesó correctamente.</p>
+    <div class="ov-detail" id="ovSuccessDetail"></div>
+    <div class="ov-actions">
+      <button class="ov-btn" id="ovSuccessPedidos">Ver mis pedidos</button>
+      <button class="ov-btn ghost" id="ovSuccessInicio">Volver a la tienda</button>
+    </div>
+  </div>
+</div>
+
+<!-- overlay: error -->
+<div class="ov" id="ovError">
+  <div class="ov-card err">
+    <div class="ov-icon">⚠️</div>
+    <div class="ov-title">No se pudo completar</div>
+    <p class="ov-text" id="ovErrorText">Algo salió mal con tu compra.</p>
+    <div class="ov-actions">
+      <button class="ov-btn" id="ovErrorRetry">Reintentar</button>
+      <button class="ov-btn ghost" id="ovErrorClose">Cerrar</button>
+    </div>
+  </div>
+</div>
 
 <script>
-(function(){
-"use strict";
-var SUPPORT_NUMBER = "593992225484";
-var ORDER_NUMBER = "593982063160";
+const SUPABASE_URL = "https://zdefkvvodijmrlhxvlrr.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_C0ur5kEiRQ0TYDpgtiaF8Q_w2lCVCQA";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const VAL_TOWN_URL = "https://demiacapital--0a4dc2f8a8e211f1a6ca1607ee4eb77e.web.val.run";
+const ADMIN_EMAIL = "hfarinango2707@gmail.com";
+const TIPO_ICONO = { topup: "🎮", giftcard: "🎁", gamekey: "🔑" };
 
-/* =====================================================================
-   SUPABASE — cuentas de usuario e historial de pedidos
-===================================================================== */
-var SUPABASE_URL = "https://zdefkvvodijmrlhxvlrr.supabase.co";
-var SUPABASE_ANON_KEY = "sb_publishable_C0ur5kEiRQ0TYDpgtiaF8Q_w2lCVCQA";
-var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-var currentUser = null;
+let currentUser = null, accessToken = null;
+let producto = null;
+let saldoDisponible = 0;
+let idValidado = false;
+let idempotencyKey = crypto.randomUUID();
 
-var authPromise = (async function requireAuth(){
-  var res = await sb.auth.getSession();
-  if(!res.data.session){
-    var actual = location.pathname.split("/").pop() + location.search;
-    location.href = "auth.html?redirect=" + encodeURIComponent(actual);
-    return null;
+const params = new URLSearchParams(location.search);
+const catalogoId = params.get("id");
+
+/* ---------- sesión ---------- */
+(async function requireAuth(){
+  const { data } = await sb.auth.getSession();
+  if (!data.session) {
+    location.href = "auth.html?redirect=" + encodeURIComponent(location.pathname + location.search);
+    return;
   }
-  currentUser = res.data.session.user;
-  var gate = document.getElementById("authGate");
-  if(gate) gate.style.display = "none";
-  return currentUser;
-})();
+  currentUser = data.session.user;
+  accessToken = data.session.access_token;
+  document.getElementById("authGate").style.display = "none";
+  document.getElementById("wrap").style.display = "block";
 
-/* =====================================================================
-   CUPONES — edítalos aquí. Clave = código en mayúsculas, valor = % descuento.
-   Esto es 100% del lado del cliente (no hay backend), así que cualquiera
-   que vea el código fuente puede leer los códigos. Sirve para promos
-   simples; si necesitas cupones de un solo uso o límites reales,
-   eso sí requiere un backend (te puedo ayudar a montarlo aparte).
-===================================================================== */
-var CUPONES = {
-  "BIENVENIDA10": 10,
-  "RECARGA5": 5
-};
-
-document.getElementById("yr").textContent = new Date().getFullYear();
-
-/* ---------- leer paquete desde la URL ---------- */
-var params = new URLSearchParams(location.search);
-var amt = params.get("amt") || "Paquete";
-var bonus = Number(params.get("bonus")) || 0;
-var price = parseFloat(params.get("price")) || 0;
-
-document.getElementById("svcName").textContent = amt + (isNaN(Number(amt.replace(/,/g,""))) ? "" : " 💎");
-document.getElementById("svcBonus").textContent = bonus > 0 ? ("+" + bonus + " de bono") : "";
-
-var descuento = 0, codigoUsado = null;
-
-function actualizarResumen(){
-  var tot = Math.max(price - descuento, 0);
-  document.getElementById("sSub").textContent = "$" + price.toFixed(2);
-  document.getElementById("sDesc").textContent = "-$" + descuento.toFixed(2);
-  document.getElementById("sTotal").textContent = "$" + tot.toFixed(2);
-  document.getElementById("sDescRow").style.display = descuento > 0 ? "flex" : "none";
-}
-actualizarResumen();
-
-/* ---------- saldo disponible ---------- */
-var saldoDisponible = 0;
-async function calcularSaldo(userId){
-  var rRecargas = await sb.from("recargas").select("monto").eq("user_id", userId).eq("estado", "confirmado");
-  var rPedidos = await sb.from("pedidos").select("total").eq("user_id", userId).eq("metodo_pago", "Saldo FariPlay");
-  var recargado = (rRecargas.data || []).reduce(function(s,r){ return s + Number(r.monto); }, 0);
-  var gastado = (rPedidos.data || []).reduce(function(s,p){ return s + Number(p.total); }, 0);
-  return recargado - gastado;
-}
-
-authPromise.then(async function(user){
-  if(!user) return;
-  saldoDisponible = await calcularSaldo(user.id);
-  var tot = Math.max(price - descuento, 0);
-  document.getElementById("saldoDisponibleTxt").textContent = "$" + saldoDisponible.toFixed(2);
-  document.getElementById("saldoADescontar").textContent = "$" + tot.toFixed(2);
-  if(saldoDisponible >= tot && tot > 0){
-    document.getElementById("iSaldoOk").style.display = "flex";
-    document.getElementById("iSaldoInsuficiente").style.display = "none";
-  }else{
-    document.getElementById("iSaldoOk").style.display = "none";
-    document.getElementById("iSaldoInsuficiente").style.display = "flex";
-  }
-});
-
-/* ---------- menú ☰ compartido ---------- */
-var ADMIN_EMAIL = "hfarinango2707@gmail.com";
-authPromise.then(function(user){
-  if(!user) return;
-  var email = user.email || "";
-  var fullName = (user.user_metadata && user.user_metadata.full_name) || "";
-  var primerNombre = (fullName || email.split("@")[0]).trim().split(" ")[0];
+  const email = currentUser.email || "";
+  const fullName = (currentUser.user_metadata && currentUser.user_metadata.full_name) || "";
+  const primerNombre = (fullName || email.split("@")[0]).trim().split(" ")[0];
   document.getElementById("hdrGreet").textContent = "Hola, " + primerNombre;
   document.getElementById("navAccountEmail").textContent = email;
-  if(email === ADMIN_EMAIL) document.getElementById("navAdminLink").style.display = "block";
-
-  document.getElementById("navSalirBtn").addEventListener("click", async function(){
+  if (email === ADMIN_EMAIL) document.getElementById("navAdminLink").style.display = "block";
+  document.getElementById("navSalirBtn").addEventListener("click", async () => {
     await sb.auth.signOut();
     location.href = "index.html";
   });
-});
 
-var navEl = document.getElementById("nav");
-var navtogBtn = document.getElementById("navtog");
-navtogBtn.addEventListener("click", function(){
-  var open = navEl.classList.toggle("open");
-  navtogBtn.setAttribute("aria-expanded", open);
-});
-document.getElementById("navClose").addEventListener("click", function(){ navEl.classList.remove("open"); });
-navEl.addEventListener("click", function(e){ if(e.target.closest("a")) navEl.classList.remove("open"); });
+  await cargarProducto();
+  await refrescarSaldo();
+})();
 
-/* ---------- toast flotante ---------- */
-var toastEl = document.getElementById("toast"), toastTimer = null;
-function showToast(msg, type){
-  toastEl.textContent = msg;
-  toastEl.className = "toast show " + type;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(function(){ toastEl.classList.remove("show"); }, 2400);
+async function calcularSaldoLocal(userId){
+  const rRecargas = await sb.from("recargas").select("monto").eq("user_id", userId).eq("estado", "confirmado");
+  const rPedidos = await sb.from("pedidos").select("total").eq("user_id", userId).eq("metodo_pago", "Saldo FariPlay");
+  const recargado = (rRecargas.data || []).reduce((s,r) => s + Number(r.monto), 0);
+  const gastado = (rPedidos.data || []).reduce((s,p) => s + Number(p.total), 0);
+  return recargado - gastado;
 }
 
-/* ---------- cupón ---------- */
-document.getElementById("promoBtn").addEventListener("click", function(){
-  var input = document.getElementById("promoIn").value.toUpperCase().trim();
-  if(!input) return;
-  if(CUPONES[input] !== undefined){
-    descuento = price * (CUPONES[input] / 100);
-    codigoUsado = input;
-    showToast("✅ Código aplicado correctamente", "ok");
-  }else{
-    descuento = 0; codigoUsado = null;
-    showToast("❌ Código no válido", "err");
+async function refrescarSaldo(){
+  saldoDisponible = await calcularSaldoLocal(currentUser.id);
+  document.getElementById("saldoTxt").textContent = "$" + saldoDisponible.toFixed(2);
+  actualizarBotonComprar();
+}
+
+/* ---------- cargar producto ---------- */
+async function cargarProducto(){
+  if (!catalogoId) { mostrarErrorCarga("Producto no especificado."); return; }
+
+  const { data, error } = await sb.from("catalogo").select("*").eq("id", catalogoId).eq("activo", true).single();
+  if (error || !data) { mostrarErrorCarga("Este producto ya no está disponible."); return; }
+
+  producto = data;
+  document.getElementById("loadState").style.display = "none";
+  document.getElementById("coCard").style.display = "block";
+
+  document.getElementById("svcIcon").textContent = TIPO_ICONO[producto.tipo] || "🛒";
+  document.getElementById("svcName").textContent = producto.offer_name;
+  document.getElementById("svcCat").textContent = producto.category_name;
+  document.title = producto.offer_name + " — FariPlay";
+  document.getElementById("sTotal").textContent = "$" + Number(producto.precio_venta).toFixed(2);
+
+  renderCampos();
+}
+
+function mostrarErrorCarga(msg){
+  document.getElementById("loadState").innerHTML = msg + '<br><br><a href="index.html" style="color:var(--orange-2);font-weight:800;">← Volver a la tienda</a>';
+}
+
+/* ---------- campos dinámicos ---------- */
+function renderCampos(){
+  const row = document.getElementById("fieldsRow");
+  const campos = (producto.campos && producto.campos.length) ? producto.campos : [];
+
+  if (!campos.length) { row.style.display = "none"; return; }
+  row.style.display = "block";
+
+  let html = "";
+  campos.forEach(c => {
+    html += `<label class="field-label">${c.label || c.key}</label>`;
+    html += `<input type="text" class="field-input campo-input" data-key="${c.key}" placeholder="${c.placeholder || ''}">`;
+  });
+  row.innerHTML = html;
+
+  if (producto.soporta_validacion) {
+    row.innerHTML += `
+      <div class="validate-row">
+        <button type="button" class="validate-btn" id="btnValidar">Validar ID</button>
+      </div>
+      <div class="validate-ok" id="validateOk">✓ <span id="validateNombre"></span></div>
+      <p class="validate-err" id="validateErr"></p>`;
+    document.getElementById("btnValidar").addEventListener("click", validarId);
   }
-  actualizarResumen();
-});
 
-/* ---------- confirmar pedido ---------- */
-document.getElementById("btnOk").addEventListener("click", async function(){
-  var id = document.getElementById("fId").value.trim();
-  if(!/^\d{6,15}$/.test(id)){ document.getElementById("fId").focus(); alert("El ID debe tener solo números, entre 6 y 15 dígitos."); return; }
-
-  var tot = Math.max(price - descuento, 0);
-
-  if(saldoDisponible < tot){
-    alert("Tu saldo no alcanza para este paquete. Recárgalo primero.");
-    return;
-  }
-
-  var btn = this;
-  btn.disabled = true;
-
-  var metodoLabel = "Saldo FariPlay";
-
-  var msg = "¡Hola FariPlay! 🚀\n\n*Pedido de diamantes Free Fire:*\n";
-  msg += "• Paquete: " + amt + (bonus > 0 ? " (+"+bonus+" bono)" : "") + "\n";
-  msg += "• ID de jugador: " + id + "\n";
-  msg += "• Subtotal: $" + price.toFixed(2) + "\n";
-  if(descuento > 0) msg += "• Código: " + codigoUsado + " (-$" + descuento.toFixed(2) + ")\n";
-  msg += "• *Total: $" + tot.toFixed(2) + "*\n";
-  msg += "• 💎 Pagado con saldo FariPlay (ya confirmado)\n";
-
-  btn.textContent = "Guardando pedido…";
-  try{
-    await sb.from("pedidos").insert({
-      user_id: currentUser.id,
-      user_email: currentUser.email,
-      paquete: amt,
-      bono: bonus,
-      precio: price,
-      metodo_pago: metodoLabel,
-      banco: null,
-      codigo_cupon: codigoUsado,
-      descuento: descuento,
-      total: tot,
-      player_id: id,
-      comprobante_url: null,
-      estado: "confirmado"
+  row.querySelectorAll(".campo-input").forEach(inp => {
+    inp.addEventListener("input", () => {
+      idValidado = false;
+      const ok = document.getElementById("validateOk");
+      if (ok) ok.classList.remove("show");
+      actualizarBotonComprar();
     });
-  }catch(e){ /* si falla el guardado, el pedido igual se envía por WhatsApp */ }
+  });
+}
 
-  btn.textContent = "Abriendo WhatsApp…";
-  window.open("https://wa.me/" + ORDER_NUMBER + "?text=" + encodeURIComponent(msg), "_blank", "noopener");
+function leerCampos(){
+  const fields = {};
+  document.querySelectorAll(".campo-input").forEach(inp => { fields[inp.dataset.key] = inp.value.trim(); });
+  return fields;
+}
 
+function camposCompletos(){
+  const inputs = document.querySelectorAll(".campo-input");
+  for (const inp of inputs) if (!inp.value.trim()) return false;
+  return true;
+}
+
+async function validarId(){
+  const btn = document.getElementById("btnValidar");
+  const errEl = document.getElementById("validateErr");
+  const okEl = document.getElementById("validateOk");
+  errEl.classList.remove("show");
+  okEl.classList.remove("show");
+
+  if (!camposCompletos()) { errEl.textContent = "Completa los campos antes de validar."; errEl.classList.add("show"); return; }
+
+  btn.disabled = true;
+  btn.textContent = "Validando…";
+  try{
+    const resp = await fetch(`${VAL_TOWN_URL}/?action=validate-id`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + accessToken },
+      body: JSON.stringify({ catalogoId: producto.id, fields: leerCampos() }),
+    });
+    const data = await resp.json();
+    if (!data.ok || !data.valido) {
+      errEl.textContent = data.error || "No pudimos validar ese ID. Revísalo e intenta de nuevo.";
+      errEl.classList.add("show");
+      idValidado = false;
+    } else {
+      document.getElementById("validateNombre").textContent = data.nombre || "ID válido";
+      okEl.classList.add("show");
+      idValidado = true;
+    }
+  }catch(e){
+    errEl.textContent = "No se pudo conectar para validar. Intenta de nuevo.";
+    errEl.classList.add("show");
+    idValidado = false;
+  }
   btn.disabled = false;
-  btn.textContent = "Confirmar pedido";
-  document.getElementById("successOv").classList.add("open");
+  btn.textContent = "Validar ID";
+  actualizarBotonComprar();
+}
+
+/* ---------- habilitar botón comprar ---------- */
+function actualizarBotonComprar(){
+  const btn = document.getElementById("btnOk");
+  if (!producto) { btn.disabled = true; return; }
+
+  const insuficiente = saldoDisponible < Number(producto.precio_venta);
+  document.getElementById("saldoInsuf").style.display = insuficiente ? "block" : "none";
+
+  const camposOk = camposCompletos();
+  const validacionOk = producto.soporta_validacion ? idValidado : true;
+
+  btn.disabled = insuficiente || !camposOk || !validacionOk;
+}
+
+/* ---------- comprar ---------- */
+document.getElementById("btnOk").addEventListener("click", async () => {
+  document.getElementById("ovProcessing").classList.add("open");
+  const fields = leerCampos();
+
+  try{
+    const resp = await fetch(`${VAL_TOWN_URL}/?action=place-order`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + accessToken },
+      body: JSON.stringify({ catalogoId: producto.id, fields, idempotencyKey }),
+    });
+    const data = await resp.json();
+    document.getElementById("ovProcessing").classList.remove("open");
+
+    if (!data.ok) {
+      document.getElementById("ovErrorText").textContent = data.error || "No se pudo procesar tu compra.";
+      document.getElementById("ovError").classList.add("open");
+      return;
+    }
+
+    document.getElementById("ovSuccessDetail").innerHTML = `
+      <div><span>Producto</span><b>${producto.offer_name}</b></div>
+      <div><span>Total</span><b>$${Number(producto.precio_venta).toFixed(2)}</b></div>
+      <div><span>Estado</span><b>${data.pedido ? data.pedido.estado : 'confirmado'}</b></div>`;
+    document.getElementById("ovSuccess").classList.add("open");
+    idempotencyKey = crypto.randomUUID(); // por si compra otra cosa después
+  }catch(e){
+    document.getElementById("ovProcessing").classList.remove("open");
+    document.getElementById("ovErrorText").textContent = "No se pudo conectar. Revisa tu internet e intenta de nuevo.";
+    document.getElementById("ovError").classList.add("open");
+  }
 });
 
-})();
+document.getElementById("ovErrorRetry").addEventListener("click", () => {
+  document.getElementById("ovError").classList.remove("open");
+  document.getElementById("btnOk").click();
+});
+document.getElementById("ovErrorClose").addEventListener("click", () => {
+  document.getElementById("ovError").classList.remove("open");
+});
+document.getElementById("ovSuccessPedidos").addEventListener("click", () => location.href = "mis-pedidos.html");
+document.getElementById("ovSuccessInicio").addEventListener("click", () => location.href = "index.html");
+
+/* ---------- menú ☰ ---------- */
+const navEl = document.getElementById("nav");
+const navtogBtn = document.getElementById("navtog");
+navtogBtn.addEventListener("click", () => {
+  const open = navEl.classList.toggle("open");
+  navtogBtn.setAttribute("aria-expanded", open);
+});
+document.getElementById("navClose").addEventListener("click", () => navEl.classList.remove("open"));
+navEl.addEventListener("click", (e) => { if (e.target.closest("a")) navEl.classList.remove("open"); });
 </script>
 </body>
 </html>

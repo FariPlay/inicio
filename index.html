@@ -172,6 +172,17 @@ p{margin:0;}
 
 /* ---------- PACKAGE GRID ---------- */
 .pgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;}
+
+/* -------- grilla de categorías (catálogo FazerCards) -------- */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.9rem;}
+.cat-loading,.cat-empty{grid-column:1/-1;text-align:center;color:var(--ink-faint);padding:2.4rem 1rem;font-size:.85rem;}
+.cat-card{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;padding:1.1rem .9rem;text-align:center;transition:transform .2s,border-color .2s,box-shadow .2s;}
+.cat-card:hover{transform:translateY(-3px);border-color:rgba(255,122,26,.4);box-shadow:0 16px 30px -14px rgba(255,122,26,.5);}
+.cat-icon{width:40px;height:40px;margin:0 auto .6rem;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;background:rgba(255,122,26,.12);border:1px solid rgba(255,122,26,.3);}
+.cat-card-name{font-size:.85rem;font-weight:900;line-height:1.25;margin-bottom:3px;}
+.cat-card-sub{font-size:.68rem;color:var(--muted);font-weight:700;}
 @media (min-width:640px){.pgrid{grid-template-columns:repeat(3,1fr);gap:1.1rem;}}
 @media (min-width:1000px){.pgrid{grid-template-columns:repeat(4,1fr);gap:1.2rem;}}
 
@@ -333,13 +344,8 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
       <p class="eyebrow">Recargas Free Fire</p>
       <h1>Diamantes<br><em>al instante.</em></h1>
       <div class="hero-cta">
-        <a href="#paquetes" class="btn btn--fire">Ver paquetes</a>
+        <a href="#paquetes" class="btn btn--fire">Ver catálogo</a>
         <a href="#como" class="btn btn--ghost">Cómo funciona</a>
-      </div>
-      <div class="quickpick" data-reveal>
-        <div class="qchip" data-buy data-id="341" data-amt="341" data-bonus="0" data-price="2.72"><b>341💎</b><span>$2.72</span></div>
-        <div class="qchip" data-buy data-id="1160" data-amt="1,160" data-bonus="0" data-price="8.60"><b>1,160💎</b><span>$8.60</span></div>
-        <div class="qchip" data-buy data-id="6160" data-amt="6,160" data-bonus="0" data-price="42.80"><b>6,160💎</b><span>$42.80</span></div>
       </div>
     </div>
     <div class="gemwrap">
@@ -390,41 +396,10 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
 
 <section class="section" id="paquetes">
   <div class="wrap">
-    <div class="s-head" data-reveal><h2>Paquetes</h2></div>
-    <div class="pgrid" data-reveal>
-      <article class="pcard" data-buy data-id="110" data-amt="110" data-bonus="0" data-price="0.91">
-        <svg class="pgem" viewBox="0 0 48 48"><polygon points="16,6 32,6 28,18 20,18" fill="#F4FFFE"/><polygon points="16,6 6,18 20,18" fill="#A6F3F7"/><polygon points="32,6 42,18 28,18" fill="#4FD8EB"/><polygon points="6,18 24,44 20,18" fill="#2CA9C9"/><polygon points="42,18 24,44 28,18" fill="#146788"/><polygon points="20,18 24,44 28,18" fill="#D8FCFF"/><g stroke="#0B4A5C" stroke-width="0.6" stroke-linejoin="round" fill="none" opacity=".55"><polygon points="16,6 32,6 28,18 20,18"/><polygon points="16,6 6,18 20,18"/><polygon points="32,6 42,18 28,18"/><polygon points="6,18 24,44 20,18"/><polygon points="42,18 24,44 28,18"/><polygon points="20,18 24,44 28,18"/></g><path d="M13.5 4.5 14.6 7.2 17.3 8.3 14.6 9.4 13.5 12.1 12.4 9.4 9.7 8.3 12.4 7.2Z" fill="#fff" opacity=".9"/></svg>
-        <p class="pamt">110<small>Diamantes</small></p><p class="pprice">$0.91</p>
-        <button class="btn btn--blue btn--block" style="padding:.6rem;font-size:.85rem;">Comprar</button>
-      </article>
-      <article class="pcard" data-buy data-id="341" data-amt="341" data-bonus="0" data-price="2.72">
-        <svg class="pgem" viewBox="0 0 48 48"><polygon points="16,6 32,6 28,18 20,18" fill="#F4FFFE"/><polygon points="16,6 6,18 20,18" fill="#A6F3F7"/><polygon points="32,6 42,18 28,18" fill="#4FD8EB"/><polygon points="6,18 24,44 20,18" fill="#2CA9C9"/><polygon points="42,18 24,44 28,18" fill="#146788"/><polygon points="20,18 24,44 28,18" fill="#D8FCFF"/><g stroke="#0B4A5C" stroke-width="0.6" stroke-linejoin="round" fill="none" opacity=".55"><polygon points="16,6 32,6 28,18 20,18"/><polygon points="16,6 6,18 20,18"/><polygon points="32,6 42,18 28,18"/><polygon points="6,18 24,44 20,18"/><polygon points="42,18 24,44 28,18"/><polygon points="20,18 24,44 28,18"/></g><path d="M13.5 4.5 14.6 7.2 17.3 8.3 14.6 9.4 13.5 12.1 12.4 9.4 9.7 8.3 12.4 7.2Z" fill="#fff" opacity=".9"/></svg>
-        <p class="pamt">341<small>Diamantes</small></p><p class="pprice">$2.72</p>
-        <button class="btn btn--blue btn--block" style="padding:.6rem;font-size:.85rem;">Comprar</button>
-      </article>
-      <article class="pcard hot" data-buy data-id="572" data-amt="572" data-bonus="0" data-price="4.60">
-        <span class="ptag">Más popular</span>
-        <svg class="pgem" viewBox="0 0 48 48"><polygon points="16,6 32,6 28,18 20,18" fill="#F4FFFE"/><polygon points="16,6 6,18 20,18" fill="#A6F3F7"/><polygon points="32,6 42,18 28,18" fill="#4FD8EB"/><polygon points="6,18 24,44 20,18" fill="#2CA9C9"/><polygon points="42,18 24,44 28,18" fill="#146788"/><polygon points="20,18 24,44 28,18" fill="#D8FCFF"/><g stroke="#0B4A5C" stroke-width="0.6" stroke-linejoin="round" fill="none" opacity=".55"><polygon points="16,6 32,6 28,18 20,18"/><polygon points="16,6 6,18 20,18"/><polygon points="32,6 42,18 28,18"/><polygon points="6,18 24,44 20,18"/><polygon points="42,18 24,44 28,18"/><polygon points="20,18 24,44 28,18"/></g><path d="M13.5 4.5 14.6 7.2 17.3 8.3 14.6 9.4 13.5 12.1 12.4 9.4 9.7 8.3 12.4 7.2Z" fill="#fff" opacity=".9"/></svg>
-        <p class="pamt">572<small>Diamantes</small></p><p class="pprice">$4.60</p>
-        <button class="btn btn--blue btn--block" style="padding:.6rem;font-size:.85rem;">Comprar</button>
-      </article>
-      <article class="pcard" data-buy data-id="1160" data-amt="1,160" data-bonus="0" data-price="8.60">
-        <svg class="pgem" viewBox="0 0 48 48"><polygon points="16,6 32,6 28,18 20,18" fill="#F4FFFE"/><polygon points="16,6 6,18 20,18" fill="#A6F3F7"/><polygon points="32,6 42,18 28,18" fill="#4FD8EB"/><polygon points="6,18 24,44 20,18" fill="#2CA9C9"/><polygon points="42,18 24,44 28,18" fill="#146788"/><polygon points="20,18 24,44 28,18" fill="#D8FCFF"/><g stroke="#0B4A5C" stroke-width="0.6" stroke-linejoin="round" fill="none" opacity=".55"><polygon points="16,6 32,6 28,18 20,18"/><polygon points="16,6 6,18 20,18"/><polygon points="32,6 42,18 28,18"/><polygon points="6,18 24,44 20,18"/><polygon points="42,18 24,44 28,18"/><polygon points="20,18 24,44 28,18"/></g><path d="M13.5 4.5 14.6 7.2 17.3 8.3 14.6 9.4 13.5 12.1 12.4 9.4 9.7 8.3 12.4 7.2Z" fill="#fff" opacity=".9"/></svg>
-        <p class="pamt">1,160<small>Diamantes</small></p><p class="pprice">$8.60</p>
-        <button class="btn btn--blue btn--block" style="padding:.6rem;font-size:.85rem;">Comprar</button>
-      </article>
-      <article class="pcard" data-buy data-id="2398" data-amt="2,398" data-bonus="0" data-price="16.90">
-        <svg class="pgem" viewBox="0 0 48 48"><polygon points="16,6 32,6 28,18 20,18" fill="#F4FFFE"/><polygon points="16,6 6,18 20,18" fill="#A6F3F7"/><polygon points="32,6 42,18 28,18" fill="#4FD8EB"/><polygon points="6,18 24,44 20,18" fill="#2CA9C9"/><polygon points="42,18 24,44 28,18" fill="#146788"/><polygon points="20,18 24,44 28,18" fill="#D8FCFF"/><g stroke="#0B4A5C" stroke-width="0.6" stroke-linejoin="round" fill="none" opacity=".55"><polygon points="16,6 32,6 28,18 20,18"/><polygon points="16,6 6,18 20,18"/><polygon points="32,6 42,18 28,18"/><polygon points="6,18 24,44 20,18"/><polygon points="42,18 24,44 28,18"/><polygon points="20,18 24,44 28,18"/></g><path d="M13.5 4.5 14.6 7.2 17.3 8.3 14.6 9.4 13.5 12.1 12.4 9.4 9.7 8.3 12.4 7.2Z" fill="#fff" opacity=".9"/></svg>
-        <p class="pamt">2,398<small>Diamantes</small></p><p class="pprice">$16.90</p>
-        <button class="btn btn--blue btn--block" style="padding:.6rem;font-size:.85rem;">Comprar</button>
-      </article>
-      <article class="pcard" data-buy data-id="6160" data-amt="6,160" data-bonus="0" data-price="42.80">
-        <svg class="pgem" viewBox="0 0 48 48"><polygon points="16,6 32,6 28,18 20,18" fill="#F4FFFE"/><polygon points="16,6 6,18 20,18" fill="#A6F3F7"/><polygon points="32,6 42,18 28,18" fill="#4FD8EB"/><polygon points="6,18 24,44 20,18" fill="#2CA9C9"/><polygon points="42,18 24,44 28,18" fill="#146788"/><polygon points="20,18 24,44 28,18" fill="#D8FCFF"/><g stroke="#0B4A5C" stroke-width="0.6" stroke-linejoin="round" fill="none" opacity=".55"><polygon points="16,6 32,6 28,18 20,18"/><polygon points="16,6 6,18 20,18"/><polygon points="32,6 42,18 28,18"/><polygon points="6,18 24,44 20,18"/><polygon points="42,18 24,44 28,18"/><polygon points="20,18 24,44 28,18"/></g><path d="M13.5 4.5 14.6 7.2 17.3 8.3 14.6 9.4 13.5 12.1 12.4 9.4 9.7 8.3 12.4 7.2Z" fill="#fff" opacity=".9"/></svg>
-        <p class="pamt">6,160<small>Diamantes</small></p><p class="pprice">$42.80</p>
-        <button class="btn btn--blue btn--block" style="padding:.6rem;font-size:.85rem;">Comprar</button>
-      </article>
+    <div class="s-head" data-reveal><h2>Nuestros productos</h2></div>
+    <div class="cat-grid" id="catGrid" data-reveal>
+      <p class="cat-loading">Cargando productos…</p>
     </div>
-
   </div>
 </section>
 
@@ -594,25 +569,43 @@ var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 var WHATSAPP_NUMBER = "593992225484";
 
 /* =====================================================================
-   PRECIOS EN VIVO — se leen de Supabase (editables desde admin.html)
-   Si por algún motivo falla la conexión, se quedan los precios que ya
-   están escritos en el HTML como respaldo, así la tienda nunca se rompe.
+   CATEGORÍAS EN VIVO — se leen del catálogo en Supabase (lo que el admin
+   activó desde el panel). Se agrupan por categoría y se muestran como
+   tarjetas que llevan a categoria.html con sus productos.
 ===================================================================== */
-(async function cargarPreciosEnVivo(){
+const TIPO_ICONO = { topup: "🎮", giftcard: "🎁", gamekey: "🔑" };
+
+(async function cargarCategorias(){
+  const grid = document.getElementById("catGrid");
   try{
-    var res = await sb.from("precios").select("*");
-    if(res.error || !res.data) return;
-    res.data.forEach(function(p){
-      document.querySelectorAll('[data-id="' + p.id + '"]').forEach(function(el){
-        el.setAttribute("data-price", p.precio);
-        el.setAttribute("data-bonus", p.bono);
-        var priceTag = el.querySelector(".pprice");
-        if(priceTag) priceTag.textContent = "$" + Number(p.precio).toFixed(2);
-        var chipPrice = el.querySelector(":scope > span");
-        if(chipPrice && el.classList.contains("qchip")) chipPrice.textContent = "$" + Number(p.precio).toFixed(2);
-      });
+    const { data: productos, error } = await sb
+      .from("catalogo")
+      .select("tipo, category_id, category_name, precio_venta")
+      .eq("activo", true);
+
+    if (error || !productos || !productos.length) {
+      grid.innerHTML = '<p class="cat-empty">Muy pronto vas a encontrar aquí recargas de juegos y tarjetas de regalo.</p>';
+      return;
+    }
+
+    const categorias = {};
+    productos.forEach(p => {
+      const key = p.tipo + ":" + p.category_id;
+      if (!categorias[key]) categorias[key] = { tipo: p.tipo, category_id: p.category_id, nombre: p.category_name, desde: Number(p.precio_venta) };
+      else categorias[key].desde = Math.min(categorias[key].desde, Number(p.precio_venta));
     });
-  }catch(e){ /* se queda con los precios de respaldo del HTML */ }
+
+    const lista = Object.values(categorias).sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+    grid.innerHTML = lista.map(c => `
+      <a class="cat-card" href="categoria.html?tipo=${encodeURIComponent(c.tipo)}&category_id=${encodeURIComponent(c.category_id)}">
+        <div class="cat-icon">${TIPO_ICONO[c.tipo] || "🛒"}</div>
+        <div class="cat-card-name">${c.nombre}</div>
+        <div class="cat-card-sub">Desde $${c.desde.toFixed(2)}</div>
+      </a>`).join("");
+  }catch(e){
+    grid.innerHTML = '<p class="cat-empty">No se pudo cargar el catálogo. Intenta de nuevo más tarde.</p>';
+  }
 })();
 
 /* ---------- año footer ---------- */
@@ -639,18 +632,6 @@ if("IntersectionObserver" in window){
   reveals.forEach(function(el){ el.classList.add("vis"); });
 }
 
-/* =====================================================================
-   COMPRAR — navega a checkout.html con los datos del paquete en la URL
-===================================================================== */
-document.querySelectorAll("[data-buy]").forEach(function(el){
-  el.addEventListener("click", function(){
-    var amt = el.getAttribute("data-amt");
-    var bonus = el.getAttribute("data-bonus");
-    var price = el.getAttribute("data-price");
-    var url = "checkout.html?amt=" + encodeURIComponent(amt) + "&bonus=" + encodeURIComponent(bonus) + "&price=" + encodeURIComponent(price);
-    window.location.href = url;
-  });
-});
 })();
 </script>
 </body>
