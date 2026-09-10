@@ -313,6 +313,38 @@ function mostrarErrorCarga(msg){
 }
 
 /* ---------- campos dinámicos ---------- */
+/* ---------- traducción de campos (FazerCards los da en inglés) ---------- */
+const CAMPO_LABEL_POR_KEY = {
+  player_id: "ID del jugador", playerid: "ID del jugador", uid: "ID del jugador",
+  user_id: "ID de usuario", userid: "ID de usuario",
+  zone_id: "ID de zona", zoneid: "ID de zona", server_id: "Servidor", server: "Servidor",
+  region: "Región", account_id: "ID de cuenta", accountid: "ID de cuenta",
+  email: "Correo electrónico", phone: "Número de teléfono", phone_number: "Número de teléfono",
+  username: "Nombre de usuario", character_id: "ID de personaje", role_id: "ID de personaje",
+  game_id: "ID del juego", ign: "Nombre en el juego", nickname: "Apodo",
+};
+const CAMPO_LABEL_POR_TEXTO = [
+  [/player\s*id/i, "ID del jugador"],
+  [/user\s*id/i, "ID de usuario"],
+  [/zone\s*id/i, "ID de zona"],
+  [/account\s*id/i, "ID de cuenta"],
+  [/server/i, "Servidor"],
+  [/region/i, "Región"],
+  [/e-?mail/i, "Correo electrónico"],
+  [/phone/i, "Número de teléfono"],
+  [/character/i, "ID de personaje"],
+  [/nickname/i, "Apodo"],
+  [/username/i, "Nombre de usuario"],
+];
+
+function traducirCampo(c){
+  const key = (c.key || "").toLowerCase().replace(/[^a-z0-9]/g, "_");
+  if (CAMPO_LABEL_POR_KEY[key]) return CAMPO_LABEL_POR_KEY[key];
+  const label = c.label || c.key || "";
+  for (const [patron, esp] of CAMPO_LABEL_POR_TEXTO) if (patron.test(label)) return esp;
+  return label; // si no reconocemos el campo, mostramos el original antes que nada en blanco
+}
+
 function renderCampos(){
   const row = document.getElementById("fieldsRow");
   const campos = (producto.campos && producto.campos.length) ? producto.campos : [];
@@ -322,7 +354,7 @@ function renderCampos(){
 
   let html = "";
   campos.forEach(c => {
-    html += `<label class="field-label">${c.label || c.key}</label>`;
+    html += `<label class="field-label">${traducirCampo(c)}</label>`;
     html += `<input type="text" class="field-input campo-input" data-key="${c.key}" placeholder="${c.placeholder || ''}">`;
   });
   row.innerHTML = html;
