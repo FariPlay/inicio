@@ -677,9 +677,12 @@ async function actualizarCategorias(){
 
     if (!data.ok) {
       hint.textContent = "Error: " + JSON.stringify(data.error || data);
+    } else if (data.guardado && data.guardado.ok === false) {
+      hint.textContent = `⚠️ FazerCards devolvió ${data.total} categorías, pero el guardado en Supabase falló: ${data.guardado.error}. Solo se guardaron ${data.guardado.count || 0}.`;
+      await cargarCatalogo();
     } else {
-      hint.textContent = `✓ ${data.total} categorías traídas (${data.conValidacion || 0} con validación de ID)` +
-        (data.errores ? " — hubo errores parciales: " + JSON.stringify(data.errores) : "");
+      hint.textContent = `✓ ${data.total} categorías traídas y guardadas (${data.conValidacion || 0} con validación de ID)` +
+        (data.errores ? " — hubo errores parciales al consultar FazerCards: " + JSON.stringify(data.errores) : "");
       await cargarCatalogo();
     }
   }catch(e){
