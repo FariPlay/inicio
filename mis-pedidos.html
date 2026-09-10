@@ -58,6 +58,8 @@ h1{font-size:1.25rem;font-weight:900;text-transform:uppercase;margin-bottom:18px
 .order-pkg{font-size:1rem;font-weight:900;}
 .order-total{font-family:var(--font);font-weight:900;color:var(--orange-2);font-size:1.05rem;}
 .order-meta{font-size:.76rem;color:var(--muted);margin-top:6px;line-height:1.6;}
+.order-code{margin-top:8px;font-size:.82rem;font-weight:900;color:var(--orange-2);background:rgba(255,122,26,.08);
+  border:1px solid rgba(255,122,26,.25);border-radius:6px;padding:8px 10px;display:inline-block;word-break:break-all;}
 .badge{display:inline-block;font-size:.62rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;
   padding:3px 9px;border-radius:20px;margin-top:8px;}
 .badge.pendiente{background:rgba(255,178,56,.12);color:var(--orange-2);border:1px solid rgba(255,178,56,.3);}
@@ -167,7 +169,8 @@ function pintarPedidos(pedidos){
         <div class="order-top">
           <div>
             <div class="order-pkg">${p.paquete}${p.bono > 0 ? ' <small>(+' + p.bono + ' bono)</small>' : ''}</div>
-            <div class="order-meta">${fecha} · ID jugador: ${p.player_id} · ${p.metodo_pago || ''}${p.banco ? ' · ' + p.banco : ''}</div>
+            <div class="order-meta">${fecha}${p.player_id ? ' · ID jugador: ' + p.player_id : ''} · ${p.metodo_pago || ''}${p.banco ? ' · ' + p.banco : ''}</div>
+            ${p.entrega_codigo ? `<div class="order-code">🎁 <span>${p.entrega_codigo}</span></div>` : ''}
           </div>
           <div class="order-total">$${Number(p.total).toFixed(2)}</div>
         </div>

@@ -465,7 +465,11 @@ document.getElementById("btnOk").addEventListener("click", async () => {
     document.getElementById("ovSuccessDetail").innerHTML = `
       <div><span>Producto</span><b>${producto.offer_name}</b></div>
       <div><span>Total</span><b>$${Number(producto.precio_venta).toFixed(2)}</b></div>
-      <div><span>Estado</span><b>${data.pedido ? data.pedido.estado : 'confirmado'}</b></div>`;
+      <div><span>Estado</span><b>${data.pedido ? data.pedido.estado : 'confirmado'}</b></div>` +
+      (data.codigo ? `<div style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(255,255,255,.15);">
+        <div style="color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Tu código</div>
+        <div style="font-family:monospace;font-size:.95rem;font-weight:900;color:var(--orange-2);word-break:break-all;user-select:all;">${data.codigo}</div>
+      </div>` : (producto.tipo !== "topup" ? `<p style="margin-top:10px;font-size:.74rem;color:var(--muted);">Tu código aparecerá en "Mis pedidos" en cuanto esté listo.</p>` : ""));
     document.getElementById("ovSuccess").classList.add("open");
     idempotencyKey = crypto.randomUUID(); // por si compra otra cosa después
   }catch(e){
