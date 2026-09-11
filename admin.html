@@ -170,6 +170,9 @@ a{color:inherit;text-decoration:none;}
   margin-top:6px;display:flex;justify-content:space-between;gap:8px;}
 .lsr-item b{color:var(--orange-2);}
 .lsr-total{color:var(--muted);font-size:.72rem;margin-top:6px;}
+.live-search-list-btn{width:100%;margin-top:10px;background:none;border:1px dashed rgba(91,124,255,.4);
+  color:var(--blue-2);border-radius:6px;padding:8px;font-family:var(--font);font-weight:800;font-size:.72rem;cursor:pointer;}
+.live-search-list-btn:disabled{opacity:.6;cursor:wait;}
 .cat-synced-badge{font-size:.68rem;font-weight:900;color:var(--green);flex:none;}
 .cat-reimport-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:var(--ink-dim);
   border-radius:6px;width:26px;height:26px;font-size:.85rem;cursor:pointer;flex:none;}
@@ -293,6 +296,8 @@ a{color:inherit;text-decoration:none;}
         <button type="button" class="live-search-btn" id="liveSearchBtn">Buscar</button>
       </div>
       <div id="liveSearchResult"></div>
+      <button type="button" class="live-search-list-btn" id="listValidateBtn">📋 Ver los juegos con validación (nombres exactos de FazerCards)</button>
+      <div id="listValidateResult"></div>
     </div>
 
     <div id="catalogoList"><p class="msg">Cargando categorías…</p></div>
@@ -910,6 +915,43 @@ document.getElementById("liveSearchBtn").addEventListener("click", () => {
 document.getElementById("liveSearchInput").addEventListener("keydown", (e) => {
   if (e.key === "Enter") pedirClaveYEjecutar(buscarEnVivo);
 });
+
+document.getElementById("listValidateBtn").addEventListener("click", () => {
+  pedirClaveYEjecutar(listarJuegosConValidacion);
+});
+
+async function listarJuegosConValidacion(){
+  const btn = document.getElementById("listValidateBtn");
+  const resultBox = document.getElementById("listValidateResult");
+  btn.disabled = true;
+  btn.textContent = "Consultando…";
+  try{
+    const url = `${VAL_TOWN_URL}/?action=debug-list-validate-id&admin_key=${encodeURIComponent(ADMIN_SYNC_KEY)}`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    if (resp.status === 401) {
+      ADMIN_SYNC_KEY = "";
+      sessionStorage.removeItem("fp_admin_sync_key");
+      localStorage.removeItem("fp_admin_sync_key");
+      btn.disabled = false;
+      btn.textContent = "📋 Ver los juegos con validación (nombres exactos de FazerCards)";
+      pedirClaveYEjecutar(listarJuegosConValidacion);
+      return;
+    }
+
+    if (!data.ok) {
+      resultBox.innerHTML = `<p class="lsr-total">Error: ${JSON.stringify(data.error || data)}</p>`;
+    } else {
+      resultBox.innerHTML = data.juegos.map(j => `<div class="lsr-item"><span>${j.name}</span><b>${j.category_id}</b></div>`).join("") +
+        `<p class="lsr-total">${data.total} juego(s) admiten validación en total, según FazerCards.</p>`;
+    }
+  }catch(e){
+    resultBox.innerHTML = `<p class="lsr-total">Error de conexión.</p>`;
+  }
+  btn.disabled = false;
+  btn.textContent = "📋 Ver los juegos con validación (nombres exactos de FazerCards)";
+}
 
 async function buscarEnVivo(){
   const btn = document.getElementById("liveSearchBtn");
