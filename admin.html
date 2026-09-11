@@ -150,6 +150,7 @@ a{color:inherit;text-decoration:none;}
 .debug-id-badge{font-size:.62rem;font-weight:800;color:var(--muted);}
 .debug-btn{background:none;border:none;color:var(--blue-2);font-family:var(--font);font-size:.66rem;
   font-weight:800;cursor:pointer;text-decoration:underline;padding:0;}
+.reimport-warning{font-size:.66rem;color:var(--orange-2);margin-top:4px;line-height:1.4;}
 
 /* -------- buscador en vivo (diagnóstico) -------- */
 .live-search-box{background:rgba(91,124,255,.06);border:1px solid rgba(91,124,255,.22);border-radius:8px;
@@ -274,6 +275,7 @@ a{color:inherit;text-decoration:none;}
       <button type="button" class="filter-chip" data-panel="cat" data-filter="topup">Juegos</button>
       <button type="button" class="filter-chip" data-panel="cat" data-filter="giftcard">Tarjetas</button>
       <button type="button" class="filter-chip" data-panel="cat" data-filter="gamekey">Llaves</button>
+      <button type="button" class="filter-chip" data-panel="cat" data-filter="con_validacion">✓ Con validación</button>
     </div>
     <input type="text" id="catSearch" class="cat-search" placeholder="Buscar categoría (ya sincronizadas)…">
     <p class="cat-count" id="catCount"></p>
@@ -701,7 +703,8 @@ async function cargarCatalogo(){
 
 function aplicarFiltroCatalogo(){
   let arr = TODAS_LAS_CATEGORIAS;
-  if (catFiltro !== "todos") arr = arr.filter(c => c.tipo === catFiltro);
+  if (catFiltro === "con_validacion") arr = arr.filter(c => c.soporta_validacion);
+  else if (catFiltro !== "todos") arr = arr.filter(c => c.tipo === catFiltro);
   if (catBusqueda) arr = arr.filter(c => c.nombre.toLowerCase().includes(catBusqueda));
   document.getElementById("catCount").textContent = arr.length + " de " + TODAS_LAS_CATEGORIAS.length + " categorías";
   renderCatalogo(arr);
@@ -723,6 +726,7 @@ function renderCatalogo(categorias){
           <div class="cat-name">${c.nombre}</div>
           <span class="cat-tag">${TIPO_LABEL[c.tipo] || c.tipo} · ${c.category_id}</span>
           ${c.tipo === "topup" ? `<div><span class="debug-id-badge">${c.soporta_validacion ? '✓ admite validar ID' : '— sin validación'}</span> <button type="button" class="debug-btn" data-category-id="${c.category_id}">🔍 Verificar</button></div>` : ''}
+          ${c.tipo === "topup" && c.soporta_validacion && c.sincronizado ? '<p class="reimport-warning">⚠️ Si importaste esto antes de hoy, dale ↻ para que el botón "Validar ID" salga en el checkout.</p>' : ''}
         </div>
         ${c.sincronizado
           ? `<span class="cat-synced-badge">✓ Importado</span> <button type="button" class="cat-reimport-btn" data-tipo="${c.tipo}" data-category-id="${c.category_id}">↻</button>`
