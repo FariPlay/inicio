@@ -695,9 +695,27 @@ async function actualizarCategorias(){
 }
 
 async function cargarCatalogo(){
-  const { data: categorias, error } = await sb.from("catalogo_categorias").select("*").order("nombre", { ascending: true });
-  if (error) { document.getElementById("catalogoList").innerHTML = '<p class="msg">No se pudo cargar el catálogo.</p>'; return; }
-  TODAS_LAS_CATEGORIAS = categorias || [];
+  const list = document.getElementById("catalogoList");
+  list.innerHTML = '<p class="msg">Cargando categorías…</p>';
+
+  let categorias = [];
+  const TAMANO_PAGINA = 1000; // Supabase entrega máximo 1000 filas por consulta
+  let desde = 0;
+
+  while (true) {
+    const { data, error } = await sb
+      .from("catalogo_categorias")
+      .select("*")
+      .order("nombre", { ascending: true })
+      .range(desde, desde + TAMANO_PAGINA - 1);
+
+    if (error) { list.innerHTML = '<p class="msg">No se pudo cargar el catálogo.</p>'; return; }
+    categorias = categorias.concat(data || []);
+    if (!data || data.length < TAMANO_PAGINA) break;
+    desde += TAMANO_PAGINA;
+  }
+
+  TODAS_LAS_CATEGORIAS = categorias;
   aplicarFiltroCatalogo();
 }
 
