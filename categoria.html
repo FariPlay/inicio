@@ -27,16 +27,28 @@ a{color:inherit;text-decoration:none;}
 .back{font-size:.8rem;font-weight:800;color:var(--ink-dim);}
 .back:hover{color:var(--orange-2);}
 
-.wrap{max-width:600px;margin:0 auto;padding:24px 16px 50px;position:relative;z-index:1;}
-h1{font-size:1.2rem;font-weight:900;margin-bottom:4px;}
-.sub{font-size:.8rem;color:var(--muted);margin-bottom:22px;}
+.cat-hero{position:relative;height:180px;background:radial-gradient(circle at 25% 20%,#1f2a3a,var(--bg-0));
+  background-size:cover;background-position:center;display:flex;align-items:flex-end;overflow:hidden;}
+.cat-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,4,10,.15) 30%,var(--bg-0) 100%);}
+.cat-hero-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:3.4rem;
+  filter:drop-shadow(0 6px 16px rgba(0,0,0,.5));}
+.cat-hero-inner{position:relative;z-index:1;padding:0 16px 16px;max-width:600px;margin:0 auto;width:100%;}
+.cat-hero-type{display:inline-block;background:rgba(7,4,10,.6);backdrop-filter:blur(4px);color:var(--orange-2);
+  font-size:.64rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;padding:4px 10px;border-radius:20px;
+  border:1px solid rgba(255,122,26,.35);margin-bottom:8px;}
+h1{font-size:1.35rem;font-weight:900;line-height:1.15;text-shadow:0 2px 8px rgba(0,0,0,.6);}
+
+.wrap{max-width:600px;margin:0 auto;padding:20px 16px 50px;position:relative;z-index:1;}
+.sub{font-size:.8rem;color:var(--muted);margin-bottom:18px;}
 
 .prod-card{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
-  border-left:3px solid var(--orange);border-radius:10px;padding:16px 18px;margin-bottom:12px;
-  display:flex;justify-content:space-between;align-items:center;gap:12px;}
+  border-radius:12px;padding:16px 18px;margin-bottom:12px;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;transition:transform .18s,border-color .18s;}
+.prod-card:hover{transform:translateY(-2px);border-color:rgba(255,122,26,.4);}
 .prod-name{font-size:.95rem;font-weight:900;}
-.prod-badge{display:inline-block;font-size:.62rem;font-weight:900;color:var(--blue-2);text-transform:uppercase;
-  letter-spacing:.4px;margin-top:4px;}
+.prod-badge{display:inline-block;font-size:.62rem;font-weight:900;color:var(--green);text-transform:uppercase;
+  letter-spacing:.4px;margin-top:5px;background:rgba(62,207,110,.12);border:1px solid rgba(62,207,110,.3);
+  padding:3px 8px;border-radius:20px;}
 .prod-price{font-size:1.05rem;font-weight:900;color:var(--orange-2);white-space:nowrap;}
 .prod-buy{background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#1A0500;font-weight:900;
   font-size:.75rem;text-transform:uppercase;padding:9px 14px;border-radius:6px;white-space:nowrap;}
@@ -52,8 +64,15 @@ h1{font-size:1.2rem;font-weight:900;margin-bottom:4px;}
   <a href="index.html" class="back">← Categorías</a>
 </header>
 
+<div class="cat-hero" id="catHero">
+  <span class="cat-hero-icon" id="catHeroIcon"></span>
+  <div class="cat-hero-inner">
+    <span class="cat-hero-type" id="catHeroType"></span>
+    <h1 id="catTitle">Cargando…</h1>
+  </div>
+</div>
+
 <div class="wrap">
-  <h1 id="catTitle">Cargando…</h1>
   <p class="sub" id="catSub"></p>
   <div id="prodList"><p class="loading">Cargando productos…</p></div>
 </div>
@@ -68,17 +87,15 @@ const tipo = params.get("tipo");
 const categoryId = params.get("category_id");
 
 const TIPO_LABEL = { topup: "Recarga", giftcard: "Tarjeta de regalo", gamekey: "Llave de juego" };
+const TIPO_ICONO = { topup: "🎮", giftcard: "🎁", gamekey: "🔑" };
 
 (async () => {
   if (!tipo || !categoryId) { document.getElementById("prodList").innerHTML = '<p class="empty">Categoría no válida.</p>'; return; }
 
-  const { data: productos, error } = await sb
-    .from("catalogo")
-    .select("*")
-    .eq("tipo", tipo)
-    .eq("category_id", categoryId)
-    .eq("activo", true)
-    .order("precio_venta", { ascending: true });
+  const [{ data: productos, error }, { data: metaCat }] = await Promise.all([
+    sb.from("catalogo").select("*").eq("tipo", tipo).eq("category_id", categoryId).eq("activo", true).order("precio_venta", { ascending: true }),
+    sb.from("catalogo_categorias").select("nombre_publico, imagen_url").eq("id", `${tipo}:${categoryId}`).maybeSingle(),
+  ]);
 
   const list = document.getElementById("prodList");
 
@@ -87,15 +104,24 @@ const TIPO_LABEL = { topup: "Recarga", giftcard: "Tarjeta de regalo", gamekey: "
     return;
   }
 
-  document.getElementById("catTitle").textContent = productos[0].category_name;
-  document.getElementById("catSub").textContent = TIPO_LABEL[tipo] || tipo;
-  document.title = productos[0].category_name + " — FariPlay";
+  const nombreCategoria = (metaCat && metaCat.nombre_publico) || productos[0].category_name;
+  document.getElementById("catTitle").textContent = nombreCategoria;
+  document.getElementById("catSub").textContent = productos.length + " producto" + (productos.length === 1 ? "" : "s") + " disponible" + (productos.length === 1 ? "" : "s");
+  document.getElementById("catHeroType").textContent = TIPO_LABEL[tipo] || tipo;
+  document.title = nombreCategoria + " — FariPlay";
+
+  const imagenCat = metaCat && metaCat.imagen_url;
+  if (imagenCat) {
+    document.getElementById("catHero").style.backgroundImage = `url('${imagenCat}')`;
+  } else {
+    document.getElementById("catHeroIcon").textContent = TIPO_ICONO[tipo] || "🛒";
+  }
 
   list.innerHTML = productos.map(p => `
     <a class="prod-card" href="checkout.html?id=${encodeURIComponent(p.id)}">
       <div>
-        <div class="prod-name">${p.offer_name}</div>
-        <span class="prod-badge">${p.soporta_validacion ? '✓ Valida tu ID' : ''}</span>
+        <div class="prod-name">${p.offer_name_publico || p.offer_name}</div>
+        ${p.soporta_validacion ? '<span class="prod-badge">✓ Valida tu ID</span>' : ''}
       </div>
       <div style="display:flex;align-items:center;gap:12px;">
         <span class="prod-price">$${Number(p.precio_venta).toFixed(2)}</span>

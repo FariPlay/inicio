@@ -174,15 +174,24 @@ p{margin:0;}
 .pgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;}
 
 /* -------- grilla de categorías (catálogo FazerCards) -------- */
-.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.9rem;}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:1rem;}
 .cat-loading,.cat-empty{grid-column:1/-1;text-align:center;color:var(--ink-faint);padding:2.4rem 1rem;font-size:.85rem;}
-.cat-card{background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
-  border-radius:10px;padding:1.1rem .9rem;text-align:center;transition:transform .2s,border-color .2s,box-shadow .2s;}
-.cat-card:hover{transform:translateY(-3px);border-color:rgba(255,122,26,.4);box-shadow:0 16px 30px -14px rgba(255,122,26,.5);}
-.cat-icon{width:40px;height:40px;margin:0 auto .6rem;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-size:1.2rem;background:rgba(255,122,26,.12);border:1px solid rgba(255,122,26,.3);}
-.cat-card-name{font-size:.85rem;font-weight:900;line-height:1.25;margin-bottom:3px;}
-.cat-card-sub{font-size:.68rem;color:var(--muted);font-weight:700;}
+.cat-card{display:block;background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;}
+.cat-card:hover{transform:translateY(-4px);border-color:rgba(255,122,26,.45);box-shadow:0 20px 36px -16px rgba(255,122,26,.55);}
+.cat-card-media{position:relative;aspect-ratio:16/11;background:radial-gradient(circle at 30% 20%,#1f2a3a,var(--bg-0));
+  background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;}
+.cat-card-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(7,4,10,.55));}
+.cat-card-icon{font-size:2.1rem;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5));position:relative;z-index:1;}
+.cat-card-type{position:absolute;top:8px;left:8px;z-index:1;background:rgba(7,4,10,.72);backdrop-filter:blur(4px);
+  color:var(--orange-2);font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.4px;
+  padding:3px 8px;border-radius:20px;border:1px solid rgba(255,122,26,.35);}
+.cat-card-body{padding:.8rem .85rem .9rem;}
+.cat-card-name{font-size:.86rem;font-weight:900;line-height:1.25;margin-bottom:8px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.2em;}
+.cat-card-foot{display:flex;justify-content:space-between;align-items:center;gap:6px;}
+.cat-card-count{font-size:.62rem;color:var(--muted);font-weight:700;}
+.cat-card-price{font-size:.76rem;color:var(--orange-2);font-weight:900;white-space:nowrap;}
 @media (min-width:640px){.pgrid{grid-template-columns:repeat(3,1fr);gap:1.1rem;}}
 @media (min-width:1000px){.pgrid{grid-template-columns:repeat(4,1fr);gap:1.2rem;}}
 
@@ -574,6 +583,7 @@ var WHATSAPP_NUMBER = "593992225484";
    tarjetas que llevan a categoria.html con sus productos.
 ===================================================================== */
 const TIPO_ICONO = { topup: "🎮", giftcard: "🎁", gamekey: "🔑" };
+const TIPO_LABEL_CORTA = { topup: "Recarga", giftcard: "Tarjeta", gamekey: "Llave" };
 
 (async function cargarCategorias(){
   const grid = document.getElementById("catGrid");
@@ -591,18 +601,38 @@ const TIPO_ICONO = { topup: "🎮", giftcard: "🎁", gamekey: "🔑" };
     const categorias = {};
     productos.forEach(p => {
       const key = p.tipo + ":" + p.category_id;
-      if (!categorias[key]) categorias[key] = { tipo: p.tipo, category_id: p.category_id, nombre: p.category_name, desde: Number(p.precio_venta) };
-      else categorias[key].desde = Math.min(categorias[key].desde, Number(p.precio_venta));
+      if (!categorias[key]) categorias[key] = { tipo: p.tipo, category_id: p.category_id, nombre: p.category_name, desde: Number(p.precio_venta), count: 1 };
+      else { categorias[key].desde = Math.min(categorias[key].desde, Number(p.precio_venta)); categorias[key].count++; }
     });
 
-    const lista = Object.values(categorias).sort((a, b) => a.nombre.localeCompare(b.nombre));
+    // traemos el nombre personalizado y la imagen que puso el admin para cada categoría
+    const { data: metaCats } = await sb.from("catalogo_categorias").select("id, nombre_publico, imagen_url");
+    (metaCats || []).forEach(m => {
+      if (categorias[m.id]) {
+        categorias[m.id].nombrePublico = m.nombre_publico;
+        categorias[m.id].imagen = m.imagen_url;
+      }
+    });
 
-    grid.innerHTML = lista.map(c => `
+    const lista = Object.values(categorias).sort((a, b) => (a.nombrePublico || a.nombre).localeCompare(b.nombrePublico || b.nombre));
+
+    grid.innerHTML = lista.map(c => {
+      const nombre = c.nombrePublico || c.nombre;
+      return `
       <a class="cat-card" href="categoria.html?tipo=${encodeURIComponent(c.tipo)}&category_id=${encodeURIComponent(c.category_id)}">
-        <div class="cat-icon">${TIPO_ICONO[c.tipo] || "🛒"}</div>
-        <div class="cat-card-name">${c.nombre}</div>
-        <div class="cat-card-sub">Desde $${c.desde.toFixed(2)}</div>
-      </a>`).join("");
+        <div class="cat-card-media" ${c.imagen ? `style="background-image:url('${c.imagen}')"` : ''}>
+          ${!c.imagen ? `<span class="cat-card-icon">${TIPO_ICONO[c.tipo] || "🛒"}</span>` : ''}
+          <span class="cat-card-type">${TIPO_LABEL_CORTA[c.tipo] || ''}</span>
+        </div>
+        <div class="cat-card-body">
+          <div class="cat-card-name">${nombre}</div>
+          <div class="cat-card-foot">
+            <span class="cat-card-count">${c.count} producto${c.count === 1 ? '' : 's'}</span>
+            <span class="cat-card-price">Desde $${c.desde.toFixed(2)}</span>
+          </div>
+        </div>
+      </a>`;
+    }).join("");
   }catch(e){
     grid.innerHTML = '<p class="cat-empty">No se pudo cargar el catálogo. Intenta de nuevo más tarde.</p>';
   }

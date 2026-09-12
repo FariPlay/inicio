@@ -299,10 +299,11 @@ async function cargarProducto(){
   document.getElementById("loadState").style.display = "none";
   document.getElementById("coCard").style.display = "block";
 
+  const nombreVisible = producto.offer_name_publico || producto.offer_name;
   document.getElementById("svcIcon").textContent = TIPO_ICONO[producto.tipo] || "🛒";
-  document.getElementById("svcName").textContent = producto.offer_name;
+  document.getElementById("svcName").textContent = nombreVisible;
   document.getElementById("svcCat").textContent = producto.category_name;
-  document.title = producto.offer_name + " — FariPlay";
+  document.title = nombreVisible + " — FariPlay";
   document.getElementById("sTotal").textContent = "$" + Number(producto.precio_venta).toFixed(2);
 
   renderCampos();
@@ -463,7 +464,7 @@ document.getElementById("btnOk").addEventListener("click", async () => {
     }
 
     document.getElementById("ovSuccessDetail").innerHTML = `
-      <div><span>Producto</span><b>${producto.offer_name}</b></div>
+      <div><span>Producto</span><b>${producto.offer_name_publico || producto.offer_name}</b></div>
       <div><span>Total</span><b>$${Number(producto.precio_venta).toFixed(2)}</b></div>
       <div><span>Estado</span><b>${data.pedido ? data.pedido.estado : 'confirmado'}</b></div>` +
       (data.codigo ? `<div style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(255,255,255,.15);">
