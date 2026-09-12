@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FariPlay — Diamantes Free Fire</title>
-<meta name="description" content="Recarga diamantes de Free Fire al instante. Elige tu paquete, valida tu ID y paga seguro.">
-<meta property="og:title" content="FariPlay — Diamantes Free Fire al instante">
-<meta property="og:description" content="Elige tu paquete, coloca tu ID y paga seguro. Entrega en minutos.">
+<title>FariPlay — Recargas, tarjetas de regalo y llaves digitales</title>
+<meta name="description" content="Recarga tus juegos favoritos, compra tarjetas de regalo y llaves digitales al instante. Elige tu producto, confirma tus datos y recibe en minutos.">
+<meta property="og:title" content="FariPlay — Recargas, tarjetas de regalo y llaves digitales">
+<meta property="og:description" content="Elige tu producto, confirma tus datos y paga seguro con tu saldo. Entrega en minutos.">
 <meta property="og:image" content="og-image.webp">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#05070F">
@@ -130,18 +130,18 @@ p{margin:0;}
 .hero-cta{display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem;}
 
 .gemwrap{position:relative;display:flex;align-items:center;justify-content:center;min-height:320px;}
-.gem-big{width:min(320px,80vw);filter:drop-shadow(0 30px 60px rgba(58,92,255,.35));animation:spin 14s linear infinite;}
-@keyframes spin{0%{transform:rotateY(0);}50%{transform:rotateY(18deg);}100%{transform:rotateY(0);}}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0);}50%{transform:translateY(-18px) rotate(3deg);}}
 .gem-particle{position:absolute;clip-path:polygon(50% 0%,100% 35%,80% 100%,20% 100%,0% 35%);background:linear-gradient(135deg,var(--cyan),var(--blue));animation:float 8s ease-in-out infinite;}
-@keyframes float{0%,100%{transform:translateY(0) rotate(0);}50%{transform:translateY(-22px) rotate(14deg);}}
-.hero-char{position:absolute;inset:0;margin:auto;max-width:min(420px,85vw);max-height:520px;z-index:2;filter:drop-shadow(0 25px 50px rgba(0,0,0,.55));animation:float 7s ease-in-out infinite;}
 
-.promo-banner{position:relative;height:clamp(140px,22vw,240px);overflow:hidden;background:linear-gradient(120deg,#1B0B26,#0E0816);}
-.promo-banner img{width:100%;height:100%;object-fit:cover;object-position:center;}
-.promo-banner .pb-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(7,4,10,.85) 0%,rgba(7,4,10,.25) 55%,rgba(7,4,10,.75) 100%);
-  display:flex;align-items:center;padding:0 6vw;}
-.promo-banner h3{font-size:clamp(1.3rem,3.5vw,2rem);text-transform:uppercase;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.6);}
-.promo-banner h3 em{font-style:normal;background:linear-gradient(100deg,var(--red),var(--orange-2));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.hv-card{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;
+  width:150px;height:150px;border-radius:20px;border:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.02));backdrop-filter:blur(6px);
+  animation:float 7s ease-in-out infinite;}
+.hv-icon{font-size:2.6rem;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4));}
+.hv-label{font-family:var(--font-m);font-weight:900;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-dim);}
+.hv-card--a{top:6%;left:8%;box-shadow:0 20px 50px -18px rgba(58,92,255,.7);border-color:rgba(91,124,255,.4);animation-delay:0s;}
+.hv-card--b{top:32%;right:2%;box-shadow:0 20px 50px -18px rgba(255,122,26,.7);border-color:rgba(255,122,26,.4);animation-delay:1.4s;}
+.hv-card--c{bottom:6%;left:22%;box-shadow:0 20px 50px -18px rgba(63,224,232,.7);border-color:rgba(63,224,232,.4);animation-delay:2.8s;}
 
 .quickpick{display:flex;gap:.7rem;margin-top:2.4rem;flex-wrap:wrap;}
 .qchip{display:flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:4px;padding:.6rem 1rem;cursor:pointer;transition:border-color .2s,transform .2s;font-family:var(--font-m);font-weight:700;font-size:.82rem;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);}
@@ -151,8 +151,9 @@ p{margin:0;}
 
 @media (max-width:920px){
   .hero-grid{grid-template-columns:1fr;}
-  .gemwrap{order:-1;min-height:220px;}
-  .gem-big{width:200px;}
+  .gemwrap{order:-1;min-height:240px;}
+  .hv-card{width:118px;height:118px;}
+  .hv-icon{font-size:2rem;}
 }
 
 /* ---------- TRUST STRIP (icons only, minimal text) ---------- */
@@ -183,15 +184,9 @@ p{margin:0;}
   background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;}
 .cat-card-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(7,4,10,.55));}
 .cat-card-icon{font-size:2.1rem;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5));position:relative;z-index:1;}
-.cat-card-type{position:absolute;top:8px;left:8px;z-index:1;background:rgba(7,4,10,.72);backdrop-filter:blur(4px);
-  color:var(--orange-2);font-size:.6rem;font-weight:900;text-transform:uppercase;letter-spacing:.4px;
-  padding:3px 8px;border-radius:20px;border:1px solid rgba(255,122,26,.35);}
 .cat-card-body{padding:.8rem .85rem .9rem;}
-.cat-card-name{font-size:.86rem;font-weight:900;line-height:1.25;margin-bottom:8px;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.2em;}
-.cat-card-foot{display:flex;justify-content:space-between;align-items:center;gap:6px;}
-.cat-card-count{font-size:.62rem;color:var(--muted);font-weight:700;}
-.cat-card-price{font-size:.76rem;color:var(--orange-2);font-weight:900;white-space:nowrap;}
+.cat-card-name{font-size:.86rem;font-weight:900;line-height:1.25;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 @media (min-width:640px){.pgrid{grid-template-columns:repeat(3,1fr);gap:1.1rem;}}
 @media (min-width:1000px){.pgrid{grid-template-columns:repeat(4,1fr);gap:1.2rem;}}
 
@@ -350,38 +345,20 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
   <div class="hero-slash" aria-hidden="true"></div>
   <div class="wrap hero-grid">
     <div>
-      <p class="eyebrow">Recargas Free Fire</p>
-      <h1>Diamantes<br><em>al instante.</em></h1>
+      <p class="eyebrow">Juegos · Tarjetas · Llaves digitales</p>
+      <h1>Recarga.<br>Regala.<br><em>Juega sin límites.</em></h1>
       <div class="hero-cta">
         <a href="#paquetes" class="btn btn--fire">Ver catálogo</a>
         <a href="#como" class="btn btn--ghost">Cómo funciona</a>
       </div>
     </div>
     <div class="gemwrap">
-      <img src="hero-character.webp" alt="" class="hero-char" fetchpriority="high"
-           onerror="this.style.display='none'"
-           onload="this.nextElementSibling.style.display='none'">
-      <svg class="gem-big" viewBox="0 0 200 200">
-        <defs>
-          <linearGradient id="gA" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#7C97FF"/><stop offset="100%" stop-color="#3A5CFF"/>
-          </linearGradient>
-          <linearGradient id="gB" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#3FE0E8"/><stop offset="100%" stop-color="#1E9FB3"/>
-          </linearGradient>
-          <linearGradient id="gC" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#FFC24D"/><stop offset="100%" stop-color="#FF9F1C"/>
-          </linearGradient>
-        </defs>
-        <polygon points="100,15 175,70 140,185 60,185 25,70" fill="url(#gA)"/>
-        <polygon points="100,15 175,70 100,90" fill="url(#gC)"/>
-        <polygon points="100,15 25,70 100,90" fill="url(#gB)"/>
-        <polygon points="25,70 100,90 60,185" fill="#2A45C9" opacity=".85"/>
-        <polygon points="175,70 100,90 140,185" fill="#1E9FB3" opacity=".85"/>
-      </svg>
-      <span class="gem-particle" style="width:16px;height:16px;top:10%;left:5%;"></span>
-      <span class="gem-particle" style="width:10px;height:10px;top:70%;left:85%;animation-delay:2s;"></span>
-      <span class="gem-particle" style="width:12px;height:12px;top:80%;left:10%;animation-delay:4s;"></span>
+      <div class="hv-card hv-card--a"><span class="hv-icon">🎮</span><span class="hv-label">Juegos</span></div>
+      <div class="hv-card hv-card--b"><span class="hv-icon">🎁</span><span class="hv-label">Tarjetas</span></div>
+      <div class="hv-card hv-card--c"><span class="hv-icon">🔑</span><span class="hv-label">Llaves</span></div>
+      <span class="gem-particle" style="width:16px;height:16px;top:6%;left:8%;"></span>
+      <span class="gem-particle" style="width:10px;height:10px;top:75%;left:88%;animation-delay:2s;"></span>
+      <span class="gem-particle" style="width:12px;height:12px;top:85%;left:8%;animation-delay:4s;"></span>
     </div>
   </div>
 </section>
@@ -393,15 +370,6 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
     <div class="trust-item"><svg viewBox="0 0 24 24"><path d="M4 4h16v12H7l-3 3V4z" fill="currentColor"/></svg>Atención Lun-Dom 8am-10pm</div>
   </div>
 </section>
-
-<div class="promo-banner" id="promoBanner">
-  <img src="diamonds-banner.webp" alt="Diamantes Free Fire"
-       loading="lazy"
-       onerror="document.getElementById('promoBanner').style.display='none'">
-  <div class="pb-overlay">
-    <h3>Recarga <em>rápido.</em><br>Juega <em>sin límites.</em></h3>
-  </div>
-</div>
 
 <section class="section" id="paquetes">
   <div class="wrap">
@@ -416,8 +384,8 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
   <div class="wrap">
     <div class="s-head" data-reveal><h2>3 pasos</h2></div>
     <div class="steps" data-reveal>
-      <div class="step"><em>01</em><h3>Elige tu paquete</h3></div>
-      <div class="step"><em>02</em><h3>Valida tu ID</h3></div>
+      <div class="step"><em>01</em><h3>Elige tu producto</h3></div>
+      <div class="step"><em>02</em><h3>Confirma tus datos</h3></div>
       <div class="step"><em>03</em><h3>Recibe al instante</h3></div>
     </div>
   </div>
@@ -427,9 +395,10 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
   <div class="wrap">
     <div class="s-head" data-reveal><h2>Preguntas</h2></div>
     <div class="faq" data-reveal>
-      <details class="fitem" open><summary>¿Cuánto tarda?</summary><p>Menos de 15 minutos en la mayoría de los casos.</p></details>
-      <details class="fitem"><summary>¿Es seguro dar mi ID?</summary><p>Sí, nunca pedimos tu contraseña.</p></details>
-      <details class="fitem"><summary>¿Qué métodos de pago aceptan?</summary><p>Transferencia (Banco Pichincha, Produbanco o Banco Guayaquil) y depósito (Produbanco o Banco Guayaquil).</p></details>
+      <details class="fitem" open><summary>¿Qué puedo comprar aquí?</summary><p>Recargas para tus juegos favoritos, tarjetas de regalo digitales y llaves de activación — todo desde un solo lugar.</p></details>
+      <details class="fitem"><summary>¿Cuánto tarda?</summary><p>Menos de 15 minutos en la mayoría de los casos.</p></details>
+      <details class="fitem"><summary>¿Es seguro dar mis datos?</summary><p>Sí, solo pedimos lo necesario para entregar tu producto (como tu ID de jugador). Nunca pedimos tu contraseña.</p></details>
+      <details class="fitem"><summary>¿Cómo pago?</summary><p>Con tu saldo FariPlay. Recárgalo una vez por transferencia o depósito, y desde ahí compra al instante sin esperar validaciones.</p></details>
       <details class="fitem"><summary>¿Tienen garantía?</summary><p>Sí, reembolso si algo falla.</p></details>
     </div>
   </div>
@@ -454,8 +423,8 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
 
 <section class="finalcta">
   <div class="wrap" data-reveal>
-    <h2>¿Listo para recargar?</h2>
-    <a href="#paquetes" class="btn btn--fire">Ver paquetes</a>
+    <h2>¿Listo para tu próxima recarga?</h2>
+    <a href="#paquetes" class="btn btn--fire">Ver catálogo</a>
   </div>
 </section>
 
@@ -466,7 +435,7 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
     <div class="f-col f-col--brand">
       <img src="logo.png" alt="FariPlay" class="f-logo"
            onerror="this.style.display='none'">
-      <p class="f-desc">Plataforma ecuatoriana de recarga de diamantes para Free Fire. Entregas ágiles, pagos verificados y atención cercana para la comunidad gamer del país.</p>
+      <p class="f-desc">Plataforma ecuatoriana de recargas para videojuegos, tarjetas de regalo y llaves digitales. Entregas ágiles, pagos verificados y atención cercana para toda la comunidad gamer del país.</p>
 
       <div class="f-info">
         <div class="f-info-row">
@@ -492,7 +461,7 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
     <div class="f-col-pair">
       <div class="f-col">
         <p class="f-col-title">Navegación</p>
-        <a href="#paquetes">Paquetes</a>
+        <a href="#paquetes">Catálogo</a>
         <a href="#como">Cómo funciona</a>
         <a href="#preguntas">Preguntas</a>
       </div>
@@ -506,7 +475,7 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
   </div>
   <div class="wrap f-legal">
     <p>© <span id="yr"></span> FariPlay. Todos los derechos reservados.</p>
-    <p class="f-disclaimer">Free Fire es una marca de Garena. FariPlay es una tienda independiente no afiliada oficialmente.</p>
+    <p class="f-disclaimer">Los videojuegos, tarjetas y marcas mencionadas pertenecen a sus respectivos dueños. FariPlay es una tienda independiente no afiliada oficialmente a ninguna de ellas.</p>
   </div>
 </footer>
 
@@ -622,14 +591,9 @@ const TIPO_LABEL_CORTA = { topup: "Recarga", giftcard: "Tarjeta", gamekey: "Llav
       <a class="cat-card" href="categoria.html?tipo=${encodeURIComponent(c.tipo)}&category_id=${encodeURIComponent(c.category_id)}">
         <div class="cat-card-media" ${c.imagen ? `style="background-image:url('${c.imagen}')"` : ''}>
           ${!c.imagen ? `<span class="cat-card-icon">${TIPO_ICONO[c.tipo] || "🛒"}</span>` : ''}
-          <span class="cat-card-type">${TIPO_LABEL_CORTA[c.tipo] || ''}</span>
         </div>
         <div class="cat-card-body">
           <div class="cat-card-name">${nombre}</div>
-          <div class="cat-card-foot">
-            <span class="cat-card-count">${c.count} producto${c.count === 1 ? '' : 's'}</span>
-            <span class="cat-card-price">Desde $${c.desde.toFixed(2)}</span>
-          </div>
         </div>
       </a>`;
     }).join("");
