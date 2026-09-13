@@ -107,54 +107,23 @@ p{margin:0;}
   white-space:nowrap;box-shadow:0 8px 18px -8px rgba(255,122,26,.6);}
 @media (max-width:480px){.wallet-band{top:64px;}.wallet-value{font-size:1rem;}.wallet-btn{padding:.5rem .85rem;font-size:.72rem;}}
 
-/* ---------- HERO ---------- */
-.hero{position:relative;padding:9rem 0 4.5rem;overflow:hidden;}
-.hero::before{content:"";position:absolute;inset:0;
-  background-image:
-    radial-gradient(55% 50% at 88% 8%, rgba(255,59,59,.35), transparent 60%),
-    radial-gradient(50% 45% at 78% 18%, rgba(255,122,26,.3), transparent 60%),
-    radial-gradient(65% 60% at 4% 40%, rgba(58,92,255,.45), transparent 60%),
-    url('hero-bg.webp');
-  background-size:auto,auto,auto,cover;
-  background-position:center;
-  background-repeat:no-repeat;
-  background-color:var(--bg-0);
-  z-index:-3;}
-.hero::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:36px 36px;mask-image:radial-gradient(65% 60% at 50% 15%,black,transparent);z-index:-2;}
-.hero-slash{position:absolute;top:-15%;left:38%;width:60%;height:150%;background:linear-gradient(100deg,rgba(255,122,26,0) 0%,rgba(255,122,26,.12) 45%,rgba(58,92,255,.14) 60%,rgba(58,92,255,0) 100%);clip-path:polygon(30% 0,60% 0,40% 100%,10% 100%);z-index:-1;pointer-events:none;}
-.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:2.5rem;align-items:center;position:relative;}
-.eyebrow{font-family:var(--font-m);font-weight:900;font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--orange-2);margin:0 0 1rem;display:flex;align-items:center;gap:.5rem;}
+/* ---------- SHOP BANNER (compacto, estilo tienda) ---------- */
+.shop-banner{position:relative;padding:5.4rem 0 2.2rem;overflow:hidden;background:linear-gradient(120deg,var(--bg-1),var(--bg-0) 70%);
+  border-bottom:1px solid rgba(255,122,26,.18);}
+.shop-banner::before{content:"";position:absolute;inset:0;z-index:0;
+  background-image:radial-gradient(45% 80% at 92% 0%, rgba(58,92,255,.22), transparent 60%),
+    radial-gradient(40% 70% at 4% 100%, rgba(255,122,26,.18), transparent 60%);}
+.shop-banner-in{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.6rem;}
+.eyebrow{font-family:var(--font-m);font-weight:900;font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;color:var(--orange-2);margin:0 0 .8rem;display:flex;align-items:center;gap:.5rem;}
 .eyebrow::before{content:"";width:22px;height:3px;background:linear-gradient(90deg,var(--red),var(--orange));}
-.hero h1{font-size:clamp(2.9rem,7.4vw,5.2rem);font-weight:900;letter-spacing:-.03em;text-transform:uppercase;text-shadow:0 0 40px rgba(255,122,26,.35);}
-.hero h1 em{font-style:normal;background:linear-gradient(100deg,var(--red) 5%,var(--orange) 45%,var(--orange-2) 80%);-webkit-background-clip:text;background-clip:text;color:transparent;}
-.hero-cta{display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem;}
-
-.gemwrap{position:relative;display:flex;align-items:center;justify-content:center;min-height:320px;}
-@keyframes float{0%,100%{transform:translateY(0) rotate(0);}50%{transform:translateY(-18px) rotate(3deg);}}
-.gem-particle{position:absolute;clip-path:polygon(50% 0%,100% 35%,80% 100%,20% 100%,0% 35%);background:linear-gradient(135deg,var(--cyan),var(--blue));animation:float 8s ease-in-out infinite;}
-
-.hv-card{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;
-  width:150px;height:150px;border-radius:20px;border:1px solid rgba(255,255,255,.12);
-  background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.02));backdrop-filter:blur(6px);
-  animation:float 7s ease-in-out infinite;}
-.hv-icon{font-size:2.6rem;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4));}
-.hv-label{font-family:var(--font-m);font-weight:900;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-dim);}
-.hv-card--a{top:6%;left:8%;box-shadow:0 20px 50px -18px rgba(58,92,255,.7);border-color:rgba(91,124,255,.4);animation-delay:0s;}
-.hv-card--b{top:32%;right:2%;box-shadow:0 20px 50px -18px rgba(255,122,26,.7);border-color:rgba(255,122,26,.4);animation-delay:1.4s;}
-.hv-card--c{bottom:6%;left:22%;box-shadow:0 20px 50px -18px rgba(63,224,232,.7);border-color:rgba(63,224,232,.4);animation-delay:2.8s;}
-
-.quickpick{display:flex;gap:.7rem;margin-top:2.4rem;flex-wrap:wrap;}
-.qchip{display:flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:4px;padding:.6rem 1rem;cursor:pointer;transition:border-color .2s,transform .2s;font-family:var(--font-m);font-weight:700;font-size:.82rem;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);}
-.qchip:hover{border-color:var(--orange);transform:translateY(-2px);background:rgba(255,122,26,.1);}
-.qchip b{color:var(--ink);}
-.qchip span{color:var(--orange-2);font-weight:900;}
-
-@media (max-width:920px){
-  .hero-grid{grid-template-columns:1fr;}
-  .gemwrap{order:-1;min-height:240px;}
-  .hv-card{width:118px;height:118px;}
-  .hv-icon{font-size:2rem;}
-}
+.shop-banner h1{font-size:clamp(1.5rem,3.2vw,2.15rem);font-weight:900;letter-spacing:-.01em;max-width:520px;}
+.shop-banner-sub{color:var(--ink-dim);font-size:.88rem;margin-top:.6rem;max-width:440px;}
+.shop-banner-nav{display:flex;gap:.6rem;flex-wrap:wrap;}
+.shop-banner-nav a{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+  border-radius:24px;padding:.65rem 1.15rem;font-weight:800;font-size:.82rem;color:var(--ink-dim);
+  transition:border-color .2s,background .2s,color .2s;white-space:nowrap;}
+.shop-banner-nav a:hover{border-color:var(--orange);color:var(--ink);background:rgba(255,122,26,.1);}
+@media (max-width:720px){.shop-banner-in{flex-direction:column;align-items:flex-start;}.shop-banner-nav{width:100%;}}
 
 /* ---------- TRUST STRIP (icons only, minimal text) ---------- */
 .trust{background:var(--bg-1);padding:1.3rem 0;border-top:1px solid rgba(255,122,26,.25);border-bottom:1px solid rgba(255,255,255,.06);}
@@ -175,6 +144,11 @@ p{margin:0;}
 .pgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;}
 
 /* -------- grilla de categorías (catálogo FazerCards) -------- */
+.cat-section{margin-bottom:2.6rem;}
+.cat-section:last-child{margin-bottom:0;}
+.cat-section-title{font-size:1.15rem;font-weight:900;margin-bottom:1.1rem;padding-left:.9rem;position:relative;}
+.cat-section-title::before{content:"";position:absolute;left:0;top:.1em;bottom:.1em;width:4px;
+  background:linear-gradient(180deg,var(--red),var(--orange));border-radius:2px;}
 .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:1rem;}
 .cat-loading,.cat-empty{grid-column:1/-1;text-align:center;color:var(--ink-faint);padding:2.4rem 1rem;font-size:.85rem;}
 .cat-card{display:block;background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
@@ -341,24 +315,17 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
 
 <main id="top">
 
-<section class="hero">
-  <div class="hero-slash" aria-hidden="true"></div>
-  <div class="wrap hero-grid">
+<section class="shop-banner">
+  <div class="wrap shop-banner-in">
     <div>
       <p class="eyebrow">Juegos · Tarjetas · Llaves digitales</p>
-      <h1>Recarga.<br>Regala.<br><em>Juega sin límites.</em></h1>
-      <div class="hero-cta">
-        <a href="#paquetes" class="btn btn--fire">Ver catálogo</a>
-        <a href="#como" class="btn btn--ghost">Cómo funciona</a>
-      </div>
+      <h1>Tu tienda de recargas y códigos digitales</h1>
+      <p class="shop-banner-sub">Elige tu producto, confirma tus datos y recíbelo al instante.</p>
     </div>
-    <div class="gemwrap">
-      <div class="hv-card hv-card--a"><span class="hv-icon">🎮</span><span class="hv-label">Juegos</span></div>
-      <div class="hv-card hv-card--b"><span class="hv-icon">🎁</span><span class="hv-label">Tarjetas</span></div>
-      <div class="hv-card hv-card--c"><span class="hv-icon">🔑</span><span class="hv-label">Llaves</span></div>
-      <span class="gem-particle" style="width:16px;height:16px;top:6%;left:8%;"></span>
-      <span class="gem-particle" style="width:10px;height:10px;top:75%;left:88%;animation-delay:2s;"></span>
-      <span class="gem-particle" style="width:12px;height:12px;top:85%;left:8%;animation-delay:4s;"></span>
+    <div class="shop-banner-nav">
+      <a href="#sec-topup">🎮 Recargas</a>
+      <a href="#sec-giftcard">🎁 Tarjetas</a>
+      <a href="#sec-gamekey">🔑 Llaves</a>
     </div>
   </div>
 </section>
@@ -373,10 +340,7 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
 
 <section class="section" id="paquetes">
   <div class="wrap">
-    <div class="s-head" data-reveal><h2>Nuestros productos</h2></div>
-    <div class="cat-grid" id="catGrid" data-reveal>
-      <p class="cat-loading">Cargando productos…</p>
-    </div>
+    <div id="catSections"><p class="cat-loading">Cargando productos…</p></div>
   </div>
 </section>
 
@@ -555,7 +519,7 @@ const TIPO_ICONO = { topup: "🎮", giftcard: "🎁", gamekey: "🔑" };
 const TIPO_LABEL_CORTA = { topup: "Recarga", giftcard: "Tarjeta", gamekey: "Llave" };
 
 (async function cargarCategorias(){
-  const grid = document.getElementById("catGrid");
+  const wrap = document.getElementById("catSections");
   try{
     const { data: productos, error } = await sb
       .from("catalogo")
@@ -563,7 +527,7 @@ const TIPO_LABEL_CORTA = { topup: "Recarga", giftcard: "Tarjeta", gamekey: "Llav
       .eq("activo", true);
 
     if (error || !productos || !productos.length) {
-      grid.innerHTML = '<p class="cat-empty">Muy pronto vas a encontrar aquí recargas de juegos y tarjetas de regalo.</p>';
+      wrap.innerHTML = '<p class="cat-empty">Muy pronto vas a encontrar aquí recargas de juegos y tarjetas de regalo.</p>';
       return;
     }
 
@@ -583,9 +547,16 @@ const TIPO_LABEL_CORTA = { topup: "Recarga", giftcard: "Tarjeta", gamekey: "Llav
       }
     });
 
-    const lista = Object.values(categorias).sort((a, b) => (a.nombrePublico || a.nombre).localeCompare(b.nombrePublico || b.nombre));
+    const lista = Object.values(categorias);
 
-    grid.innerHTML = lista.map(c => {
+    const grupos = { topup: [], giftcard: [], gamekey: [] };
+    lista.forEach(c => { if (grupos[c.tipo]) grupos[c.tipo].push(c); });
+    Object.values(grupos).forEach(arr => arr.sort((a, b) => (a.nombrePublico || a.nombre).localeCompare(b.nombrePublico || b.nombre)));
+
+    const SECCION_TITULO = { topup: "🎮 Recargas de juegos", giftcard: "🎁 Tarjetas de regalo", gamekey: "🔑 Llaves digitales" };
+    const SECCION_ID = { topup: "sec-topup", giftcard: "sec-giftcard", gamekey: "sec-gamekey" };
+
+    function tarjetaHtml(c){
       const nombre = c.nombrePublico || c.nombre;
       return `
       <a class="cat-card" href="categoria.html?tipo=${encodeURIComponent(c.tipo)}&category_id=${encodeURIComponent(c.category_id)}">
@@ -596,9 +567,21 @@ const TIPO_LABEL_CORTA = { topup: "Recarga", giftcard: "Tarjeta", gamekey: "Llav
           <div class="cat-card-name">${nombre}</div>
         </div>
       </a>`;
-    }).join("");
+    }
+
+    let html = "";
+    ["topup", "giftcard", "gamekey"].forEach(tipoKey => {
+      if (!grupos[tipoKey].length) return;
+      html += `
+        <div class="cat-section" id="${SECCION_ID[tipoKey]}">
+          <h2 class="cat-section-title">${SECCION_TITULO[tipoKey]}</h2>
+          <div class="cat-grid">${grupos[tipoKey].map(tarjetaHtml).join("")}</div>
+        </div>`;
+    });
+
+    wrap.innerHTML = html || '<p class="cat-empty">Muy pronto vas a encontrar aquí recargas de juegos y tarjetas de regalo.</p>';
   }catch(e){
-    grid.innerHTML = '<p class="cat-empty">No se pudo cargar el catálogo. Intenta de nuevo más tarde.</p>';
+    wrap.innerHTML = '<p class="cat-empty">No se pudo cargar el catálogo. Intenta de nuevo más tarde.</p>';
   }
 })();
 

@@ -300,11 +300,21 @@ async function cargarProducto(){
   document.getElementById("coCard").style.display = "block";
 
   const nombreVisible = producto.offer_name_publico || producto.offer_name;
-  document.getElementById("svcIcon").textContent = TIPO_ICONO[producto.tipo] || "🛒";
+  const svcIcon = document.getElementById("svcIcon");
+  svcIcon.textContent = TIPO_ICONO[producto.tipo] || "🛒";
   document.getElementById("svcName").textContent = nombreVisible;
   document.getElementById("svcCat").textContent = producto.category_name;
   document.title = nombreVisible + " — FariPlay";
   document.getElementById("sTotal").textContent = "$" + Number(producto.precio_venta).toFixed(2);
+
+  // si el admin le puso imagen a la categoría, la mostramos en vez del ícono
+  const { data: metaCat } = await sb.from("catalogo_categorias").select("imagen_url").eq("id", `${producto.tipo}:${producto.category_id}`).maybeSingle();
+  if (metaCat && metaCat.imagen_url) {
+    svcIcon.style.backgroundImage = `url('${metaCat.imagen_url}')`;
+    svcIcon.style.backgroundSize = "cover";
+    svcIcon.style.backgroundPosition = "center";
+    svcIcon.textContent = "";
+  }
 
   renderCampos();
 }
