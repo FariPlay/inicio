@@ -107,23 +107,33 @@ p{margin:0;}
   white-space:nowrap;box-shadow:0 8px 18px -8px rgba(255,122,26,.6);}
 @media (max-width:480px){.wallet-band{top:64px;}.wallet-value{font-size:1rem;}.wallet-btn{padding:.5rem .85rem;font-size:.72rem;}}
 
-/* ---------- SHOP BANNER (compacto, estilo tienda) ---------- */
-.shop-banner{position:relative;padding:5.4rem 0 2.2rem;overflow:hidden;background:linear-gradient(120deg,var(--bg-1),var(--bg-0) 70%);
-  border-bottom:1px solid rgba(255,122,26,.18);}
-.shop-banner::before{content:"";position:absolute;inset:0;z-index:0;
-  background-image:radial-gradient(50% 90% at 95% 0%, rgba(58,92,255,.12), transparent 60%),
-    radial-gradient(45% 80% at 2% 100%, rgba(255,122,26,.1), transparent 60%);}
-.shop-banner-in{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1.6rem;}
+/* ---------- HERO CAROUSEL (carrusel de banners tipo tienda) ---------- */
+.hero-carousel{position:relative;width:100vw;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;
+  margin-top:4.6rem;height:clamp(200px,34vw,380px);overflow:hidden;background:var(--bg-0);}
+.hc-track{position:relative;width:100%;height:100%;}
+.hc-slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .6s ease,visibility .6s;
+  background-size:cover;background-position:center;display:flex;align-items:flex-end;}
+.hc-slide.active{opacity:1;visibility:visible;}
+.hc-slide::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(7,4,10,.88) 0%,rgba(7,4,10,.45) 55%,rgba(7,4,10,.15) 100%);}
+.hc-slide-body{position:relative;z-index:1;padding:0 6vw 2.6rem;max-width:620px;}
+.hc-slide-eyebrow{font-family:var(--font-m);font-weight:900;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--orange-2);margin-bottom:.6rem;}
+.hc-slide-title{font-size:clamp(1.4rem,3.4vw,2.3rem);font-weight:900;letter-spacing:-.01em;color:#fff;
+  text-shadow:0 2px 12px rgba(0,0,0,.55);margin-bottom:.5rem;}
+.hc-slide-sub{font-size:.9rem;color:rgba(255,255,255,.82);max-width:440px;}
+.hc-dots{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:2;display:flex;gap:7px;}
+.hc-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.4);cursor:pointer;transition:background .2s,width .2s;}
+.hc-dot.active{background:var(--orange-2);width:22px;border-radius:4px;}
+
+.shop-quicknav{background:var(--bg-1);border-bottom:1px solid rgba(255,122,26,.15);padding:.9rem 0;}
+.shop-quicknav-in{display:flex;gap:.6rem;flex-wrap:wrap;}
+.shop-quicknav-in a{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+  border-radius:24px;padding:.55rem 1.1rem;font-weight:800;font-size:.8rem;color:var(--ink-dim);
+  transition:border-color .2s,background .2s,color .2s;white-space:nowrap;}
+.shop-quicknav-in a:hover{border-color:var(--orange);color:var(--ink);background:rgba(255,122,26,.1);}
 .eyebrow{font-family:var(--font-m);font-weight:900;font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;color:var(--orange-2);margin:0 0 .8rem;display:flex;align-items:center;gap:.5rem;}
 .eyebrow::before{content:"";width:22px;height:3px;background:linear-gradient(90deg,var(--red),var(--orange));}
-.shop-banner h1{font-size:clamp(1.5rem,3.2vw,2.15rem);font-weight:900;letter-spacing:-.01em;max-width:520px;}
-.shop-banner-sub{color:var(--ink-dim);font-size:.88rem;margin-top:.6rem;max-width:440px;}
-.shop-banner-nav{display:flex;gap:.6rem;flex-wrap:wrap;}
-.shop-banner-nav a{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
-  border-radius:24px;padding:.65rem 1.15rem;font-weight:800;font-size:.82rem;color:var(--ink-dim);
-  transition:border-color .2s,background .2s,color .2s;white-space:nowrap;}
-.shop-banner-nav a:hover{border-color:var(--orange);color:var(--ink);background:rgba(255,122,26,.1);}
-@media (max-width:720px){.shop-banner-in{flex-direction:column;align-items:flex-start;}.shop-banner-nav{width:100%;}}
 
 /* ---------- TRUST STRIP (icons only, minimal text) ---------- */
 .trust{background:var(--bg-1);padding:1.3rem 0;border-top:1px solid rgba(255,122,26,.25);border-bottom:1px solid rgba(255,255,255,.06);}
@@ -336,19 +346,17 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
 
 <main id="top">
 
-<section class="shop-banner">
-  <div class="wrap shop-banner-in">
-    <div>
-      <p class="eyebrow">Juegos · Tarjetas de regalo</p>
-      <h1>Tu tienda de recargas y códigos digitales</h1>
-      <p class="shop-banner-sub">Elige tu producto, confirma tus datos y recíbelo al instante.</p>
-    </div>
-    <div class="shop-banner-nav">
-      <a href="#sec-topup">🎮 Recargas</a>
-      <a href="#sec-giftcard">🎁 Tarjetas</a>
-    </div>
-  </div>
+<section class="hero-carousel" id="heroCarousel">
+  <div class="hc-track" id="hcTrack"></div>
+  <div class="hc-dots" id="hcDots"></div>
 </section>
+
+<div class="shop-quicknav">
+  <div class="wrap shop-quicknav-in">
+    <a href="#sec-topup">🎮 Recargas</a>
+    <a href="#sec-giftcard">🎁 Tarjetas</a>
+  </div>
+</div>
 
 <section class="trust">
   <div class="wrap trust-in">
@@ -556,6 +564,49 @@ var WHATSAPP_NUMBER = "593992225484";
 ===================================================================== */
 const TIPO_ICONO = { topup: "🎮", giftcard: "🎁", gamekey: "🔑" };
 const TIPO_LABEL_CORTA = { topup: "Recarga", giftcard: "Tarjeta", gamekey: "Llave" };
+
+(async function cargarBannersHero(){
+  const track = document.getElementById("hcTrack");
+  const dotsWrap = document.getElementById("hcDots");
+  let slides = [];
+  try{
+    const { data } = await sb.from("banners_home").select("*").eq("activo", true).order("orden", { ascending: true });
+    if (data && data.length) slides = data;
+  }catch(e){ /* seguimos con el banner de respaldo */ }
+
+  if (!slides.length) {
+    slides = [{
+      titulo: "Tu tienda de recargas y códigos digitales",
+      subtitulo: "Elige tu producto, confirma tus datos y recíbelo al instante.",
+      imagen_url: "",
+      link_url: "#paquetes",
+    }];
+  }
+
+  track.innerHTML = slides.map((s, i) => `
+    <a class="hc-slide ${i === 0 ? 'active' : ''}" href="${s.link_url || '#paquetes'}"
+       style="background-image:${s.imagen_url ? `url('${s.imagen_url}')` : "linear-gradient(120deg,#1B0B26,#0E0816)"}">
+      <div class="hc-slide-body">
+        <p class="hc-slide-eyebrow">Juegos · Tarjetas de regalo</p>
+        <div class="hc-slide-title">${s.titulo}</div>
+        ${s.subtitulo ? `<div class="hc-slide-sub">${s.subtitulo}</div>` : ''}
+      </div>
+    </a>`).join("");
+
+  if (slides.length > 1) {
+    dotsWrap.innerHTML = slides.map((_, i) => `<span class="hc-dot ${i === 0 ? 'active' : ''}" data-i="${i}"></span>`).join("");
+    let actual = 0;
+    const irA = (i) => {
+      track.querySelectorAll(".hc-slide").forEach((el, idx) => el.classList.toggle("active", idx === i));
+      dotsWrap.querySelectorAll(".hc-dot").forEach((el, idx) => el.classList.toggle("active", idx === i));
+      actual = i;
+    };
+    dotsWrap.querySelectorAll(".hc-dot").forEach(dot => {
+      dot.addEventListener("click", () => irA(parseInt(dot.dataset.i)));
+    });
+    setInterval(() => irA((actual + 1) % slides.length), 5000);
+  }
+})();
 
 (async function cargarCategorias(){
   const wrap = document.getElementById("catSections");
