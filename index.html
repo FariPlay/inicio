@@ -107,9 +107,14 @@ p{margin:0;}
   white-space:nowrap;box-shadow:0 8px 18px -8px rgba(255,122,26,.6);}
 @media (max-width:480px){.wallet-band{top:64px;}.wallet-value{font-size:1rem;}.wallet-btn{padding:.5rem .85rem;font-size:.72rem;}}
 
+/* ---------- BARRA DE AVISO ---------- */
+.announce-bar{position:relative;width:100vw;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;
+  margin-top:4.6rem;background:linear-gradient(90deg,var(--orange),var(--orange-2));color:#1A0500;
+  text-align:center;font-weight:800;font-size:.78rem;letter-spacing:.02em;padding:.55rem 1rem;}
+
 /* ---------- HERO CAROUSEL (carrusel de banners tipo tienda) ---------- */
 .hero-carousel{position:relative;width:100vw;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;
-  margin-top:4.6rem;height:clamp(200px,34vw,380px);overflow:hidden;background:var(--bg-0);}
+  height:clamp(200px,34vw,380px);overflow:hidden;background:var(--bg-0);}
 .hc-track{position:relative;width:100%;height:100%;}
 .hc-slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .6s ease,visibility .6s;
   background-size:cover;background-position:center;display:flex;align-items:flex-end;}
@@ -126,12 +131,21 @@ p{margin:0;}
 .hc-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.4);cursor:pointer;transition:background .2s,width .2s;}
 .hc-dot.active{background:var(--orange-2);width:22px;border-radius:4px;}
 
-.shop-quicknav{background:var(--bg-1);border-bottom:1px solid rgba(255,122,26,.15);padding:.9rem 0;}
-.shop-quicknav-in{display:flex;gap:.6rem;flex-wrap:wrap;}
-.shop-quicknav-in a{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
-  border-radius:24px;padding:.55rem 1.1rem;font-weight:800;font-size:.8rem;color:var(--ink-dim);
-  transition:border-color .2s,background .2s,color .2s;white-space:nowrap;}
-.shop-quicknav-in a:hover{border-color:var(--orange);color:var(--ink);background:rgba(255,122,26,.1);}
+/* ---------- BUSCADOR + ÍCONOS RÁPIDOS ---------- */
+.search-band{background:var(--bg-1);border-bottom:1px solid rgba(255,255,255,.07);padding:1.3rem 0 1.5rem;}
+.search-box{display:flex;align-items:center;gap:.6rem;background:var(--bg-0);border:1px solid rgba(255,255,255,.14);
+  border-radius:10px;padding:.8rem 1rem;max-width:520px;margin:0 auto 1.3rem;transition:border-color .2s;}
+.search-box:focus-within{border-color:var(--orange);}
+.search-box svg{width:18px;height:18px;color:var(--ink-faint);flex:none;}
+.search-box input{flex:1;background:none;border:none;outline:none;color:var(--ink);font-family:inherit;font-size:.88rem;}
+.search-box input::placeholder{color:var(--ink-faint);}
+.quick-icons{display:flex;justify-content:center;gap:2.2rem;flex-wrap:wrap;}
+.quick-icon{display:flex;flex-direction:column;align-items:center;gap:.5rem;font-size:.75rem;font-weight:700;color:var(--ink-dim);}
+.quick-icon-circle{width:52px;height:52px;border-radius:50%;background:var(--bg-0);border:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;color:var(--orange-2);transition:border-color .2s,background .2s;}
+.quick-icon-circle svg{width:22px;height:22px;}
+.quick-icon:hover .quick-icon-circle{border-color:var(--orange);background:rgba(255,122,26,.08);}
+
 .eyebrow{font-family:var(--font-m);font-weight:900;font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;color:var(--orange-2);margin:0 0 .8rem;display:flex;align-items:center;gap:.5rem;}
 .eyebrow::before{content:"";width:22px;height:3px;background:linear-gradient(90deg,var(--red),var(--orange));}
 
@@ -154,23 +168,31 @@ p{margin:0;}
 .pgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;}
 
 /* -------- grilla de categorías (catálogo FazerCards) -------- */
-.cat-section{margin-bottom:2.6rem;}
+.cat-section{margin-bottom:2.8rem;}
 .cat-section:last-child{margin-bottom:0;}
-.cat-section-title{font-size:1.15rem;font-weight:900;margin-bottom:1.1rem;padding-left:.9rem;position:relative;}
-.cat-section-title::before{content:"";position:absolute;left:0;top:.1em;bottom:.1em;width:4px;
-  background:linear-gradient(180deg,var(--red),var(--orange));border-radius:2px;}
-.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:1rem;}
+.cat-section-head{display:flex;align-items:center;justify-content:space-between;gap:.7rem;margin-bottom:1.2rem;}
+.cat-section-head-left{display:flex;align-items:center;gap:.7rem;}
+.cat-section-icon{width:34px;height:34px;flex:none;border-radius:8px;background:rgba(255,122,26,.1);
+  border:1px solid rgba(255,122,26,.25);color:var(--orange-2);display:flex;align-items:center;justify-content:center;}
+.cat-section-icon svg{width:18px;height:18px;}
+.cat-section-title{font-size:1.1rem;font-weight:800;letter-spacing:-.005em;}
+.cat-section-count{font-size:.76rem;color:var(--ink-faint);font-weight:600;}
+.cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem;}
 .cat-loading,.cat-empty{grid-column:1/-1;text-align:center;color:var(--ink-faint);padding:2.4rem 1rem;font-size:.85rem;}
-.cat-card{display:block;background:linear-gradient(160deg,var(--bg-2),var(--bg-1));border:1px solid rgba(255,255,255,.08);
-  border-radius:12px;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;}
-.cat-card:hover{transform:translateY(-3px);border-color:rgba(255,122,26,.35);box-shadow:0 14px 26px -14px rgba(0,0,0,.5);}
-.cat-card-media{position:relative;aspect-ratio:16/11;background:radial-gradient(circle at 30% 20%,#1f2a3a,var(--bg-0));
-  background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;}
-.cat-card-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(7,4,10,.55));}
-.cat-card-icon{font-size:2.1rem;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5));position:relative;z-index:1;}
-.cat-card-body{padding:.8rem .85rem .9rem;}
-.cat-card-name{font-size:.86rem;font-weight:900;line-height:1.25;
+.cat-card{display:flex;align-items:center;gap:.8rem;background:var(--bg-1);border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;padding:.7rem;transition:transform .16s,border-color .16s,box-shadow .16s;}
+.cat-card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.2);box-shadow:0 10px 22px -14px rgba(0,0,0,.6);}
+.cat-card-media{position:relative;width:56px;height:56px;flex:none;border-radius:8px;background:var(--bg-0);
+  background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.07);}
+.cat-card-icon{width:24px;height:24px;color:var(--ink-faint);}
+.cat-card-icon svg{width:100%;height:100%;}
+.cat-card-body{min-width:0;flex:1;}
+.cat-card-name{font-size:.82rem;font-weight:700;line-height:1.3;margin-bottom:.3rem;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.cat-card-cta{font-size:.7rem;font-weight:700;color:var(--orange-2);}
+@media (min-width:560px){.cat-grid{grid-template-columns:repeat(3,1fr);}}
+@media (min-width:860px){.cat-grid{grid-template-columns:repeat(4,1fr);}}
 @media (min-width:640px){.pgrid{grid-template-columns:repeat(3,1fr);gap:1.1rem;}}
 @media (min-width:1000px){.pgrid{grid-template-columns:repeat(4,1fr);gap:1.2rem;}}
 
@@ -340,23 +362,45 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
       <span class="wallet-label">Tu saldo</span>
       <span class="wallet-value" id="walletValue">$0.00</span>
     </div>
-    <a href="recargar.html" class="wallet-btn">💎 Recargar saldo</a>
+    <a href="recargar.html" class="wallet-btn">Recargar saldo</a>
   </div>
 </div>
 
 <main id="top">
+
+<div class="announce-bar">Recarga al instante · Paga con tu saldo FariPlay</div>
 
 <section class="hero-carousel" id="heroCarousel">
   <div class="hc-track" id="hcTrack"></div>
   <div class="hc-dots" id="hcDots"></div>
 </section>
 
-<div class="shop-quicknav">
-  <div class="wrap shop-quicknav-in">
-    <a href="#sec-topup">🎮 Recargas</a>
-    <a href="#sec-giftcard">🎁 Tarjetas</a>
+<section class="search-band">
+  <div class="wrap">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="storeSearch" placeholder="Busca un juego o tarjeta de regalo…">
+    </div>
+    <div class="quick-icons">
+      <a href="#sec-topup" class="quick-icon">
+        <span class="quick-icon-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="10" rx="5"/><path d="M7 11v4M5 13h4"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.5" cy="14" r="1"/></svg></span>
+        <span>Recargas</span>
+      </a>
+      <a href="#sec-giftcard" class="quick-icon">
+        <span class="quick-icon-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M3 13h18M12 9v12"/><path d="M12 9c-1.5-3-4-4-5.5-2.5S6 9 12 9c6 0 6.5-4.9 5.5-6.5S13.5 6 12 9z"/></svg></span>
+        <span>Tarjetas</span>
+      </a>
+      <a href="recargar.html" class="quick-icon">
+        <span class="quick-icon-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+        <span>Mi saldo</span>
+      </a>
+      <a href="https://wa.me/593992225484" target="_blank" rel="noopener" class="quick-icon">
+        <span class="quick-icon-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>
+        <span>Soporte</span>
+      </a>
+    </div>
   </div>
-</div>
+</section>
 
 <section class="trust">
   <div class="wrap trust-in">
@@ -562,7 +606,11 @@ var WHATSAPP_NUMBER = "593992225484";
    activó desde el panel). Se agrupan por categoría y se muestran como
    tarjetas que llevan a categoria.html con sus productos.
 ===================================================================== */
-const TIPO_ICONO = { topup: "🎮", giftcard: "🎁", gamekey: "🔑" };
+const ICONO_CONTROLLER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="10" rx="5"/><path d="M7 11v4M5 13h4"/><circle cx="16" cy="11.5" r="1"/><circle cx="18.5" cy="14" r="1"/></svg>';
+const ICONO_GIFT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M3 13h18M12 9v12"/><path d="M12 9c-1.5-3-4-4-5.5-2.5S6 9 12 9c6 0 6.5-4.9 5.5-6.5S13.5 6 12 9z"/></svg>';
+const ICONO_KEY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="15" r="4"/><path d="M10 12l9-9M17 5l2 2M14 8l2 2"/></svg>';
+const ICONO_CART = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6 5 3H2"/><circle cx="9" cy="20" r="1"/><circle cx="17" cy="20" r="1"/></svg>';
+const TIPO_ICONO = { topup: ICONO_CONTROLLER, giftcard: ICONO_GIFT, gamekey: ICONO_KEY };
 const TIPO_LABEL_CORTA = { topup: "Recarga", giftcard: "Tarjeta", gamekey: "Llave" };
 
 (async function cargarBannersHero(){
@@ -608,6 +656,8 @@ const TIPO_LABEL_CORTA = { topup: "Recarga", giftcard: "Tarjeta", gamekey: "Llav
   }
 })();
 
+let TODAS_CATEGORIAS_STORE = [];
+
 (async function cargarCategorias(){
   const wrap = document.getElementById("catSections");
   try{
@@ -637,43 +687,61 @@ const TIPO_LABEL_CORTA = { topup: "Recarga", giftcard: "Tarjeta", gamekey: "Llav
       }
     });
 
-    const lista = Object.values(categorias);
-
-    const grupos = { topup: [], giftcard: [], gamekey: [] };
-    lista.forEach(c => { if (grupos[c.tipo]) grupos[c.tipo].push(c); });
-    Object.values(grupos).forEach(arr => arr.sort((a, b) => (a.nombrePublico || a.nombre).localeCompare(b.nombrePublico || b.nombre)));
-
-    const SECCION_TITULO = { topup: "🎮 Recargas de juegos", giftcard: "🎁 Tarjetas de regalo", gamekey: "🔑 Llaves digitales" };
-    const SECCION_ID = { topup: "sec-topup", giftcard: "sec-giftcard", gamekey: "sec-gamekey" };
-
-    function tarjetaHtml(c){
-      const nombre = c.nombrePublico || c.nombre;
-      return `
-      <a class="cat-card" href="categoria.html?tipo=${encodeURIComponent(c.tipo)}&category_id=${encodeURIComponent(c.category_id)}">
-        <div class="cat-card-media" ${c.imagen ? `style="background-image:url('${c.imagen}')"` : ''}>
-          ${!c.imagen ? `<span class="cat-card-icon">${TIPO_ICONO[c.tipo] || "🛒"}</span>` : ''}
-        </div>
-        <div class="cat-card-body">
-          <div class="cat-card-name">${nombre}</div>
-        </div>
-      </a>`;
-    }
-
-    let html = "";
-    ["topup", "giftcard"].forEach(tipoKey => {
-      if (!grupos[tipoKey].length) return;
-      html += `
-        <div class="cat-section" id="${SECCION_ID[tipoKey]}">
-          <h2 class="cat-section-title">${SECCION_TITULO[tipoKey]}</h2>
-          <div class="cat-grid">${grupos[tipoKey].map(tarjetaHtml).join("")}</div>
-        </div>`;
-    });
-
-    wrap.innerHTML = html || '<p class="cat-empty">Muy pronto vas a encontrar aquí recargas de juegos y tarjetas de regalo.</p>';
+    TODAS_CATEGORIAS_STORE = Object.values(categorias);
+    renderCatSections(TODAS_CATEGORIAS_STORE);
   }catch(e){
     wrap.innerHTML = '<p class="cat-empty">No se pudo cargar el catálogo. Intenta de nuevo más tarde.</p>';
   }
 })();
+
+const SECCION_TITULO = { topup: "Recargas de juegos", giftcard: "Tarjetas de regalo", gamekey: "Llaves digitales" };
+const SECCION_ID = { topup: "sec-topup", giftcard: "sec-giftcard", gamekey: "sec-gamekey" };
+
+function tarjetaHtml(c){
+  const nombre = c.nombrePublico || c.nombre;
+  return `
+  <a class="cat-card" href="categoria.html?tipo=${encodeURIComponent(c.tipo)}&category_id=${encodeURIComponent(c.category_id)}">
+    <div class="cat-card-media" ${c.imagen ? `style="background-image:url('${c.imagen}')"` : ''}>
+      ${!c.imagen ? `<span class="cat-card-icon">${TIPO_ICONO[c.tipo] || ICONO_CART}</span>` : ''}
+    </div>
+    <div class="cat-card-body">
+      <div class="cat-card-name">${nombre}</div>
+      <span class="cat-card-cta">Ver productos</span>
+    </div>
+  </a>`;
+}
+
+function renderCatSections(lista){
+  const wrap = document.getElementById("catSections");
+  const grupos = { topup: [], giftcard: [], gamekey: [] };
+  lista.forEach(c => { if (grupos[c.tipo]) grupos[c.tipo].push(c); });
+  Object.values(grupos).forEach(arr => arr.sort((a, b) => (a.nombrePublico || a.nombre).localeCompare(b.nombrePublico || b.nombre)));
+
+  let html = "";
+  ["topup", "giftcard"].forEach(tipoKey => {
+    if (!grupos[tipoKey].length) return;
+    html += `
+      <div class="cat-section" id="${SECCION_ID[tipoKey]}">
+        <div class="cat-section-head">
+          <div class="cat-section-head-left">
+            <span class="cat-section-icon">${TIPO_ICONO[tipoKey]}</span>
+            <h2 class="cat-section-title">${SECCION_TITULO[tipoKey]}</h2>
+          </div>
+          <span class="cat-section-count">${grupos[tipoKey].length}</span>
+        </div>
+        <div class="cat-grid">${grupos[tipoKey].map(tarjetaHtml).join("")}</div>
+      </div>`;
+  });
+
+  wrap.innerHTML = html || '<p class="cat-empty">No encontramos nada con esa búsqueda.</p>';
+}
+
+document.getElementById("storeSearch").addEventListener("input", (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  if (!q) { renderCatSections(TODAS_CATEGORIAS_STORE); return; }
+  const filtradas = TODAS_CATEGORIAS_STORE.filter(c => (c.nombrePublico || c.nombre).toLowerCase().includes(q));
+  renderCatSections(filtradas);
+});
 
 /* ---------- año footer ---------- */
 var yr = document.getElementById("yr"); if(yr) yr.textContent = new Date().getFullYear();
