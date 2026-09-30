@@ -148,21 +148,6 @@ html.logged .sec-h{display:none}
 .cta{background:linear-gradient(135deg,#0B1F3A,#0B3C85);color:#fff;padding:48px 0;text-align:center}
 .cta .w{display:flex;flex-direction:column;align-items:center;gap:20px}.cta h2{color:#fff}
 @media(min-width:900px){.vhero .w{grid-template-columns:1.2fr .8fr}.vhero{padding:72px 0 110px}}
-/* ventana del canal de WhatsApp */
-.wap{position:fixed;left:12px;right:12px;bottom:12px;max-width:380px;margin:0 auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 24px 60px -16px rgba(0,0,0,.55);z-index:90;transform:translateY(130%);transition:transform .45s cubic-bezier(.2,.85,.3,1)}
-.wap.show{transform:none}
-.wap-top{background:linear-gradient(135deg,#0E7A45,#25D366);color:#fff;padding:20px 20px 18px;position:relative}
-.wap-top svg{width:46px;height:46px;background:rgba(255,255,255,.2);border-radius:14px;padding:9px;margin-bottom:10px}
-.wap-top b{display:block;font-size:1.15rem;line-height:1.2}
-.wap-x{position:absolute;top:10px;right:12px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(0,0,0,.2);color:#fff;cursor:pointer;font-size:1rem}
-.wap-body{padding:16px 20px 20px}
-.wap-body p{color:var(--ink2);font-size:.92rem;margin-bottom:12px}
-.wap-perks{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.wap-perks span{background:#E8F7EE;color:#0E6B3E;font-weight:700;font-size:.78rem;padding:5px 11px;border-radius:20px}
-.wap-go{display:block;text-align:center;background:#25A35A;color:#fff;font-weight:700;padding:13px;border-radius:10px}
-.wap-no{display:block;margin:10px auto 0;background:none;border:0;color:var(--mute);font:inherit;font-size:.85rem;cursor:pointer}
-@media(min-width:700px){.wap{left:auto;right:84px;bottom:18px;margin:0}}
-@media(prefers-reduced-motion:reduce){.wap{transition:none}}
 
 body{font-size:15px}
 h1{font-size:clamp(1.7rem,5vw,2.5rem)}
@@ -181,6 +166,34 @@ h2{font-size:clamp(1.25rem,3vw,1.65rem)}
 .cat-section-title{font-size:1rem}
 .sec{padding:40px 0}.cta{padding:36px 0}
 @media(min-width:900px){.sec{padding:52px 0}.vhero{padding:48px 0 88px}}
+
+/* ventana del canal de WhatsApp */
+.wap{position:fixed;left:12px;right:12px;bottom:12px;max-width:392px;margin:0 auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 30px 70px -20px rgba(6,20,40,.6),0 0 0 1px rgba(11,31,58,.06);z-index:90;opacity:0;transform:translateY(26px) scale(.97);pointer-events:none;transition:transform .5s cubic-bezier(.2,.9,.3,1.1),opacity .35s}
+.wap.show{opacity:1;transform:none;pointer-events:auto}
+.wap-top{position:relative;padding:22px 22px 20px;color:#fff;background:linear-gradient(135deg,#075E54 0%,#128C7E 55%,#25D366 135%);overflow:hidden}
+.wap-top::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.2) 50%,transparent 65%);transform:translateX(-120%);animation:wapShine 5s ease-in-out 1.2s infinite;pointer-events:none}
+@keyframes wapShine{0%,55%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+.wap-ic{position:relative;width:52px;height:52px;border-radius:16px;background:rgba(255,255,255,.18);display:grid;place-items:center;margin-bottom:14px}
+.wap-ic svg{width:28px;height:28px}
+.wap-ic::before{content:"";position:absolute;inset:0;border-radius:16px;border:2px solid rgba(255,255,255,.65);animation:wapPulse 2.8s ease-out infinite}
+@keyframes wapPulse{0%{transform:scale(1);opacity:.85}100%{transform:scale(1.55);opacity:0}}
+.wap-badge{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:700;background:rgba(255,255,255,.2);border-radius:20px;padding:3px 10px 3px 7px;margin-bottom:8px}
+.wap-badge svg{width:13px;height:13px}
+.wap-top .t{display:block;font-size:1.2rem;line-height:1.2;letter-spacing:-.01em}
+.wap-x{position:absolute;top:12px;right:12px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(0,0,0,.22);color:#fff;cursor:pointer;font-size:.9rem;z-index:2}
+.wap-body{padding:18px 22px 18px}
+.wap-body>p{color:#3B4A5F;font-size:.9rem;line-height:1.55;margin-bottom:12px}
+.wap-list{list-style:none;margin:0 0 18px}
+.wap-list li{display:flex;gap:10px;align-items:center;font-size:.86rem;font-weight:600;color:#0F1B2D;padding:6px 0}
+.wap-list svg{width:18px;height:18px;flex:none;color:#128C4A}
+.wap-go{display:flex;align-items:center;justify-content:center;gap:9px;background:#128C4A;color:#fff;font-weight:700;font-size:.92rem;padding:13px;border-radius:12px;transition:background .2s,transform .2s}
+.wap-go:hover{background:#0E7A3F;transform:translateY(-1px)}
+.wap-go svg{width:19px;height:19px}
+.wap-no{display:block;margin:12px auto 0;background:none;border:0;color:#66758A;font:inherit;font-size:.86rem;font-weight:600;cursor:pointer}
+.wap-no:hover{color:#0F1B2D}
+.wap .wap-fine{text-align:center;font-size:.72rem;color:#8593A6;margin:10px 0 0}
+@media(min-width:700px){.wap{left:auto;right:84px;bottom:20px;margin:0}}
+@media(prefers-reduced-motion:reduce){.wap,.wap-go{transition:none}.wap-top::after,.wap-ic::before{animation:none}}
 </style></head><body>
 <header><div class="w hb">
   <a href="#top" class="brand"><img src="logo.png" alt="FariPlay" onerror="this.outerHTML='<b>FariPlay</b>'"></a>
@@ -479,20 +492,41 @@ if("IntersectionObserver" in window){
 
 })();
 </script>
-<div class="wap" id="waPop" role="dialog" aria-label="Canal de WhatsApp">
-  <div class="wap-top"><button class="wap-x" id="waPopX" aria-label="Cerrar">✕</button>
-    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-13.4 7.8L3 21l1.3-4.4A9 9 0 1 1 21 12z"/></svg>
-    <b>Únete a nuestro canal de WhatsApp</b></div>
-  <div class="wap-body"><p>Entérate primero de precios, promos y disponibilidad.</p>
-    <div class="wap-perks"><span>Promos</span><span>Precios al día</span><span>Nuevos juegos</span></div>
-    <a class="wap-go" href="https://whatsapp.com/channel/0029VbDdDfoG3R3r6dhezS2i" target="_blank" rel="noopener" id="waPopGo">Unirme al canal</a>
-    <button class="wap-no" id="waPopNo" type="button">Ahora no</button></div>
+<div class="wap" id="waPop" role="dialog" aria-labelledby="waPopT">
+  <div class="wap-top">
+    <button class="wap-x" id="waPopX" type="button" aria-label="Cerrar">✕</button>
+    <div class="wap-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-13.4 7.8L3 21l1.3-4.4A9 9 0 1 1 21 12z"/><path d="M9.5 8.5c.3 2.4 2.6 4.7 5 5l1.2-1.2-1.8-1-.8.7c-.8-.3-1.6-1.1-1.9-1.9l.7-.8-1-1.8z"/></svg></div>
+    <span class="wap-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4.5 4.5L19 7"/></svg>Canal oficial</span>
+    <b class="t" id="waPopT">Mantente al día con FariPlay</b>
+  </div>
+  <div class="wap-body">
+    <p>Síguenos en nuestro canal de WhatsApp y recibe la información importante antes que nadie.</p>
+    <ul class="wap-list">
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4.5 4.5L19 7"/></svg>Promociones y ofertas</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4.5 4.5L19 7"/></svg>Precios actualizados</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4.5 4.5L19 7"/></svg>Nuevos juegos y tarjetas disponibles</li>
+    </ul>
+    <a class="wap-go" id="waPopGo" href="https://whatsapp.com/channel/0029VbDdDfoG3R3r6dhezS2i" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-13.4 7.8L3 21l1.3-4.4A9 9 0 1 1 21 12z"/><path d="M9.5 8.5c.3 2.4 2.6 4.7 5 5l1.2-1.2-1.8-1-.8.7c-.8-.3-1.6-1.1-1.9-1.9l.7-.8-1-1.8z"/></svg>Unirme al canal</a>
+    <button class="wap-no" id="waPopNo" type="button">Ahora no</button>
+    <p class="wap-fine">Es gratis y puedes dejar de seguirlo cuando quieras.</p>
+  </div>
 </div>
 <script>
-(function(){var p=document.getElementById("waPop");if(!p)return;
-function cerrar(){p.classList.remove("show");try{sessionStorage.setItem("waPop","1")}catch(e){}}
-["waPopX","waPopNo","waPopGo"].forEach(function(i){document.getElementById(i).addEventListener("click",cerrar)});
-setTimeout(function(){var visto=false;try{visto=sessionStorage.getItem("waPop")}catch(e){}
-if(!visto&&document.documentElement.classList.contains("logged"))p.classList.add("show")},2200)})();
+(function(){
+  var p=document.getElementById("waPop"); if(!p) return;
+  var K="waCanalAviso";
+  function hoy(){var d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
+  function leer(){try{return localStorage.getItem(K)}catch(e){return null}}
+  function guardar(v){try{localStorage.setItem(K,v)}catch(e){}}
+  function cerrar(){p.classList.remove("show");}
+  function postergar(){guardar(hoy());cerrar();}           /* reaparece mañana */
+  document.getElementById("waPopNo").addEventListener("click",postergar);
+  document.getElementById("waPopX").addEventListener("click",postergar);
+  document.getElementById("waPopGo").addEventListener("click",function(){guardar("unido");cerrar();});
+  setTimeout(function(){
+    var v=leer(); if(v==="unido"||v===hoy()) return;
+    if(document.documentElement.classList.contains("logged")) p.classList.add("show");
+  },2000);
+})();
 </script>
 </body></html>

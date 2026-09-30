@@ -55,6 +55,28 @@ h1{font-size:1.35rem;font-weight:900;line-height:1.15;text-shadow:0 2px 8px rgba
 
 .empty{text-align:center;padding:60px 20px;color:var(--muted);}
 .loading{text-align:center;padding:50px;color:var(--muted);font-size:.85rem;}
+/* -------- menú ☰ compartido (todas las funciones) -------- */
+.hdr-actions{display:flex;align-items:center;gap:.6rem;}
+.hdr-greet{font-size:.78rem;font-weight:900;color:var(--orange-2);white-space:nowrap;}
+.navtog{display:flex;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;
+  width:36px;height:36px;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;flex:none;}
+.navtog span{width:16px;height:2.5px;background:#FF6347;border-radius:2px;}
+.nav{position:fixed;inset:0 0 auto 0;width:100%;background:var(--bg-1);
+  padding:5.5rem 1.6rem 2.4rem;transform:translateY(-100%);transition:transform .32s ease;
+  border-bottom:2px solid var(--orange);max-height:100vh;overflow-y:auto;z-index:299;}
+.nav.open{transform:translateY(0);}
+.nav-close{position:absolute;top:1rem;right:1.2rem;width:38px;height:38px;background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);border-radius:8px;color:var(--ink);font-size:1.3rem;line-height:1;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.nav-section{max-width:520px;margin:0 auto 1.6rem;}
+.nav-section-title{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.12em;
+  color:var(--muted);margin-bottom:.8rem;}
+.nav-link{display:block;width:100%;text-align:left;background:none;border:none;font-family:inherit;
+  font-size:1.02rem;font-weight:800;color:var(--ink-dim);padding:.65rem 0;cursor:pointer;
+  border-bottom:1px solid rgba(255,255,255,.06);}
+.nav-link:hover{color:var(--orange-2);}
+.nav-link--danger:hover{color:#ff8080;}
+.nav-account-email{font-size:.78rem;color:var(--muted);padding-bottom:.6rem;word-break:break-all;}
 </style>
 <link rel="stylesheet" href="tema.css">
 </head>
@@ -62,8 +84,27 @@ h1{font-size:1.35rem;font-weight:900;line-height:1.15;text-shadow:0 2px 8px rgba
 
 <header class="hdr">
   <a href="index.html"><img src="logo.png" alt="FariPlay" class="brand-logo" onerror="this.style.display='none'"></a>
-  <a href="index.html" class="back">← Categorías</a>
+  <div class="hdr-actions"><a href="index.html" class="back">← Catálogo</a><span class="hdr-greet" id="hdrGreet"></span>
+    <button class="navtog" id="navtog" aria-label="Menú" aria-expanded="false"><span></span><span></span><span></span></button></div>
 </header>
+
+<nav class="nav" id="nav">
+  <button class="nav-close" id="navClose" aria-label="Cerrar menú">✕</button>
+  <div class="nav-section">
+    <p class="nav-section-title">Explorar</p>
+    <a href="index.html" class="nav-link">Inicio</a>
+    <a href="index.html#paquetes" class="nav-link">Catálogo</a>
+  </div>
+  <div class="nav-section">
+    <p class="nav-section-title">Mi cuenta</p>
+    <p class="nav-account-email" id="navAccountEmail"></p>
+    <a href="perfil.html" class="nav-link">Mi perfil</a>
+    <a href="mis-pedidos.html" class="nav-link">Mis pedidos</a>
+    <a href="recargar.html" class="nav-link">Recargar saldo</a>
+    <a href="admin.html" class="nav-link" id="navAdminLink" style="display:none;">Panel admin</a>
+    <button type="button" class="nav-link nav-link--danger" id="navSalirBtn">Cerrar sesión</button>
+  </div>
+</nav>
 
 <div class="cat-hero" id="catHero">
   <span class="cat-hero-icon" id="catHeroIcon"></span>
@@ -133,6 +174,20 @@ const TIPO_ICONO = { topup: ICONO_CONTROLLER, giftcard: ICONO_GIFT, gamekey: ICO
         <span class="prod-buy">Comprar</span>
       </div>
     </a>`).join("");
+})();
+</script>
+<script>
+(async () => {
+  const navEl = document.getElementById("nav"), tog = document.getElementById("navtog");
+  tog.addEventListener("click", () => { const o = navEl.classList.toggle("open"); tog.setAttribute("aria-expanded", o); });
+  navEl.addEventListener("click", (e) => { if (e.target.closest("a")) navEl.classList.remove("open"); });
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { document.getElementById("navAccountEmail").closest(".nav-section").innerHTML = '<p class="nav-section-title">Mi cuenta</p><a href="auth.html" class="nav-link">Iniciar sesión</a>'; return; }
+  const u = session.user, email = u.email || "", nombre = ((u.user_metadata && u.user_metadata.full_name) || email.split("@")[0]).trim().split(" ")[0];
+  document.getElementById("hdrGreet").textContent = "Hola, " + nombre;
+  document.getElementById("navAccountEmail").textContent = email;
+  if (email === "hfarinango2707@gmail.com") document.getElementById("navAdminLink").style.display = "block";
+  document.getElementById("navSalirBtn").addEventListener("click", async () => { await sb.auth.signOut(); location.href = "index.html"; });
 })();
 </script>
 </body>
