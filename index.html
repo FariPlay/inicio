@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FariPlay — Recargas y tarjetas digitales en Ecuador</title>
-<meta name="description" content="Recargas de videojuegos, tarjetas de regalo y llaves digitales. Para personas y para negocios.">
+<title>FariPlay — Recargas de videojuegos y tarjetas de regalo en Ecuador</title>
+<meta name="description" content="Recargas de videojuegos y tarjetas de regalo en Ecuador.">
 <meta name="theme-color" content="#0B1F3A">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B4AA6'/%3E%3Cpath d='M20 46V18h22v7H28v5h12v7H28v9z' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>try{if(Object.keys(localStorage).some(function(k){return /^sb-.+-auth-token$/.test(k)}))document.documentElement.classList.add("logged")}catch(e){}</script>
 <style>
-:root{--ink:#0F1B2D;--ink2:#3B4A5F;--mute:#66758A;--line:#D9E2EE;--soft:#EEF3FA;--navy:#0B1F3A;--b:#0B4AA6;--b2:#1F6FE0;--y:#F5B700;--f:'Manrope',Arial,sans-serif}
+:root{--ink:#0F1B2D;--ink2:#3B4A5F;--mute:#66758A;--line:#D9E2EE;--soft:#EEF3FA;--navy:#0B1F3A;--b:#0B4AA6;--b2:#1F6FE0;--y:#E04A2B;--f:'Manrope',Arial,sans-serif}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;scroll-padding-top:76px}
 body{font-family:var(--f);color:var(--ink);background:#fff;line-height:1.55;-webkit-font-smoothing:antialiased}
@@ -134,10 +134,57 @@ html.logged .hero-carousel{aspect-ratio:16/7;border-radius:14px}
 .shop-bar .find{max-width:none;border-width:1px;border-color:var(--line);box-shadow:0 8px 20px -12px rgba(11,74,166,.55)}
 html.logged .sec{padding:18px 0 44px}
 html.logged .sec-h{display:none}
+
+.acct{background:none;color:#fff;border:1px solid rgba(255,255,255,.4)}
+.acct-cta{font-weight:700;font-size:.86rem;padding:9px 16px;background:var(--y);color:var(--navy);border-radius:8px}
+.vhero{background:linear-gradient(135deg,#0B1F3A 0%,#0B3C85 100%);color:#fff;padding:48px 0 92px;overflow:hidden}
+.vhero .w{display:grid;gap:30px;align-items:center}
+.vhero h1{color:#fff;max-width:11em}.vhero .lead{color:#D3DCEA}
+.art{position:relative;width:min(300px,78%);margin:0 auto}.art svg{width:100%;height:auto;display:block}
+.chip{position:absolute;background:#fff;color:var(--navy);font-weight:700;font-size:.78rem;padding:8px 13px;border-radius:10px;box-shadow:0 12px 26px -10px rgba(0,0,0,.55);white-space:nowrap}
+.chip i{color:#0E8A4F;font-style:normal;margin-right:6px}
+.vfacts{margin-top:-52px;position:relative;z-index:2}
+.vfacts .facts{margin-top:0;box-shadow:0 14px 34px -18px rgba(11,31,58,.5)}
+.cta{background:linear-gradient(135deg,#0B1F3A,#0B3C85);color:#fff;padding:48px 0;text-align:center}
+.cta .w{display:flex;flex-direction:column;align-items:center;gap:20px}.cta h2{color:#fff}
+@media(min-width:900px){.vhero .w{grid-template-columns:1.2fr .8fr}.vhero{padding:72px 0 110px}}
+/* ventana del canal de WhatsApp */
+.wap{position:fixed;left:12px;right:12px;bottom:12px;max-width:380px;margin:0 auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 24px 60px -16px rgba(0,0,0,.55);z-index:90;transform:translateY(130%);transition:transform .45s cubic-bezier(.2,.85,.3,1)}
+.wap.show{transform:none}
+.wap-top{background:linear-gradient(135deg,#0E7A45,#25D366);color:#fff;padding:20px 20px 18px;position:relative}
+.wap-top svg{width:46px;height:46px;background:rgba(255,255,255,.2);border-radius:14px;padding:9px;margin-bottom:10px}
+.wap-top b{display:block;font-size:1.15rem;line-height:1.2}
+.wap-x{position:absolute;top:10px;right:12px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(0,0,0,.2);color:#fff;cursor:pointer;font-size:1rem}
+.wap-body{padding:16px 20px 20px}
+.wap-body p{color:var(--ink2);font-size:.92rem;margin-bottom:12px}
+.wap-perks{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.wap-perks span{background:#E8F7EE;color:#0E6B3E;font-weight:700;font-size:.78rem;padding:5px 11px;border-radius:20px}
+.wap-go{display:block;text-align:center;background:#25A35A;color:#fff;font-weight:700;padding:13px;border-radius:10px}
+.wap-no{display:block;margin:10px auto 0;background:none;border:0;color:var(--mute);font:inherit;font-size:.85rem;cursor:pointer}
+@media(min-width:700px){.wap{left:auto;right:84px;bottom:18px;margin:0}}
+@media(prefers-reduced-motion:reduce){.wap{transition:none}}
+
+body{font-size:15px}
+h1{font-size:clamp(1.7rem,5vw,2.5rem)}
+h2{font-size:clamp(1.25rem,3vw,1.65rem)}
+.lead{font-size:.95rem}
+.b{font-size:.88rem;padding:11px 18px}
+.b.yel{color:#fff}.b.yel:hover{background:#C93D20}
+.step em{color:#fff}
+.biz .tag{color:#fff}.card.biz li::before{color:#FFD0C2}
+.card{padding:22px}.card h3{font-size:1.1rem}
+.vhero{padding:34px 0 76px;background:radial-gradient(60% 90% at 88% 0%,rgba(31,111,224,.6),transparent 62%),radial-gradient(50% 80% at 0% 100%,rgba(224,74,43,.3),transparent 60%),linear-gradient(135deg,#0B1F3A,#0B3C85)}
+.vhero .w{grid-template-columns:1fr!important;gap:0}
+.vhero h1{max-width:14em}.vhero .lead{max-width:30em;margin:12px 0 20px}
+.facts b{font-size:.88rem}.facts span{font-size:.76rem}
+.step b{font-size:.92rem}
+.cat-section-title{font-size:1rem}
+.sec{padding:40px 0}.cta{padding:36px 0}
+@media(min-width:900px){.sec{padding:52px 0}.vhero{padding:48px 0 88px}}
 </style></head><body>
 <header><div class="w hb">
   <a href="#top" class="brand"><img src="logo.png" alt="FariPlay" onerror="this.outerHTML='<b>FariPlay</b>'"></a>
-  <nav class="top only-out" aria-label="Principal"><a href="#paquetes">Catálogo</a><a href="#accesos" class="only-out">Negocios</a><a href="#ayuda" class="only-out">Ayuda</a></nav>
+  <nav class="top only-out" aria-label="Principal"><a href="#paquetes">Catálogo</a><a href="#como">Cómo funciona</a><a href="#ayuda">Ayuda</a></nav>
   <div class="hr">
     <a href="auth.html" id="acctQuick" class="acct"><span id="acctQuickLabel">Ingresar</span></a>
     <button class="navtog" id="navtog" aria-label="Menú" aria-expanded="false"><span></span><span></span><span></span></button>
@@ -145,60 +192,59 @@ html.logged .sec-h{display:none}
 </div>
 <nav class="nav" id="nav"><button class="nav-close" id="navClose" aria-label="Cerrar">✕</button>
   <div class="nav-section"><p class="nav-section-title">Explorar</p>
-    <a href="#paquetes" class="nav-link">Catálogo</a><a href="#accesos" class="nav-link only-out">Para negocios</a><a href="#ayuda" class="nav-link only-out">Preguntas frecuentes</a></div>
+    <a href="#paquetes" class="nav-link">Catálogo</a><a href="#como" class="nav-link only-out">Cómo funciona</a><a href="#ayuda" class="nav-link only-out">Preguntas frecuentes</a></div>
   <div class="nav-section" id="navAccountSection"><p class="nav-section-title">Mi cuenta</p><a href="auth.html" class="nav-link">Iniciar sesión</a></div>
 </nav></header>
 <div class="wallet" id="walletBand" style="display:none"><div class="w"><div><span class="wallet-label">Saldo disponible</span><span class="wallet-value" id="walletValue">$0.00</span></div><a href="recargar.html" class="wallet-btn">Recargar saldo</a></div></div>
 <main id="top">
-<section class="hero"><div class="w">
-  <div class="hero-txt">
-    <h1>Recargas y tarjetas digitales para todos.</h1>
-    <p class="lead">Diamantes, tarjetas de regalo y llaves de activación. Compra para ti o ábrete una cuenta de negocio con precios especiales.</p>
-  </div>
-  <div class="hero-carousel" id="heroCarousel"><div class="hc-track" id="hcTrack"></div><div class="hc-dots" id="hcDots"></div></div>
-  <div class="facts-wrap"><ul class="facts">
-    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg><div><b>Entrega en minutos</b><span>Casi siempre en menos de 15 min.</span></div></li>
-    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v12H4zM4 11h16"/></svg><div><b>Pago con saldo</b><span>Recarga una vez y compra al instante.</span></div></li>
-    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.4 8.5 8 9.5 4.6-1 8-4.5 8-9.5V6z"/><path d="m9 12 2 2 4-4"/></svg><div><b>ID validado</b><span>Verifica la cuenta antes de pagar.</span></div></li>
-    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg><div><b>Soporte diario</b><span>8 a. m. a 10 p. m. por WhatsApp.</span></div></li>
-  </ul></div>
+<section class="vhero only-out"><div class="w">
+  <h1>Recargas de videojuegos y tarjetas de regalo.</h1>
+  <p class="lead">Elige tu juego, completa tus datos y recibe tu recarga en minutos. Crea tu cuenta gratis y empieza hoy.</p>
+  <div class="bt"><a class="b yel" href="auth.html?modo=signup">Crear cuenta</a><a class="b line" href="#paquetes">Ver catálogo</a></div>
 </div></section>
+<div class="w vfacts only-out"><ul class="facts">
+  <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7z"/></svg><div><b>Entrega en minutos</b><span>Casi siempre en menos de 15 min.</span></div></li>
+  <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.4 8.5 8 9.5 4.6-1 8-4.5 8-9.5V6z"/></svg><div><b>Compra segura</b><span>Nunca pedimos tu contraseña.</span></div></li>
+  <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg><div><b>Historial de pedidos</b><span>Consulta tus compras cuando quieras.</span></div></li>
+  <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1"/><rect x="17" y="14" width="4" height="6" rx="1"/></svg><div><b>Soporte diario</b><span>8 a. m. a 10 p. m. por WhatsApp.</span></div></li>
+</ul></div>
+<section class="hero only-in"><div class="w"><div class="hero-carousel" id="heroCarousel"><div class="hc-track" id="hcTrack"></div><div class="hc-dots" id="hcDots"></div></div></div></section>
 <div class="shop-bar only-in"><div class="w"><div class="find"><input id="storeSearch" type="search" placeholder="¿Qué juego quieres recargar?" aria-label="Buscar juego"><button type="button" onclick="document.getElementById('paquetes').scrollIntoView()">Buscar</button></div></div></div>
 <section class="sec" id="paquetes"><div class="w">
   <div class="sec-h"><h2>Catálogo</h2><p>Elige tu juego o tarjeta y mira los productos disponibles.</p></div>
   <div id="catSections"><p class="cat-loading">Cargando catálogo…</p></div>
 </div></section>
 <section class="sec only-out" id="accesos"><div class="w">
-  <div class="sec-h"><h2>Elige cómo quieres comprar</h2><p>Mismo catálogo, dos tipos de cuenta.</p></div>
+  <div class="sec-h"><h2>Para personas y para negocios</h2><p>Mismo catálogo, elige el tipo de cuenta.</p></div>
   <div class="acc">
-    <div class="card pub"><span class="tag">Personas</span><h3>Compra para ti</h3><p>Crea tu cuenta gratis y recarga tus juegos cuando quieras.</p>
-      <ul><li>Valida tu ID antes de pagar</li><li>Paga con tu saldo FariPlay</li><li>Historial de todos tus pedidos</li></ul>
-      <a class="b blue" href="auth.html">Crear cuenta</a></div>
-    <div class="card biz"><span class="tag">Negocios</span><h3>Vende recargas en tu tienda</h3><p>Accede a precios especiales para negocios y atiende a tus clientes desde el mostrador.</p>
-      <ul><li>Precios para negocios</li><li>Historial de cada operación</li><li>Atención directa por WhatsApp</li></ul>
-      <div class="bt"><a class="b yel" href="auth.html">Ingresar como negocio</a><a class="b line" href="https://wa.me/593992225484?text=Hola%2C%20quiero%20precios%20para%20mi%20negocio" target="_blank" rel="noopener">Pedir precios</a></div></div>
+    <div class="card pub"><span class="tag">Personas</span><h3>Compra para ti</h3><p>Crea tu cuenta gratis y compra tus recargas y tarjetas cuando quieras.</p>
+      <ul><li>Registro en un minuto</li><li>Historial de tus pedidos</li><li>Entrega en minutos</li></ul>
+      <a class="b blue" href="auth.html?modo=signup">Crear cuenta</a></div>
+    <div class="card biz"><span class="tag">Negocios</span><h3>Vende en tu tienda</h3><p>Cuenta de negocio con precios especiales para atender a tus clientes.</p>
+      <ul><li>Precios especiales</li><li>Historial de cada operación</li><li>Atención directa por WhatsApp</li></ul>
+      <a class="b yel" href="https://wa.me/593992225484?text=Hola%2C%20quiero%20crear%20una%20cuenta%20de%20negocio%20en%20FariPlay" target="_blank" rel="noopener">Crear cuenta de negocio</a></div>
   </div>
 </div></section>
-<section class="sec only-out" id="como" style="padding-top:0"><div class="w">
+<section class="sec only-out" id="como"><div class="w">
   <div class="sec-h"><h2>Cómo funciona</h2></div>
-  <div class="steps"><div class="step"><em>1</em><b>Recarga tu saldo</b></div><div class="step"><em>2</em><b>Elige el juego y valida el ID</b></div><div class="step"><em>3</em><b>Confirma y recibe al instante</b></div></div>
+  <div class="steps"><div class="step"><em>1</em><b>Crea tu cuenta gratis</b></div><div class="step"><em>2</em><b>Completa tus datos</b></div><div class="step"><em>3</em><b>Recibe tu recarga en minutos</b></div></div>
 </div></section>
 <section class="sec only-out" id="ayuda"><div class="w faq-g">
-  <div><h2>Preguntas frecuentes</h2><a class="wa-link" href="https://whatsapp.com/channel/0029Vb8DjsKHQbS2yeezJu1C" target="_blank" rel="noopener">Canal oficial de WhatsApp</a></div>
+  <div><h2>Preguntas frecuentes</h2><a class="wa-link" href="https://whatsapp.com/channel/0029VbDdDfoG3R3r6dhezS2i" target="_blank" rel="noopener">Canal oficial de WhatsApp</a></div>
   <div>
-    <details open><summary>¿Qué puedo comprar aquí?</summary><p>Recargas para juegos, tarjetas de regalo digitales y llaves de activación.</p></details>
+    <details open><summary>¿Qué puedo comprar aquí?</summary><p>Recargas para tus videojuegos y tarjetas de regalo digitales.</p></details>
+    <details><summary>¿Necesito una cuenta?</summary><p>Sí. Crearla es gratis y te permite comprar y ver el historial de tus pedidos.</p></details>
     <details><summary>¿Cuánto tarda?</summary><p>Menos de 15 minutos en la mayoría de los casos.</p></details>
-    <details><summary>¿Cómo pago?</summary><p>Con tu saldo FariPlay. Lo recargas por transferencia o depósito y compras al instante.</p></details>
-    <details><summary>¿Es seguro dar mis datos?</summary><p>Solo pedimos lo necesario para entregar tu producto, como el ID de jugador. Nunca pedimos tu contraseña.</p></details>
-    <details><summary>¿Puedo revender en mi negocio?</summary><p>Sí. Crea una cuenta de negocio, carga saldo y entrega las recargas a tus clientes.</p></details>
+    <details><summary>¿Es seguro dar mis datos?</summary><p>Solo pedimos lo necesario para entregar tu producto, como los datos de tu cuenta de juego. Nunca pedimos tu contraseña.</p></details>
     <details><summary>¿Tienen garantía?</summary><p>Sí, hay reembolso si algo falla.</p></details>
   </div>
 </div></section>
+<section class="cta only-out"><div class="w"><h2>Crea tu cuenta y recarga hoy mismo</h2><a class="b yel" href="auth.html?modo=signup">Crear cuenta</a></div></section>
 </main>
 <footer><div class="w">
   <div class="fg">
-    <div><img src="logo.png" alt="FariPlay" class="f-logo" onerror="this.outerHTML='<b>FariPlay</b>'">Plataforma ecuatoriana de recargas de videojuegos, tarjetas de regalo y llaves digitales para personas y negocios.<br><br><a href="https://wa.me/593992225484" target="_blank" rel="noopener">WhatsApp +593 99 222 5484</a>Lunes a domingo, 8:00 a. m. – 10:00 p. m.</div>
-    <div><b>Navegación</b><a href="#paquetes">Catálogo</a><a href="#accesos" class="only-out">Negocios</a><a href="#ayuda" class="only-out">Ayuda</a></div>
+    <div><img src="logo.png" alt="FariPlay" class="f-logo" onerror="this.outerHTML='<b>FariPlay</b>'">Plataforma ecuatoriana de recargas de videojuegos y tarjetas de regalo.<br><br><a href="https://wa.me/593992225484" target="_blank" rel="noopener">WhatsApp +593 99 222 5484</a>Lunes a domingo, 8:00 a. m. – 10:00 p. m.</div>
+    <div><b>Navegación</b><a href="#paquetes">Catálogo</a><a href="#como" class="only-out">Cómo funciona</a><a href="#ayuda" class="only-out">Ayuda</a></div>
     <div><b>Legal</b><a href="terminos.html">Términos</a><a href="privacidad.html">Privacidad</a><a href="proteccion.html">Protección de datos</a></div>
   </div>
   <p class="legal">© <span id="yr"></span> FariPlay. Los videojuegos, tarjetas y marcas mencionadas pertenecen a sus respectivos dueños. FariPlay es una tienda independiente no afiliada oficialmente a ninguna de ellas.</p>
@@ -432,5 +478,21 @@ if("IntersectionObserver" in window){
 }
 
 })();
+</script>
+<div class="wap" id="waPop" role="dialog" aria-label="Canal de WhatsApp">
+  <div class="wap-top"><button class="wap-x" id="waPopX" aria-label="Cerrar">✕</button>
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-13.4 7.8L3 21l1.3-4.4A9 9 0 1 1 21 12z"/></svg>
+    <b>Únete a nuestro canal de WhatsApp</b></div>
+  <div class="wap-body"><p>Entérate primero de precios, promos y disponibilidad.</p>
+    <div class="wap-perks"><span>Promos</span><span>Precios al día</span><span>Nuevos juegos</span></div>
+    <a class="wap-go" href="https://whatsapp.com/channel/0029VbDdDfoG3R3r6dhezS2i" target="_blank" rel="noopener" id="waPopGo">Unirme al canal</a>
+    <button class="wap-no" id="waPopNo" type="button">Ahora no</button></div>
+</div>
+<script>
+(function(){var p=document.getElementById("waPop");if(!p)return;
+function cerrar(){p.classList.remove("show");try{sessionStorage.setItem("waPop","1")}catch(e){}}
+["waPopX","waPopNo","waPopGo"].forEach(function(i){document.getElementById(i).addEventListener("click",cerrar)});
+setTimeout(function(){var visto=false;try{visto=sessionStorage.getItem("waPop")}catch(e){}
+if(!visto&&document.documentElement.classList.contains("logged"))p.classList.add("show")},2200)})();
 </script>
 </body></html>
