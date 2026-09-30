@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+/* FariPlay — tema profesional (se carga DESPUÉS del estilo de cada página) */
+:root{
+  --bg-0:#F2F5F9; --bg-1:#FFFFFF; --bg-2:#FFFFFF;
+  --ink:#0F1B2D; --ink-dim:#3B4A5F; --ink-faint:#66758A; --muted:#66758A;
+  --blue:#0B4AA6; --blue-2:#0B4AA6; --blue-glow:#0B4AA6;
+  --orange:#F5B700; --orange-2:#0B4AA6; --red:#C62828; --green:#0E8A4F; --cyan:#0B4AA6;
+  --paper:#F2F5F9; --navy:#0B1F3A; --line:#D9E0E9;
+  --font:'IBM Plex Sans',Arial,Helvetica,sans-serif; --font-d:var(--font); --font-b:var(--font); --font-m:var(--font);
+}
+body{background:var(--bg-0)!important;color:var(--ink);font-family:var(--font);}
+body::before{display:none!important;}
+h1,h2,h3{letter-spacing:-.01em;}
+/* cabecera, menú y pie: azul marino */
+.hdr,.site-header,.nav,footer{--ink:#FFFFFF;--ink-dim:#D3DCEA;--ink-faint:#93A3BA;--muted:#93A3BA;--orange-2:#F5C542;--bg-1:#0B1F3A;--bg-2:#0B1F3A;background:var(--navy)!important;color:#fff;}
+.hdr,.site-header{border-bottom:3px solid var(--orange)!important;backdrop-filter:none!important;}
+.nav{border-bottom:3px solid var(--orange)!important;}
+.navtog{background:rgba(255,255,255,.08)!important;}
+.navtog span{background:#F5C542!important;}
+.wallet-band{background:#0F2A4D!important;border-color:rgba(255,255,255,.12)!important;}
+/* tarjetas y paneles */
+.co-card,.balance-card,.step-box,.recarga-item,.order,.profile-card,.card,.state-card,.prod-card,.feature-card,.fitem,
+.ov-card,.success-card,.info-box,.cuenta-info,.panel,.cat-item,.live-search-box,.edit-panel,.lsr-item,.step{
+  background:#fff!important;border:1px solid var(--line)!important;box-shadow:0 1px 2px rgba(15,27,45,.06);border-radius:8px;color:var(--ink);}
+.order,.profile-card,.card,.state-card,.co-card,.balance-card{border-top:3px solid var(--navy)!important;}
+.prod-card:hover{border-color:var(--navy)!important;transform:none;box-shadow:0 4px 14px rgba(15,27,45,.1);}
+.metodo-btn,.banco-btn,.amount-chip,.comprobante-box,.filter-chip,.tab{background:#fff!important;border:1px solid var(--line)!important;color:var(--ink);}
+.metodo-btn.selected,.banco-btn.selected,.amount-chip.selected,.filter-chip.active,.tab.active{border-color:var(--navy)!important;background:#E8EEF8!important;color:var(--navy)!important;box-shadow:inset 0 0 0 1px var(--navy);}
+/* campos */
+.field-input,.filter-field input,.search-box input,.price-input,.cat-search,.live-search-input,.live-search-select,.estado-select,.edit-panel select,#storeSearch{
+  background:#fff!important;color:var(--ink)!important;border:1px solid #B9C4D3!important;border-radius:6px;}
+.field-input:focus,.filter-field input:focus,.search-box input:focus,.cat-search:focus{border-color:var(--navy)!important;box-shadow:0 0 0 3px rgba(11,74,166,.15);outline:none;}
+.search-band{background:#fff!important;border-bottom:1px solid var(--line);}
+.search-box svg{color:var(--ink-faint);}
+/* botones: amarillo señal con texto azul marino */
+.btn--fire,.btn-ok,.prod-buy,.wallet-btn,.ov-btn,.success-btn,.save-btn,.price-save,.cat-import-btn,.live-search-btn,.wa-popup-btn{
+  background:var(--orange)!important;color:var(--navy)!important;border:none;border-radius:6px;box-shadow:none!important;font-weight:700;text-transform:none;letter-spacing:0;}
+.btn--fire:hover,.btn-ok:hover:not(:disabled),.prod-buy:hover{background:#FFC71F!important;transform:none;}
+.btn-ok:disabled,.btn--fire:disabled{background:#D9E0E9!important;color:#8694A8!important;}
+.btn--ghost,.validate-btn,.ov-btn.ghost,.filter-clear{background:#fff!important;color:var(--navy)!important;border:1px solid var(--navy)!important;border-radius:6px;}
+.btn--google{border:1px solid #B9C4D3;}
+/* estados */
+.badge.pendiente{background:#FFF4D6;color:#8A5A00;border:1px solid #F1D38A;}
+.badge.confirmado,.badge.entregado{background:#E3F4EA;color:#0E6B3E;border:1px solid #A9D9BC;}
+.badge.rechazado{background:#FBE5E5;color:#A32020;border:1px solid #EBB0B0;}
+.msg.err,.msg-err,.validate-err,.saldo-warn{color:#B42318!important;}
+.msg.err{background:#FDECEA;border-color:#F1B8B2;}
+.msg.ok,.validate-ok{color:#0E6B3E!important;}
+.nav-link--danger:hover{color:#FFB4B4;}
+/* inicio */
+.section{background:var(--bg-0);}
+#como,#preguntas{background:#fff!important;border-top:1px solid var(--line);}
+.feature-icon{background:#E8EEF8!important;color:var(--navy)!important;border-color:var(--line)!important;}
+.finalcta{background:var(--navy)!important;color:#fff;}
+.finalcta h2{color:#fff;}
+.hero-carousel{display:none!important;} /* banners antiguos: borra esta línea para volver a mostrarlos */
+/* portada profesional */
+.pro-hero{background:var(--navy);color:#fff;padding:3.2rem 0 3.6rem;border-bottom:3px solid var(--orange);}
+.pro-hero .wrap{display:grid;gap:2.2rem;grid-template-columns:1fr;align-items:center;}
+.pro-hero h1{font-size:clamp(1.9rem,5.4vw,3rem);line-height:1.1;font-weight:700;max-width:16em;}
+.pro-hero p.lead{color:#D3DCEA;font-size:1.05rem;line-height:1.6;margin:1rem 0 1.6rem;max-width:34em;}
+.pro-cta{display:flex;gap:.8rem;flex-wrap:wrap;}
+.pro-cta a{padding:.85rem 1.4rem;border-radius:6px;font-weight:700;font-size:.95rem;}
+.pro-cta .p{background:var(--orange);color:var(--navy);}
+.pro-cta .s{border:1px solid rgba(255,255,255,.4);color:#fff;}
+.receipt{background:#fff;color:var(--ink);border-radius:8px;padding:1.3rem 1.4rem;max-width:380px;width:100%;box-shadow:0 18px 40px -16px rgba(0,0,0,.5);}
+.receipt h3{font-size:.8rem;font-weight:600;color:var(--ink-faint);margin-bottom:.9rem;}
+.rc-row{display:flex;justify-content:space-between;gap:1rem;padding:.6rem 0;border-bottom:1px solid var(--line);font-size:.9rem;}
+.rc-row span:first-child{color:var(--ink-faint);}
+.rc-row b{font-weight:600;text-align:right;}
+.rc-total{display:flex;justify-content:space-between;align-items:center;padding-top:.9rem;font-weight:700;font-size:1.1rem;}
+.rc-ok{display:inline-block;margin-top:.9rem;background:#E3F4EA;color:#0E6B3E;border-radius:20px;padding:.25rem .8rem;font-size:.78rem;font-weight:600;}
+@media(min-width:820px){.pro-hero .wrap{grid-template-columns:1.25fr .75fr;}.receipt{justify-self:end;}}

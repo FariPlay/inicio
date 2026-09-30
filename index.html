@@ -311,6 +311,7 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="tema.css">
 </head>
 <body>
 
@@ -338,7 +339,7 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
   <div class="nav-section">
     <p class="nav-section-title">Explorar</p>
     <a href="#top" class="nav-link">Inicio</a>
-    <a href="#paquetes" class="nav-link">Paquetes</a>
+    <a href="#paquetes" class="nav-link">Catálogo</a>
     <a href="#como" class="nav-link">Cómo funciona</a>
     <a href="#preguntas" class="nav-link">Preguntas</a>
   </div>
@@ -360,6 +361,25 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
 </div>
 
 <main id="top">
+
+<section class="pro-hero">
+  <div class="wrap">
+    <div>
+      <h1>Recargas de videojuegos para el mostrador de tu negocio</h1>
+      <p class="lead">Fondea tu saldo una vez y recarga a tus clientes en segundos: diamantes, tarjetas de regalo y llaves digitales desde una sola plataforma, con historial de cada operación.</p>
+      <div class="pro-cta"><a class="p" href="auth.html">Abrir cuenta de negocio</a><a class="s" href="#paquetes">Ver catálogo</a></div>
+    </div>
+    <div class="receipt" aria-label="Ejemplo de comprobante">
+      <h3>Ejemplo de comprobante</h3>
+      <div class="rc-row"><span>Servicio</span><b>Mobile Legends (Global)</b></div>
+      <div class="rc-row"><span>Producto</span><b>78 + 8 Diamonds</b></div>
+      <div class="rc-row"><span>ID validado</span><b>••••2922</b></div>
+      <div class="rc-row"><span>Forma de pago</span><b>Saldo FariPlay</b></div>
+      <div class="rc-total"><span>Total</span><span>$1.40</span></div>
+      <span class="rc-ok">Recarga entregada</span>
+    </div>
+  </div>
+</section>
 
 <section class="hero-carousel" id="heroCarousel">
   <div class="hc-track" id="hcTrack"></div>
@@ -409,11 +429,11 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
 
 <section class="section" id="como" style="background:var(--bg-1);">
   <div class="wrap">
-    <div class="s-head" data-reveal><h2>3 pasos</h2></div>
+    <div class="s-head" data-reveal><h2>Cómo funciona para tu negocio</h2></div>
     <div class="steps" data-reveal>
-      <div class="step"><em>01</em><h3>Elige tu producto</h3></div>
-      <div class="step"><em>02</em><h3>Confirma tus datos</h3></div>
-      <div class="step"><em>03</em><h3>Recibe al instante</h3></div>
+      <div class="step"><em>01</em><h3>Abre tu cuenta y fondea tu saldo</h3></div>
+      <div class="step"><em>02</em><h3>Elige el juego y valida el ID del cliente</h3></div>
+      <div class="step"><em>03</em><h3>Confirma y entrega la recarga</h3></div>
     </div>
   </div>
 </section>
@@ -450,8 +470,8 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
 
 <section class="finalcta">
   <div class="wrap" data-reveal>
-    <h2>¿Listo para tu próxima recarga?</h2>
-    <a href="#paquetes" class="btn btn--fire">Ver catálogo</a>
+    <h2>Empieza a ofrecer recargas en tu tienda</h2>
+    <a href="auth.html" class="btn btn--fire">Abrir cuenta de negocio</a>
   </div>
 </section>
 
@@ -462,12 +482,12 @@ footer{background:var(--bg-0);padding:2.4rem 0 1.4rem;border-top:1px solid rgba(
     <div class="f-col f-col--brand">
       <img src="logo.png" alt="FariPlay" class="f-logo"
            onerror="this.style.display='none'">
-      <p class="f-desc">Plataforma ecuatoriana de recargas para videojuegos, tarjetas de regalo y llaves digitales. Entregas ágiles, pagos verificados y atención cercana para toda la comunidad gamer del país.</p>
+      <p class="f-desc">Plataforma ecuatoriana de recargas para videojuegos, tarjetas de regalo y llaves digitales. Entregas ágiles, pagos verificados y atención cercana para toda la tiendas y negocios de todo el país.</p>
 
       <div class="f-info">
         <div class="f-info-row">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          <div><span class="f-info-lbl">Atención al cliente</span><a href="https://wa.me/593992225484" target="_blank" rel="noopener">+593 99 222 5484</a></div>
+          <div><span class="f-info-lbl">Atención a negocios</span><a href="https://wa.me/593992225484" target="_blank" rel="noopener">+593 99 222 5484</a></div>
         </div>
         <div class="f-info-row">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
