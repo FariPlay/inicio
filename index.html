@@ -296,6 +296,14 @@ var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   var session = res.data.session;
   if(!session){ document.documentElement.classList.remove("logged"); return; }
   document.documentElement.classList.add("logged");
+  try {
+    var raw = localStorage.getItem("fp_redirect");
+    if (raw) {
+      localStorage.removeItem("fp_redirect");
+      var d = JSON.parse(raw);
+      if (d && d.u && Date.now() - d.t < 600000 && /^[A-Za-z0-9_\-.\/?=&:%]+$/.test(d.u) && !/^(\/\/|[a-z]+:)/i.test(d.u)) { location.replace(d.u); return; }
+    }
+  } catch (_) {}
 
   var user = session.user;
   var email = user.email || "";
