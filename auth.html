@@ -222,7 +222,7 @@ const SUPABASE_ANON_KEY = "sb_publishable_C0ur5kEiRQ0TYDpgtiaF8Q_w2lCVCQA";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const params = new URLSearchParams(location.search);
-const redirectTo = params.get("redirect") || "index.html";
+const redirectTo = "index.html"; // siempre al inicio, entre por donde entre
 
 const authCard = document.getElementById("authCard");
 const callbackScreen = document.getElementById("callbackScreen");
@@ -324,11 +324,6 @@ document.getElementById("resendBtn").addEventListener("click", async () => {
 });
 
 document.getElementById("googleBtn").addEventListener("click", async () => {
-  // Google siempre regresa al inicio (esa dirección ya está permitida en Supabase).
-  // Guardamos a dónde quería ir la persona y el inicio la lleva allí al volver.
-  try {
-    if (redirectTo && redirectTo !== "index.html") localStorage.setItem("fp_redirect", JSON.stringify({ u: redirectTo, t: Date.now() }));
-  } catch (_) {}
   const base = location.origin + location.pathname.replace(/[^/]*$/, "");
   const { error } = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: base + "index.html" } });
   if (error) showMsg("No se pudo continuar con Google: " + error.message, "err");
