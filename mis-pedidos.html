@@ -125,7 +125,7 @@ footer{background:#08111F!important}
 .balance-card{background:linear-gradient(135deg,#0B3C85,#1F6FE0)!important;border:0!important}
 .balance-label{color:#CFE0FA!important}.balance-value{color:#fff!important}
 .profile-avatar{background:linear-gradient(135deg,var(--blue),var(--orange))!important;color:#fff!important;box-shadow:0 0 0 4px rgba(63,134,242,.25)!important}
-.svc-icon{background:rgba(63,134,242,.15)!important;color:var(--blue-2)!important;border:1px solid rgba(63,134,242,.35)!important}
+.svc-icon{background-color:rgba(63,134,242,.15)!important;color:var(--blue-2)!important;border:1px solid rgba(63,134,242,.35)!important}
 .section-title,.step-title{color:var(--blue-2)!important}
 .metodo-btn.selected,.banco-btn.selected,.amount-chip.selected,.filter-chip.active,.tab.active{border-color:var(--blue-2)!important;background:rgba(63,134,242,.16)!important;color:#fff!important}
 /* botones naranja tomate */
@@ -140,6 +140,17 @@ footer{background:#08111F!important}
 .notice svg{width:20px;height:20px;flex:none;margin-top:1px}
 .notice b{display:block;color:#FFB199;font-size:.88rem;margin-bottom:3px}
 .notice p{color:#E6C9BF;font-size:.8rem;line-height:1.5}
+</style>
+<style>
+.code-box{margin-top:12px;padding-top:12px;border-top:1px dashed rgba(255,255,255,.15)}
+.code-label{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.code-val{font-family:monospace;font-size:1rem;font-weight:900;color:var(--orange-2);word-break:break-all;user-select:all}
+.code-tools{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.code-tel{width:100%;background:var(--bg-0);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:10px 12px;color:var(--ink);font-family:var(--font);font-size:.85rem}
+.code-btns{display:flex;gap:8px;flex-wrap:wrap}
+.code-btns button,.code-btns a{flex:1;min-width:92px;text-align:center;font-family:var(--font);font-weight:700;font-size:.8rem;padding:10px 12px;border-radius:8px;cursor:pointer;background:rgba(63,134,242,.15);border:1px solid rgba(63,134,242,.45);color:#fff;text-decoration:none}
+.code-btns .wa{background:#128C4A;border-color:#128C4A}
+.code-btns .consult{background:rgba(224,74,43,.14);border-color:var(--orange);color:#FF8A65}
 </style>
 </head>
 <body>
@@ -197,6 +208,7 @@ footer{background:#08111F!important}
 const SUPABASE_URL = "https://zdefkvvodijmrlhxvlrr.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_C0ur5kEiRQ0TYDpgtiaF8Q_w2lCVCQA";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const VAL_TOWN_URL = "https://demiacapital--0a4dc2f8a8e211f1a6ca1607ee4eb77e.web.val.run";
 
 let TODOS_LOS_PEDIDOS = [];
 
@@ -218,7 +230,7 @@ function pintarPedidos(pedidos){
           <div>
             <div class="order-pkg">${p.paquete}${p.bono > 0 ? ' <small>(+' + p.bono + ' bono)</small>' : ''}</div>
             <div class="order-meta">${fecha}${p.player_id ? ' · ID jugador: ' + p.player_id : ''} · ${p.metodo_pago || ''}${p.banco ? ' · ' + p.banco : ''}</div>
-            ${p.entrega_codigo ? `<div class="order-code">🎁 <span>${p.entrega_codigo}</span></div>` : ''}
+            ${p.entrega_codigo ? herramientasCodigo(p.offer_name || p.paquete, p.entrega_codigo) : ((p.tipo === 'giftcard' || p.tipo === 'gamekey') && p.fazercards_order_id ? `<div class="code-btns" style="margin-top:10px"><button type="button" class="consult" data-consultar="${p.id}">Consultar código</button></div>` : '')}
           </div>
           <div class="order-total">$${Number(p.total).toFixed(2)}</div>
         </div>
@@ -314,6 +326,49 @@ navtogBtn.addEventListener("click", () => {
 });
 document.getElementById("navClose").addEventListener("click", () => navEl.classList.remove("open"));
 navEl.addEventListener("click", (e) => { if (e.target.closest("a")) navEl.classList.remove("open"); });
+
+/* ---------- entregar el código al cliente final (copiar / WhatsApp / compartir) ---------- */
+function herramientasCodigo(nombre, codigo){
+  const att = 'data-nombre="' + String(nombre).replace(/"/g, "&quot;") + '" data-codigo="' + String(codigo).replace(/"/g, "&quot;") + '"';
+  return '<div class="code-box"><div class="code-label">Código</div><div class="code-val">' + codigo + '</div>' +
+    '<div class="code-tools"><input type="tel" class="code-tel" placeholder="WhatsApp del cliente (opcional) · 09XXXXXXXX">' +
+    '<div class="code-btns"><button type="button" data-ca="copiar" ' + att + '>Copiar</button>' +
+    '<button type="button" class="wa" data-ca="wa" ' + att + '>Enviar por WhatsApp</button>' +
+    '<button type="button" data-ca="share" ' + att + '>Compartir</button></div></div></div>';
+}
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-ca]"); if (!b) return;
+  const nombre = b.dataset.nombre, codigo = b.dataset.codigo;
+  const texto = "Hola, aquí está tu código de " + nombre + ":\n\n" + codigo + "\n\n¡Gracias por tu compra!";
+  if (b.dataset.ca === "copiar") {
+    try { await navigator.clipboard.writeText(codigo); b.textContent = "✓ Copiado"; } catch (_) { b.textContent = "Mantén pulsado el código"; }
+    setTimeout(() => { b.textContent = "Copiar"; }, 1800);
+  } else if (b.dataset.ca === "wa") {
+    let n = ((b.closest(".code-tools").querySelector(".code-tel") || {}).value || "").replace(/\D/g, "");
+    if (n.startsWith("0")) n = "593" + n.slice(1);
+    window.open("https://wa.me/" + n + "?text=" + encodeURIComponent(texto), "_blank");
+  } else if (b.dataset.ca === "share") {
+    if (navigator.share) { try { await navigator.share({ text: texto }); } catch (_) {} }
+    else { try { await navigator.clipboard.writeText(texto); b.textContent = "✓ Mensaje copiado"; setTimeout(() => { b.textContent = "Compartir"; }, 1800); } catch (_) {} }
+  }
+});
+
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-consultar]"); if (!b) return;
+  b.disabled = true; b.textContent = "Consultando…";
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const resp = await fetch(`${VAL_TOWN_URL}/?action=refresh-code`, { method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + session.access_token },
+      body: JSON.stringify({ pedidoId: b.dataset.consultar }) });
+    const r = await resp.json();
+    if (r.ok && r.codigo) {
+      const p = TODOS_LOS_PEDIDOS.find(x => String(x.id) === String(b.dataset.consultar));
+      if (p) { p.entrega_codigo = r.codigo; if (r.estado) p.estado = r.estado; }
+      aplicarFiltros();
+    } else { b.disabled = false; b.textContent = "Aún no está listo · reintentar"; }
+  } catch (_) { b.disabled = false; b.textContent = "Error · reintentar"; }
+});
 </script>
 </body>
 </html>

@@ -180,6 +180,17 @@ footer{background:#08111F!important}
 .notice b{display:block;color:#FFB199;font-size:.88rem;margin-bottom:3px}
 .notice p{color:#E6C9BF;font-size:.8rem;line-height:1.5}
 </style>
+<style>
+.code-box{margin-top:12px;padding-top:12px;border-top:1px dashed rgba(255,255,255,.15)}
+.code-label{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.code-val{font-family:monospace;font-size:1rem;font-weight:900;color:var(--orange-2);word-break:break-all;user-select:all}
+.code-tools{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.code-tel{width:100%;background:var(--bg-0);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:10px 12px;color:var(--ink);font-family:var(--font);font-size:.85rem}
+.code-btns{display:flex;gap:8px;flex-wrap:wrap}
+.code-btns button,.code-btns a{flex:1;min-width:92px;text-align:center;font-family:var(--font);font-weight:700;font-size:.8rem;padding:10px 12px;border-radius:8px;cursor:pointer;background:rgba(63,134,242,.15);border:1px solid rgba(63,134,242,.45);color:#fff;text-decoration:none}
+.code-btns .wa{background:#128C4A;border-color:#128C4A}
+.code-btns .consult{background:rgba(224,74,43,.14);border-color:var(--orange);color:#FF8A65}
+</style>
 </head>
 <body>
 
@@ -229,7 +240,7 @@ footer{background:#08111F!important}
     <div class="co-row">
       <div class="notice" role="note">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6A45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17.5v.01"/></svg>
-        <div><b>Verifica tus datos antes de comprar</b><p>Revisa que la información ingresada sea correcta. Si los datos son incorrectos, esta transacción no tiene reverso ni reembolso.</p></div>
+        <div><b id="noticeTitle">Verifica tus datos antes de comprar</b><p id="noticeText">Revisa que la información ingresada sea correcta. Si los datos son incorrectos, esta transacción no tiene reverso ni reembolso.</p></div>
       </div>
     </div>
 
@@ -378,6 +389,10 @@ async function cargarProducto(){
     svcIcon.innerHTML = "";
   }
 
+  if (producto.tipo !== "topup" || !(producto.campos && producto.campos.length)) {
+    document.getElementById("noticeTitle").textContent = "Revisa tu compra antes de confirmar";
+    document.getElementById("noticeText").textContent = "Verifica que el producto y el monto sean los correctos. El código se entrega al instante y la compra no tiene reverso ni reembolso.";
+  }
   renderCampos();
 }
 
@@ -539,10 +554,8 @@ document.getElementById("btnOk").addEventListener("click", async () => {
       <div><span>Producto</span><b>${producto.offer_name_publico || producto.offer_name}</b></div>
       <div><span>Total</span><b>$${Number(producto.precio_venta).toFixed(2)}</b></div>
       <div><span>Estado</span><b>${data.pedido ? data.pedido.estado : 'confirmado'}</b></div>` +
-      (data.codigo ? `<div style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(255,255,255,.15);">
-        <div style="color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Tu código</div>
-        <div style="font-family:monospace;font-size:.95rem;font-weight:900;color:var(--orange-2);word-break:break-all;user-select:all;">${data.codigo}</div>
-      </div>` : (producto.tipo !== "topup" ? `<p style="margin-top:10px;font-size:.74rem;color:var(--muted);">Tu código aparecerá en "Mis pedidos" en cuanto esté listo.</p>` : ""));
+      (false ? '' : (producto.tipo !== "topup" ? `<p style="margin-top:10px;font-size:.74rem;color:var(--muted);">Tu código aparecerá en "Mis pedidos" en cuanto esté listo.</p>` : ""));
+    if (data.codigo) document.getElementById("ovSuccessDetail").insertAdjacentHTML("beforeend", herramientasCodigo(producto.offer_name_publico || producto.offer_name, data.codigo));
     document.getElementById("ovSuccess").classList.add("open");
     idempotencyKey = crypto.randomUUID(); // por si compra otra cosa después
   }catch(e){
@@ -571,6 +584,32 @@ navtogBtn.addEventListener("click", () => {
 });
 document.getElementById("navClose").addEventListener("click", () => navEl.classList.remove("open"));
 navEl.addEventListener("click", (e) => { if (e.target.closest("a")) navEl.classList.remove("open"); });
+
+/* ---------- entregar el código al cliente final (copiar / WhatsApp / compartir) ---------- */
+function herramientasCodigo(nombre, codigo){
+  const att = 'data-nombre="' + String(nombre).replace(/"/g, "&quot;") + '" data-codigo="' + String(codigo).replace(/"/g, "&quot;") + '"';
+  return '<div class="code-box"><div class="code-label">Código</div><div class="code-val">' + codigo + '</div>' +
+    '<div class="code-tools"><input type="tel" class="code-tel" placeholder="WhatsApp del cliente (opcional) · 09XXXXXXXX">' +
+    '<div class="code-btns"><button type="button" data-ca="copiar" ' + att + '>Copiar</button>' +
+    '<button type="button" class="wa" data-ca="wa" ' + att + '>Enviar por WhatsApp</button>' +
+    '<button type="button" data-ca="share" ' + att + '>Compartir</button></div></div></div>';
+}
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-ca]"); if (!b) return;
+  const nombre = b.dataset.nombre, codigo = b.dataset.codigo;
+  const texto = "Hola, aquí está tu código de " + nombre + ":\n\n" + codigo + "\n\n¡Gracias por tu compra!";
+  if (b.dataset.ca === "copiar") {
+    try { await navigator.clipboard.writeText(codigo); b.textContent = "✓ Copiado"; } catch (_) { b.textContent = "Mantén pulsado el código"; }
+    setTimeout(() => { b.textContent = "Copiar"; }, 1800);
+  } else if (b.dataset.ca === "wa") {
+    let n = ((b.closest(".code-tools").querySelector(".code-tel") || {}).value || "").replace(/\D/g, "");
+    if (n.startsWith("0")) n = "593" + n.slice(1);
+    window.open("https://wa.me/" + n + "?text=" + encodeURIComponent(texto), "_blank");
+  } else if (b.dataset.ca === "share") {
+    if (navigator.share) { try { await navigator.share({ text: texto }); } catch (_) {} }
+    else { try { await navigator.clipboard.writeText(texto); b.textContent = "✓ Mensaje copiado"; setTimeout(() => { b.textContent = "Compartir"; }, 1800); } catch (_) {} }
+  }
+});
 </script>
 </body>
 </html>
