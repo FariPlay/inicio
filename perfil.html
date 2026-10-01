@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<meta name="color-scheme" content="dark">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mi perfil — FariPlay</title>
@@ -76,7 +78,53 @@ a{color:inherit;text-decoration:none;}
 .nav-link--danger:hover{color:#ff8080;}
 .nav-account-email{font-size:.78rem;color:var(--muted);padding-bottom:.6rem;word-break:break-all;}
 </style>
-<link rel="stylesheet" href="tema.css">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style id="tema">
+/* FariPlay — tema oscuro azul marino + naranja tomate */
+:root{color-scheme:dark;--bg-0:#0B1426;--bg-1:#111E35;--bg-2:#15233B;--ink:#EAF0FA;--ink-dim:#B6C3D8;--ink-faint:#8C9BB2;--muted:#8C9BB2;
+ --blue:#3F86F2;--blue-2:#5B9BFF;--blue-glow:#3F86F2;--cyan:#5B9BFF;--orange:#E04A2B;--orange-2:#FF8A65;--red:#FF5A4D;--green:#3ECF6E;--navy:#08111F;--line:#25344E;
+ --font:'Manrope',Arial,Helvetica,sans-serif;--font-d:var(--font);--font-b:var(--font);--font-m:var(--font)}
+body{background:radial-gradient(70% 38% at 92% 0%,rgba(63,134,242,.24),transparent 62%),radial-gradient(50% 32% at 0% 0%,rgba(224,74,43,.15),transparent 60%),#0B1426!important;color:var(--ink);font-family:var(--font)}
+body::before{display:none!important}
+.hdr,.site-header{background:#08111F!important;border-bottom:3px solid var(--orange)!important;backdrop-filter:none!important}
+footer{background:#08111F!important}
+.navtog{background:rgba(255,255,255,.08)!important;border-color:rgba(255,255,255,.2)!important}
+.navtog span{background:var(--orange)!important}
+.hdr-greet{color:#fff!important}
+/* menú ☰ (igual que en el inicio) */
+.nav{position:fixed!important;inset:auto!important;top:66px!important;right:16px!important;left:auto!important;width:min(320px,calc(100vw - 32px))!important;
+ transform:none!important;display:none;background:#13213A!important;color:var(--ink)!important;border:1px solid var(--line)!important;border-radius:12px;
+ box-shadow:0 20px 50px -18px rgba(0,0,0,.7);padding:8px 18px 16px!important;max-height:calc(100vh - 90px);overflow:auto;z-index:299}
+.nav.open{display:block}
+.nav-close{display:none!important}
+.nav-section{margin:0 0 4px!important;max-width:none!important}
+.nav-section-title{color:#8C9BB2!important;margin:12px 0 4px!important;font-size:.72rem!important;letter-spacing:0!important;text-transform:none!important}
+.nav-link{color:#EAF0FA!important;font-size:.95rem!important;font-weight:600!important;padding:9px 0!important;border-bottom:1px solid #1F2E48!important}
+.nav-link:hover{color:#8DB4F5!important}
+.nav-link--danger,.nav-link--danger:hover{color:#FF8A75!important}
+.nav-account-email{color:#8C9BB2!important}
+/* tarjetas con acento de color */
+.co-card,.balance-card,.profile-card,.card,.state-card,.step-box{border-top:3px solid var(--blue)!important}
+.order{border-left:4px solid var(--orange)!important}
+.balance-card{background:linear-gradient(135deg,#0B3C85,#1F6FE0)!important;border:0!important}
+.balance-label{color:#CFE0FA!important}.balance-value{color:#fff!important}
+.profile-avatar{background:linear-gradient(135deg,var(--blue),var(--orange))!important;color:#fff!important;box-shadow:0 0 0 4px rgba(63,134,242,.25)!important}
+.svc-icon{background:rgba(63,134,242,.15)!important;color:var(--blue-2)!important;border:1px solid rgba(63,134,242,.35)!important}
+.section-title,.step-title{color:var(--blue-2)!important}
+.metodo-btn.selected,.banco-btn.selected,.amount-chip.selected,.filter-chip.active,.tab.active{border-color:var(--blue-2)!important;background:rgba(63,134,242,.16)!important;color:#fff!important}
+/* botones naranja tomate */
+.btn--fire,.btn-ok,.prod-buy,.wallet-btn,.ov-btn,.success-btn,.save-btn,.price-save,.cat-import-btn,.live-search-btn,.wa-popup-btn{
+ background:var(--orange)!important;color:#fff!important;border:none;border-radius:8px;box-shadow:none!important;font-weight:700}
+.btn--fire:hover,.btn-ok:hover:not(:disabled),.prod-buy:hover{background:#F0583A!important;transform:none}
+.btn-ok:disabled,.btn--fire:disabled{background:#2A3A55!important;color:#7C8CA5!important}
+.validate-btn{background:rgba(224,74,43,.14)!important;color:#FF8A65!important;border:1px solid var(--orange)!important;font-weight:700;border-radius:8px}
+.validate-btn:hover:not(:disabled){background:var(--orange)!important;color:#fff!important}
+/* aviso de verificación (pago) */
+.notice{display:flex;gap:12px;align-items:flex-start;background:rgba(224,74,43,.1);border:1px solid rgba(224,74,43,.4);border-left:5px solid var(--orange);border-radius:10px;padding:13px 14px}
+.notice svg{width:20px;height:20px;flex:none;margin-top:1px}
+.notice b{display:block;color:#FFB199;font-size:.88rem;margin-bottom:3px}
+.notice p{color:#E6C9BF;font-size:.8rem;line-height:1.5}
+</style>
 </head>
 <body>
 
@@ -92,7 +140,6 @@ a{color:inherit;text-decoration:none;}
   <button class="nav-close" id="navClose" aria-label="Cerrar menú">✕</button>
   <div class="nav-section">
     <p class="nav-section-title">Explorar</p>
-    <a href="index.html" class="nav-link">Inicio</a>
     <a href="index.html#paquetes" class="nav-link">Catálogo</a>
   </div>
   <div class="nav-section">

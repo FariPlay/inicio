@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="es"><head><meta charset="UTF-8">
+<meta name="color-scheme" content="dark"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FariPlay — Recargas de videojuegos y tarjetas de regalo en Ecuador</title>
 <meta name="description" content="Recargas de videojuegos y tarjetas de regalo en Ecuador.">
-<meta name="theme-color" content="#0B1F3A">
+<meta name="theme-color" content="#08111F">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B4AA6'/%3E%3Cpath d='M20 46V18h22v7H28v5h12v7H28v9z' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -194,6 +195,22 @@ h2{font-size:clamp(1.25rem,3vw,1.65rem)}
 .wap .wap-fine{text-align:center;font-size:.72rem;color:#8593A6;margin:10px 0 0}
 @media(min-width:700px){.wap{left:auto;right:84px;bottom:20px;margin:0}}
 @media(prefers-reduced-motion:reduce){.wap,.wap-go{transition:none}.wap-top::after,.wap-ic::before{animation:none}}
+
+/* ===== tema oscuro ===== */
+:root{color-scheme:dark;--ink:#EAF0FA;--ink2:#B6C3D8;--mute:#8C9BB2;--line:#25344E;--soft:#111E35;--navy:#08111F;--b:#3F86F2}
+body{background:#0B1426;color:var(--ink)}
+h1,h2,.cat-section-title,.card.pub h3{color:#fff}
+.find{background:#13213A;border-color:#2E4468}
+.find input{background:transparent;color:#fff}.find input::placeholder{color:#8C9BB2}
+.facts li,.cat-card,.step,.card.pub{background:#13213A;border-color:var(--line)}
+.cat-card-media{background-color:#1A2B48;color:#7FA9F0}
+.cat-section-count,.pub .tag{background:#1A2B48;color:#8DB4F5}
+.nav{background:#13213A;color:var(--ink);border-color:var(--line)}
+.nav-link{border-bottom-color:#1F2E48}.nav-link:hover{color:#8DB4F5}.nav-link--danger{color:#FF8A75}
+.wallet{background:#1B2A44;border-color:#2A3B59}.wallet-label{color:var(--ink2)}.wallet-btn{color:#FF8A65}
+.b.blue:hover{background:#2F6FD0}
+.wap{background:#13213A}.wap-body>p{color:var(--ink2)}.wap-list li{color:#EAF0FA}.wap-no{color:var(--mute)}.wap-no:hover{color:#fff}
+.wap .wap-fine{color:#7C8CA5}
 </style></head><body>
 <header><div class="w hb">
   <a href="#top" class="brand"><img src="logo.png" alt="FariPlay" onerror="this.outerHTML='<b>FariPlay</b>'"></a>
@@ -303,6 +320,7 @@ var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       '<p class="nav-account-email">' + email + '</p>' +
       '<a href="perfil.html" class="nav-link">Mi perfil</a>' +
       '<a href="mis-pedidos.html" class="nav-link">Mis pedidos</a>' +
+      '<a href="recargar.html" class="nav-link">Recargar saldo</a>' +
       (esAdmin ? '<a href="admin.html" class="nav-link">Panel admin</a>' : '') +
       '<button type="button" class="nav-link nav-link--danger" id="navSalirBtn">Cerrar sesión</button>';
 
