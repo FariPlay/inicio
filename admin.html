@@ -290,7 +290,7 @@ footer{background:#08111F!important}
 .balance-card{background:linear-gradient(135deg,#0B3C85,#1F6FE0)!important;border:0!important}
 .balance-label{color:#CFE0FA!important}.balance-value{color:#fff!important}
 .profile-avatar{background:linear-gradient(135deg,var(--blue),var(--orange))!important;color:#fff!important;box-shadow:0 0 0 4px rgba(63,134,242,.25)!important}
-.svc-icon{background:rgba(63,134,242,.15)!important;color:var(--blue-2)!important;border:1px solid rgba(63,134,242,.35)!important}
+.svc-icon{background-color:rgba(63,134,242,.15)!important;color:var(--blue-2)!important;border:1px solid rgba(63,134,242,.35)!important}
 .section-title,.step-title{color:var(--blue-2)!important}
 .metodo-btn.selected,.banco-btn.selected,.amount-chip.selected,.filter-chip.active,.tab.active{border-color:var(--blue-2)!important;background:rgba(63,134,242,.16)!important;color:#fff!important}
 /* botones naranja tomate */
@@ -305,6 +305,20 @@ footer{background:#08111F!important}
 .notice svg{width:20px;height:20px;flex:none;margin-top:1px}
 .notice b{display:block;color:#FFB199;font-size:.88rem;margin-bottom:3px}
 .notice p{color:#E6C9BF;font-size:.8rem;line-height:1.5}
+</style>
+<style>
+.prod-row{flex-wrap:wrap}
+.pct-box{display:flex;flex-direction:column;gap:3px;min-width:96px}
+.pct-box label{font-size:.58rem;font-weight:800;text-transform:uppercase;color:var(--muted)}
+.pct-box input,.bulk-row input,.neg-in{width:100%;background:var(--bg-0);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:8px 9px;color:var(--ink);font-family:var(--font);font-size:.85rem}
+.pct-out{font-size:.76rem;color:var(--ink-dim)}.pct-out b{color:var(--orange-2)}
+.bulk-box,.neg-box{background:var(--bg-1);border:1px solid var(--line);border-radius:10px;padding:14px;margin:12px 0}
+.bulk-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.bulk-row input{flex:1;min-width:110px}
+.bulk-apply{background:var(--orange);color:#fff;border:0;border-radius:6px;padding:9px 14px;font-weight:700;cursor:pointer}
+.neg-in{margin:8px 0}
+.neg-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--bg-1);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.neg-row small{color:var(--muted);display:block}.neg-row .on{color:var(--green)}.neg-row .off{color:var(--red)}
+.neg-acts{display:flex;gap:8px}.neg-acts button{background:none;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:7px 11px;cursor:pointer;font-weight:700}
 </style>
 </head>
 <body>
@@ -343,6 +357,7 @@ footer{background:#08111F!important}
     <div class="tab" data-tab="catalogo">Catálogo</div>
     <div class="tab" data-tab="banners">Banners</div>
     <div class="tab" data-tab="precios">Precios</div>
+    <div class="tab" data-tab="negocios">Negocios</div>
   </div>
 
   <div class="panel active" id="panelPedidos">
@@ -363,6 +378,18 @@ footer{background:#08111F!important}
       <input type="date" class="filter-date" id="recFecha" data-panel="rec">
     </div>
     <div id="recargasList"><p class="msg">Cargando recargas…</p></div>
+  </div>
+
+  <div class="panel" id="panelNegocios">
+    <div class="neg-box">
+      <p class="cat-custom-title">Activar cuenta de negocio</p>
+      <p class="refresh-cats-hint">La persona primero debe registrarse en la tienda. Escribe el correo con el que se registró; sus precios salen del % de negocio que pongas en cada producto del Catálogo.</p>
+      <input type="email" id="negEmail" class="neg-in" placeholder="correo@ejemplo.com">
+      <input type="text" id="negNombre" class="neg-in" placeholder="Nombre del negocio (opcional)">
+      <button type="button" class="cat-custom-save" id="negAdd">Activar como negocio</button>
+      <p class="cat-custom-hint" id="negHint"></p>
+    </div>
+    <div id="negList"><p class="msg">Cargando negocios…</p></div>
   </div>
 
   <div class="panel" id="panelCatalogo">
@@ -1069,16 +1096,23 @@ async function cargarProductosDeCategoria(tipo, categoryId, box){
       <button type="button" class="cat-custom-save" data-tipo="${tipo}" data-category-id="${categoryId}">Guardar cambios de la categoría</button>
       <p class="cat-custom-hint"></p>
     </div>
+    <div class="bulk-box"><p class="cat-custom-title">Ganancia para toda la categoría</p>
+      <div class="bulk-row"><input type="number" step="0.1" min="0" class="bulk-pub" placeholder="% público"><input type="number" step="0.1" min="0" class="bulk-neg" placeholder="% negocio"><button type="button" class="bulk-apply">Aplicar y guardar todos</button></div>
+      <p class="cat-custom-hint bulk-hint"></p></div>
     <p class="cat-products-title">Productos</p>`;
 
+  const { data: negRows } = await sb.from("precios_negocio").select("catalogo_id,ganancia_pct").in("catalogo_id", productos.map(p => p.id));
+  const NEG = {}; (negRows || []).forEach(r => NEG[r.catalogo_id] = r.ganancia_pct);
+  const pctDe = p => p.ganancia_pct != null ? Number(p.ganancia_pct) : (p.precio_venta && p.precio_mayorista > 0 ? Math.round((p.precio_venta / p.precio_mayorista - 1) * 1000) / 10 : "");
   html += productos.map(p => `
-    <div class="prod-row" data-id="${p.id}">
+    <div class="prod-row" data-id="${p.id}" data-m="${p.precio_mayorista}">
       <div class="prod-name-col">
         <span class="prod-name-orig">${p.offer_name}</span>
         <input type="text" class="prod-name-input" placeholder="Nombre público (opcional)" value="${p.offer_name_publico || ''}">
       </div>
       <span class="prod-cost">mayorista $${Number(p.precio_mayorista).toFixed(2)}</span>
-      <input type="number" step="0.01" class="prod-price-input" placeholder="Precio" value="${p.precio_venta != null ? p.precio_venta : ''}">
+      <div class="pct-box"><label>% ganancia público</label><input type="number" step="0.1" min="0" class="prod-pct-input" value="${pctDe(p)}"><span class="pct-out">= $<b class="pub-out"></b></span></div>
+      <div class="pct-box"><label>% ganancia negocio</label><input type="number" step="0.1" min="0" class="prod-pct-neg-input" value="${NEG[p.id] != null ? NEG[p.id] : ''}"><span class="pct-out">= $<b class="neg-out"></b></span></div>
       <label class="prod-toggle"><input type="checkbox" ${p.activo ? "checked" : ""}> Activo</label>
       <button type="button" class="prod-save" data-id="${p.id}">Guardar</button>
     </div>`).join("");
@@ -1136,25 +1170,65 @@ async function cargarProductosDeCategoria(tipo, categoryId, box){
     setTimeout(() => { hint.textContent = ""; }, 2500);
   });
 
-  /* -------- guardar cada producto -------- */
+  /* -------- ganancia en % : cálculo y guardado -------- */
+  const redondear = (m, pct) => Math.round(m * (1 + pct / 100) * 100) / 100;
+  function pintarPrecios(row){
+    const m = Number(row.dataset.m);
+    const pub = parseFloat(row.querySelector(".prod-pct-input").value);
+    const neg = parseFloat(row.querySelector(".prod-pct-neg-input").value);
+    row.querySelector(".pub-out").textContent = isNaN(pub) ? "—" : redondear(m, pub).toFixed(2);
+    row.querySelector(".neg-out").textContent = isNaN(neg) ? "—" : redondear(m, neg).toFixed(2);
+  }
+  box.querySelectorAll(".prod-row").forEach(row => {
+    pintarPrecios(row);
+    row.querySelectorAll(".prod-pct-input,.prod-pct-neg-input").forEach(i => i.addEventListener("input", () => pintarPrecios(row)));
+  });
+
+  async function guardarFila(row, silencioso){
+    const m = Number(row.dataset.m);
+    const pub = parseFloat(row.querySelector(".prod-pct-input").value);
+    const neg = parseFloat(row.querySelector(".prod-pct-neg-input").value);
+    const activo = row.querySelector('input[type="checkbox"]').checked;
+    const nombrePublico = row.querySelector(".prod-name-input").value.trim();
+    if (activo && (isNaN(pub) || pub < 0)) { if (!silencioso) alert("Pon el % de ganancia antes de activarlo."); return false; }
+    const id = row.dataset.id;
+    let { error } = await sb.from("catalogo").update({
+      ganancia_pct: isNaN(pub) ? null : pub,
+      precio_venta: isNaN(pub) ? null : redondear(m, pub),
+      activo: activo,
+      offer_name_publico: nombrePublico || null,
+    }).eq("id", id);
+    if (!error) {
+      if (isNaN(neg)) { const r = await sb.from("precios_negocio").delete().eq("catalogo_id", id); error = r.error; }
+      else { const r = await sb.from("precios_negocio").upsert({ catalogo_id: id, ganancia_pct: neg, precio: redondear(m, neg) }); error = r.error; }
+    }
+    return !error;
+  }
+
   box.querySelectorAll(".prod-save").forEach(btn => {
     btn.addEventListener("click", async () => {
-      const row = btn.closest(".prod-row");
-      const precioVenta = parseFloat(row.querySelector(".prod-price-input").value);
-      const activo = row.querySelector('input[type="checkbox"]').checked;
-      const nombrePublico = row.querySelector(".prod-name-input").value.trim();
-      if (activo && (isNaN(precioVenta) || precioVenta <= 0)) { alert("Ponle un precio de venta antes de activarlo."); return; }
-
       btn.textContent = "Guardando…";
-      const { error } = await sb.from("catalogo").update({
-        precio_venta: isNaN(precioVenta) ? null : precioVenta,
-        activo: activo,
-        offer_name_publico: nombrePublico || null,
-      }).eq("id", btn.dataset.id);
-      btn.textContent = error ? "Error" : "✓ Guardado";
-      btn.classList.toggle("saved", !error);
+      const ok = await guardarFila(btn.closest(".prod-row"), false);
+      btn.textContent = ok ? "✓ Guardado" : "Error";
+      btn.classList.toggle("saved", ok);
       setTimeout(() => { btn.textContent = "Guardar"; btn.classList.remove("saved"); }, 1500);
     });
+  });
+
+  box.querySelector(".bulk-apply").addEventListener("click", async (e) => {
+    const bp = box.querySelector(".bulk-pub").value, bn = box.querySelector(".bulk-neg").value;
+    const hint = box.querySelector(".bulk-hint");
+    if (bp === "" && bn === "") { hint.textContent = "Escribe al menos un porcentaje."; return; }
+    e.target.disabled = true; hint.textContent = "Guardando…";
+    let ok = 0, total = 0;
+    for (const row of box.querySelectorAll(".prod-row")) {
+      if (bp !== "") row.querySelector(".prod-pct-input").value = bp;
+      if (bn !== "") row.querySelector(".prod-pct-neg-input").value = bn;
+      pintarPrecios(row); total++;
+      if (await guardarFila(row, true)) ok++;
+    }
+    e.target.disabled = false;
+    hint.textContent = "✓ " + ok + " de " + total + " productos guardados.";
   });
 }
 
@@ -1383,6 +1457,35 @@ async function cargarPrecios(){
     });
   });
 }
+
+/* ---------- cuentas de negocio ---------- */
+async function cargarNegocios(){
+  const list = document.getElementById("negList");
+  const { data, error } = await sb.from("cuentas_negocio").select("*").order("creado_at", { ascending: false });
+  if (error) { list.innerHTML = '<p class="msg">No se pudieron cargar. ¿Corriste negocios_setup.sql?</p>'; return; }
+  if (!data.length) { list.innerHTML = '<p class="msg">Todavía no hay cuentas de negocio.</p>'; return; }
+  list.innerHTML = data.map(n => `<div class="neg-row"><div><b>${n.nombre || n.email}</b><small>${n.email}</small>
+    <small class="${n.activo ? 'on' : 'off'}">${n.activo ? 'Activa' : 'Desactivada'}</small></div>
+    <div class="neg-acts"><button data-act="toggle" data-id="${n.user_id}" data-on="${n.activo}">${n.activo ? 'Desactivar' : 'Activar'}</button><button data-act="del" data-id="${n.user_id}">Quitar</button></div></div>`).join("");
+}
+document.querySelector('.tab[data-tab="negocios"]').addEventListener("click", cargarNegocios);
+document.getElementById("negAdd").addEventListener("click", async () => {
+  const hint = document.getElementById("negHint"), email = document.getElementById("negEmail").value.trim();
+  if (!email) { hint.textContent = "Escribe el correo."; return; }
+  hint.textContent = "Activando…";
+  const { data, error } = await sb.rpc("admin_activar_negocio", { p_email: email, p_nombre: document.getElementById("negNombre").value.trim() || null });
+  if (error) { hint.textContent = "Error: " + error.message; return; }
+  if (data === "no_registrado") { hint.textContent = "Ese correo aún no se registró en la tienda. Pídele que cree su cuenta y vuelve a intentarlo."; return; }
+  hint.textContent = "✓ Cuenta de negocio activada.";
+  document.getElementById("negEmail").value = ""; document.getElementById("negNombre").value = "";
+  cargarNegocios();
+});
+document.getElementById("negList").addEventListener("click", async (e) => {
+  const b = e.target.closest("button[data-act]"); if (!b) return;
+  if (b.dataset.act === "del") { if (!confirm("¿Quitar esta cuenta de negocio? Volverá a precios normales.")) return; await sb.from("cuentas_negocio").delete().eq("user_id", b.dataset.id); }
+  else { await sb.from("cuentas_negocio").update({ activo: b.dataset.on !== "true" }).eq("user_id", b.dataset.id); }
+  cargarNegocios();
+});
 </script>
 </body>
 </html>

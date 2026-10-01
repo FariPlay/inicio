@@ -111,7 +111,7 @@ footer{background:#08111F!important}
 .balance-card{background:linear-gradient(135deg,#0B3C85,#1F6FE0)!important;border:0!important}
 .balance-label{color:#CFE0FA!important}.balance-value{color:#fff!important}
 .profile-avatar{background:linear-gradient(135deg,var(--blue),var(--orange))!important;color:#fff!important;box-shadow:0 0 0 4px rgba(63,134,242,.25)!important}
-.svc-icon{background:rgba(63,134,242,.15)!important;color:var(--blue-2)!important;border:1px solid rgba(63,134,242,.35)!important}
+.svc-icon{background-color:rgba(63,134,242,.15)!important;color:var(--blue-2)!important;border:1px solid rgba(63,134,242,.35)!important}
 .section-title,.step-title{color:var(--blue-2)!important}
 .metodo-btn.selected,.banco-btn.selected,.amount-chip.selected,.filter-chip.active,.tab.active{border-color:var(--blue-2)!important;background:rgba(63,134,242,.16)!important;color:#fff!important}
 /* botones naranja tomate */
@@ -210,6 +210,12 @@ const TIPO_ICONO = { topup: ICONO_CONTROLLER, giftcard: ICONO_GIFT, gamekey: ICO
     document.getElementById("catHeroIcon").innerHTML = TIPO_ICONO[tipo] || ICONO_CART;
   }
 
+  const NEG = {};
+  const { data: { session: ses } } = await sb.auth.getSession();
+  if (ses) {
+    const rn = await sb.from("precios_negocio").select("catalogo_id,precio").in("catalogo_id", productos.map(p => p.id));
+    (rn.data || []).forEach(x => NEG[x.catalogo_id] = Number(x.precio));
+  }
   list.innerHTML = productos.map(p => `
     <a class="prod-card" href="checkout.html?id=${encodeURIComponent(p.id)}">
       <div>
@@ -217,7 +223,7 @@ const TIPO_ICONO = { topup: ICONO_CONTROLLER, giftcard: ICONO_GIFT, gamekey: ICO
         ${p.soporta_validacion ? '<span class="prod-badge">✓ Valida tu ID</span>' : ''}
       </div>
       <div style="display:flex;align-items:center;gap:12px;">
-        <span class="prod-price">$${Number(p.precio_venta).toFixed(2)}</span>
+        <span class="prod-price">$${Number(NEG[p.id] != null ? NEG[p.id] : p.precio_venta).toFixed(2)}</span>
         <span class="prod-buy">Comprar</span>
       </div>
     </a>`).join("");

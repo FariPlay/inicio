@@ -164,7 +164,7 @@ footer{background:#08111F!important}
 .balance-card{background:linear-gradient(135deg,#0B3C85,#1F6FE0)!important;border:0!important}
 .balance-label{color:#CFE0FA!important}.balance-value{color:#fff!important}
 .profile-avatar{background:linear-gradient(135deg,var(--blue),var(--orange))!important;color:#fff!important;box-shadow:0 0 0 4px rgba(63,134,242,.25)!important}
-.svc-icon{background:rgba(63,134,242,.15)!important;color:var(--blue-2)!important;border:1px solid rgba(63,134,242,.35)!important}
+.svc-icon{background-color:rgba(63,134,242,.15)!important;color:var(--blue-2)!important;border:1px solid rgba(63,134,242,.35)!important}
 .section-title,.step-title{color:var(--blue-2)!important}
 .metodo-btn.selected,.banco-btn.selected,.amount-chip.selected,.filter-chip.active,.tab.active{border-color:var(--blue-2)!important;background:rgba(63,134,242,.16)!important;color:#fff!important}
 /* botones naranja tomate */
@@ -356,6 +356,8 @@ async function cargarProducto(){
   if (error || !data) { mostrarErrorCarga("Este producto ya no está disponible."); return; }
 
   producto = data;
+  const rn = await sb.from("precios_negocio").select("precio").eq("catalogo_id", producto.id).maybeSingle();
+  if (rn.data) producto.precio_venta = Number(rn.data.precio); // cuenta de negocio
   document.getElementById("loadState").style.display = "none";
   document.getElementById("coCard").style.display = "block";
 
