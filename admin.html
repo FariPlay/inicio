@@ -393,7 +393,7 @@ footer{background:#08111F!important}
   </div>
 
   <div class="panel" id="panelCatalogo">
-    <button type="button" class="refresh-cats-btn" id="refreshCatsBtn">🔄 Actualizar lista completa de categorías desde FazerCards</button>
+    <button type="button" class="refresh-cats-btn" id="refreshCatsBtn">🔄 Actualizar todo desde FazerCards (juegos, productos y precios)</button>
     <p class="refresh-cats-hint" id="refreshCatsHint"></p>
     <button type="button" class="refresh-cats-btn revalidate-btn" id="revalidarBtn">🔁 Revalidar juegos ya importados (arregla "Validar ID" en productos viejos)</button>
     <p class="refresh-cats-hint" id="revalidarHint"></p>
@@ -836,7 +836,7 @@ async function actualizarCategorias(){
       sessionStorage.removeItem("fp_admin_sync_key");
       localStorage.removeItem("fp_admin_sync_key");
       btn.disabled = false;
-      btn.textContent = "🔄 Actualizar lista completa de categorías desde FazerCards";
+      btn.textContent = "🔄 Actualizar todo desde FazerCards (juegos, productos y precios)";
       pedirClaveYEjecutar(actualizarCategorias);
       return;
     }
@@ -850,12 +850,32 @@ async function actualizarCategorias(){
       hint.textContent = `✓ ${data.total} categorías traídas y guardadas (${data.conValidacion || 0} con validación de ID)` +
         (data.errores ? " — hubo errores parciales al consultar FazerCards: " + JSON.stringify(data.errores) : "");
       await cargarCatalogo();
+      await actualizarProductosImportados(btn, hint, data);
     }
   }catch(e){
     hint.textContent = "Error de conexión.";
   }
   btn.disabled = false;
-  btn.textContent = "🔄 Actualizar lista completa de categorías desde FazerCards";
+  btn.textContent = "🔄 Actualizar todo desde FazerCards (juegos, productos y precios)";
+}
+
+async function actualizarProductosImportados(btn, hint, base){
+  const cats = TODAS_LAS_CATEGORIAS.filter(c => c.sincronizado);
+  let ok = 0, fallos = 0, nuevos = 0, quitados = 0;
+  for (const cat of cats) {
+    btn.textContent = `Actualizando productos y precios… (${ok + fallos + 1}/${cats.length}) ${cat.nombre_publico || cat.nombre}`;
+    try {
+      const resp = await fetch(`${VAL_TOWN_URL}/?action=sync-offers&tipo=${encodeURIComponent(cat.tipo)}&category_id=${encodeURIComponent(cat.category_id)}&admin_key=${encodeURIComponent(ADMIN_SYNC_KEY)}`);
+      const d = await resp.json();
+      if (d.ok && !d.error) { ok++; nuevos += d.nuevos || 0; quitados += d.eliminados || 0; } else fallos++;
+    } catch (_) { fallos++; }
+    await new Promise(r => setTimeout(r, 700)); // pausa para no chocar con el límite de FazerCards
+  }
+  await cargarCatalogo();
+  hint.textContent = `✓ ${base.total} categorías al día` + (base.eliminadas ? ` (${base.eliminadas} que ya no existían se borraron)` : "") +
+    ` · ${ok} actualizadas con sus precios nuevos` + (nuevos ? ` · ${nuevos} producto(s) nuevo(s) (aparecen apagados)` : "") +
+    (quitados ? ` · ${quitados} producto(s) que ya no existían se borraron` : "") +
+    (fallos ? ` · ${fallos} con error, vuelve a intentar` : "") + ". Tus productos activos siguen activos.";
 }
 
 document.getElementById("revalidarBtn").addEventListener("click", () => {
