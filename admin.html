@@ -320,6 +320,15 @@ footer{background:#08111F!important}
 .neg-row small{color:var(--muted);display:block}.neg-row .on{color:var(--green)}.neg-row .off{color:var(--red)}
 .neg-acts{display:flex;gap:8px}.neg-acts button{background:none;border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:7px 11px;cursor:pointer;font-weight:700}
 </style>
+<style>
+.usr-stat{display:flex;justify-content:space-between;align-items:center;gap:12px;background:linear-gradient(135deg,#0B3C85,#1F6FE0);border-radius:12px;padding:16px 18px;margin:12px 0}
+.usr-num{display:block;font-size:2rem;font-weight:800;color:#fff;line-height:1}.usr-cap{font-size:.8rem;color:#CFE0FA}
+.usr-refresh{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:8px 13px;font-weight:700;cursor:pointer}
+.usr-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--bg-1);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:10px;padding:11px 14px;margin-bottom:8px}
+.usr-name{font-weight:700}.usr-mail{font-size:.8rem;color:var(--muted);word-break:break-all}.usr-date{font-size:.72rem;color:var(--muted)}
+.usr-id{font-family:monospace;font-weight:800;font-size:.82rem;color:var(--orange-2);background:rgba(224,74,43,.12);border:1px solid rgba(224,74,43,.35);border-radius:6px;padding:4px 8px;white-space:nowrap}
+.usr-biz{font-size:.62rem;font-weight:800;text-transform:uppercase;background:rgba(63,134,242,.18);color:#8DB4F5;border-radius:20px;padding:2px 8px;margin-left:6px}
+</style>
 </head>
 <body>
 
@@ -358,6 +367,7 @@ footer{background:#08111F!important}
     <div class="tab" data-tab="banners">Banners</div>
     <div class="tab" data-tab="precios">Precios</div>
     <div class="tab" data-tab="negocios">Negocios</div>
+    <div class="tab" data-tab="usuarios">Usuarios</div>
   </div>
 
   <div class="panel active" id="panelPedidos">
@@ -378,6 +388,13 @@ footer{background:#08111F!important}
       <input type="date" class="filter-date" id="recFecha" data-panel="rec">
     </div>
     <div id="recargasList"><p class="msg">Cargando recargas…</p></div>
+  </div>
+
+  <div class="panel" id="panelUsuarios">
+    <div class="usr-stat"><div><span class="usr-num" id="usrTotal">—</span><span class="usr-cap">usuarios registrados</span></div><button type="button" class="usr-refresh" id="usrRefresh">Actualizar</button></div>
+    <input type="search" id="usrSearch" class="neg-in" placeholder="Buscar por correo, nombre o N° de cliente (FP-…)">
+    <p class="cat-custom-hint" id="usrCount"></p>
+    <div id="usrList"><p class="msg">Cargando usuarios…</p></div>
   </div>
 
   <div class="panel" id="panelNegocios">
@@ -1506,6 +1523,30 @@ document.getElementById("negList").addEventListener("click", async (e) => {
   else { await sb.from("cuentas_negocio").update({ activo: b.dataset.on !== "true" }).eq("user_id", b.dataset.id); }
   cargarNegocios();
 });
+
+/* ---------- usuarios registrados ---------- */
+let USUARIOS = [];
+const escU = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function pintarUsuarios(){
+  const q = document.getElementById("usrSearch").value.trim().toLowerCase();
+  const lista = !q ? USUARIOS : USUARIOS.filter(u => (u.email || "").toLowerCase().includes(q) || (u.nombre || "").toLowerCase().includes(q) || (u.numero_cliente || "").toLowerCase().includes(q));
+  document.getElementById("usrCount").textContent = q ? lista.length + " resultado(s) de " + USUARIOS.length : "";
+  document.getElementById("usrList").innerHTML = lista.length ? lista.map(u => `<div class="usr-row">
+    <div><div class="usr-name">${escU(u.nombre) || "Sin nombre"}${u.es_negocio ? '<span class="usr-biz">Negocio</span>' : ""}</div>
+    <div class="usr-mail">${escU(u.email)}</div>
+    <div class="usr-date">Registrado: ${new Date(u.creado_at).toLocaleDateString("es-EC", { year: "numeric", month: "short", day: "numeric" })}</div></div>
+    <span class="usr-id">${escU(u.numero_cliente)}</span></div>`).join("") : '<p class="msg">No se encontraron usuarios.</p>';
+}
+async function cargarUsuarios(){
+  const { data, error } = await sb.rpc("admin_listar_usuarios");
+  if (error) { document.getElementById("usrList").innerHTML = '<p class="msg">No se pudo cargar. ¿Corriste usuarios_admin.sql en Supabase?</p>'; return; }
+  USUARIOS = data || [];
+  document.getElementById("usrTotal").textContent = USUARIOS.length ? USUARIOS[0].total : 0;
+  pintarUsuarios();
+}
+document.querySelector('.tab[data-tab="usuarios"]').addEventListener("click", cargarUsuarios);
+document.getElementById("usrRefresh").addEventListener("click", cargarUsuarios);
+document.getElementById("usrSearch").addEventListener("input", pintarUsuarios);
 </script>
 </body>
 </html>
